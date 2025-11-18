@@ -26,7 +26,7 @@ serve(async (req) => {
 
     const { data: products } = await supabase
       .from("products")
-      .select("name, brand, category, price, description, style, colors, sizes, stock_total, is_featured, is_limited_edition")
+      .select("id, name, brand, category, price, description, style, colors, images, sizes, stock_total, is_featured, is_limited_edition")
       .order('brand', { ascending: true });
 
     const productContext = products
@@ -48,6 +48,40 @@ serve(async (req) => {
         }).join('\n\n')}`
       : '';
 
+    // Tool for recommending products
+    const tools = [
+      {
+        type: "function",
+        function: {
+          name: "recommend_products",
+          description: "Recommend 2-4 specific products from inventory by providing their IDs",
+          parameters: {
+            type: "object",
+            properties: {
+              products: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    id: { type: "string", description: "Product UUID" },
+                    name: { type: "string" },
+                    brand: { type: "string" },
+                    price: { type: "number" },
+                    images: { type: "array", items: { type: "string" } },
+                    is_featured: { type: "boolean" },
+                    is_limited_edition: { type: "boolean" },
+                    stock_total: { type: "number" }
+                  },
+                  required: ["id", "name", "brand", "price"]
+                }
+              }
+            },
+            required: ["products"]
+          }
+        }
+      }
+    ];
+
     const systemPrompt = `You are an expert AI sneaker consultant at BM Kicks, a premium sneaker store. You're passionate about sneaker culture and know every shoe in our 50+ shoe inventory inside-out.
 
 🎯 YOUR EXPERTISE:
@@ -61,9 +95,10 @@ serve(async (req) => {
 1. **Understand Their Needs**: Ask about style preferences, size, occasion, budget, favorite brands, and colors
 2. **Check Stock**: ALWAYS verify size availability before recommending. Mention if items are LIMITED EDITION or FEATURED
 3. **Personalized Recommendations**: Suggest 2-4 specific shoes that match their criteria, explaining WHY each shoe fits
-4. **Stock Awareness**: If a shoe is OUT OF STOCK in their size, immediately suggest similar alternatives
-5. **Sneaker Education**: Share interesting details about silhouettes, collaborations, and styling tips
-6. **Smart Follow-ups**: Ask clarifying questions to narrow down perfect matches
+4. **Use the recommend_products tool**: When making recommendations, ALWAYS use the recommend_products function to show visual product cards with the EXACT product objects from inventory including id, name, brand, price, images, is_featured, is_limited_edition, and stock_total
+5. **Stock Awareness**: If a shoe is OUT OF STOCK in their size, immediately suggest similar alternatives
+6. **Sneaker Education**: Share interesting details about silhouettes, collaborations, and styling tips
+7. **Smart Follow-ups**: Ask clarifying questions to narrow down perfect matches
 
 🗣️ YOUR PERSONALITY:
 • Enthusiastic and knowledgeable about sneaker culture
@@ -85,12 +120,14 @@ ${productContext}
 
 🚨 IMPORTANT RULES:
 • NEVER recommend shoes not in our inventory
+• ALWAYS use the recommend_products tool when suggesting specific shoes
+• ALWAYS provide complete product objects with id field for the tool
 • ALWAYS check size availability before suggesting
 • If unsure about stock, err on the side of caution
 • For WhatsApp support or orders, direct them to contact us directly
 • Keep responses under 150 words unless explaining multiple options
 
-Remember: Your goal is to make them fall in love with the perfect pair while being honest about what's actually available in their size!`;
+Remember: Your goal is to make them fall in love with the perfect pair while being honest about what's actually available in their size! Use the recommend_products function to show beautiful product cards!`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -104,6 +141,7 @@ Remember: Your goal is to make them fall in love with the perfect pair while bei
           { role: "system", content: systemPrompt },
           ...messages,
         ],
+        tools: tools,
         stream: true,
       }),
     });
