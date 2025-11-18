@@ -2,7 +2,11 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-sneakers.jpg";
 
-export const HeroSection = () => {
+interface HeroSectionProps {
+  onAIClick: () => void;
+}
+
+export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden">
       {/* Background Image with Overlay */}
@@ -35,11 +39,13 @@ export const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <Button 
+              onClick={onAIClick}
               size="lg" 
-              className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg h-14 px-8 shadow-accent"
+              className="ai-hero-button animate-gradient-shift animate-float text-accent-foreground font-semibold text-lg h-16 px-10 shadow-accent animate-pulse-glow hover:scale-105 transition-transform duration-300 group"
             >
-              <MessageSquare className="mr-2 h-5 w-5" />
+              <MessageSquare className="mr-2 h-6 w-6 group-hover:rotate-12 transition-transform" />
               Find Your Perfect Kicks
+              <Sparkles className="ml-2 h-5 w-5 animate-sparkle" />
             </Button>
             <Button 
               size="lg" 

@@ -1,19 +1,24 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare, Send, Loader2, X } from "lucide-react";
+import { Send, Loader2, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
 
 type Message = { role: "user" | "assistant"; content: string };
 
-export const AIShoeConsultant = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface AIShoeConsultantProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hey there! 👟 I'm your AI shoe consultant at BM Kicks. Tell me what you're looking for and I'll help you find your perfect pair!",
+      content: "Hey there! 👟 I'm your AI sneaker consultant at BM Kicks. Tell me what you're looking for - style, size, occasion, budget - and I'll help you find your perfect pair!",
     },
   ]);
   const [input, setInput] = useState("");
@@ -56,6 +61,7 @@ export const AIShoeConsultant = () => {
             description: "Please wait a moment before trying again.",
             variant: "destructive",
           });
+          setIsLoading(false);
           return;
         }
         if (response.status === 402) {
@@ -64,6 +70,7 @@ export const AIShoeConsultant = () => {
             description: "Please try again in a few moments.",
             variant: "destructive",
           });
+          setIsLoading(false);
           return;
         }
         throw new Error("Failed to get response");
@@ -115,10 +122,10 @@ export const AIShoeConsultant = () => {
         }
       }
     } catch (error) {
-      console.error("Chat error:", error);
+      console.error("AI consultant error:", error);
       toast({
-        title: "Something went wrong",
-        description: "Please try again or contact us via WhatsApp.",
+        title: "Error",
+        description: "Failed to connect to AI assistant. Please try again.",
         variant: "destructive",
       });
       setMessages((prev) => prev.slice(0, -1));
@@ -128,79 +135,91 @@ export const AIShoeConsultant = () => {
   };
 
   return (
-    <>
-      <Button
-        onClick={() => setIsOpen(true)}
-        size="icon"
-        className="fixed bottom-24 right-6 z-40 h-14 w-14 rounded-full bg-accent hover:bg-accent/90 shadow-lg hover:scale-110 transition-transform"
-      >
-        <MessageSquare className="h-6 w-6" />
-      </Button>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 bg-background/95 backdrop-blur-xl border-border/50">
+        <div className="flex items-center justify-between p-6 border-b border-border/50 bg-gradient-to-r from-primary/10 to-accent/10">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-accent/20 blur-lg rounded-full animate-pulse-glow" />
+              <div className="relative bg-gradient-to-br from-accent to-accent/80 p-3 rounded-full">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">AI Sneaker Consultant</h2>
+              <p className="text-sm text-muted-foreground">Powered by AI • 50+ Shoes in Stock</p>
+            </div>
+          </div>
+          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="hover:bg-accent/10">
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
 
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
-          <SheetHeader className="p-6 pb-4 border-b">
-            <SheetTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-accent" />
-              AI Shoe Consultant
-            </SheetTitle>
-          </SheetHeader>
-
-          <ScrollArea className="flex-1 p-6" ref={scrollRef}>
-            <div className="space-y-4">
-              {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                      msg.role === "user"
-                        ? "bg-accent text-white"
-                        : "bg-muted text-foreground"
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  </div>
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full p-6">
+            <div ref={scrollRef} className="space-y-6 pb-4">
+              {messages.map((message, idx) => (
+                <div key={idx} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}>
+                  <Card className={`max-w-[80%] ${message.role === "user" ? "bg-accent text-accent-foreground" : "bg-card border-border/50"}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        {message.role === "assistant" && (
+                          <div className="bg-accent/10 p-2 rounded-full shrink-0">
+                            <Sparkles className="h-4 w-4 text-accent" />
+                          </div>
+                        )}
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               ))}
               {isLoading && (
-                <div className="flex justify-start">
-                  <div className="rounded-lg px-4 py-2 bg-muted">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                  </div>
+                <div className="flex justify-start animate-fade-in">
+                  <Card className="bg-card border-border/50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-accent/10 p-2 rounded-full">
+                          <Sparkles className="h-4 w-4 text-accent" />
+                        </div>
+                        <Loader2 className="h-5 w-5 animate-spin text-accent" />
+                        <span className="text-sm text-muted-foreground">Finding your perfect kicks...</span>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               )}
             </div>
           </ScrollArea>
+        </div>
 
-          <div className="p-4 border-t">
-            <div className="flex gap-2">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
-                }}
-                placeholder="Ask about shoes, styles, sizes..."
-                className="min-h-[60px] resize-none"
-                disabled={isLoading}
-              />
-              <Button
-                onClick={sendMessage}
-                disabled={!input.trim() || isLoading}
-                size="icon"
-                className="h-[60px] w-[60px] flex-shrink-0"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+        <div className="p-6 border-t border-border/50 bg-muted/30">
+          <div className="flex gap-3">
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+              placeholder="Describe what you're looking for... (style, size, brand, occasion, budget)"
+              className="min-h-[60px] resize-none bg-background border-border/50 focus:border-accent"
+              disabled={isLoading}
+            />
+            <Button
+              onClick={sendMessage}
+              disabled={!input.trim() || isLoading}
+              size="icon"
+              className="h-[60px] w-[60px] bg-accent hover:bg-accent/90 text-accent-foreground shrink-0"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
           </div>
-        </SheetContent>
-      </Sheet>
-    </>
+          <p className="text-xs text-muted-foreground mt-2 text-center">Press Enter to send • Shift + Enter for new line</p>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
