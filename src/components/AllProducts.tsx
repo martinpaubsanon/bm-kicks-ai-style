@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { ProductCard } from "./ProductCard";
+import { Skeleton } from "./ui/skeleton";
+import { Badge } from "./ui/badge";
+import { ProductFilters } from "./ProductFilters";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "./ui/button";
 
 interface Product {
   id: string;
@@ -17,7 +18,10 @@ interface Product {
   is_featured?: boolean;
   is_limited_edition?: boolean;
   stock_total?: number;
+  created_at?: string;
 }
+
+const categories = ["Running", "Basketball", "Lifestyle", "Training", "Skateboarding"];
 
 export const AllProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -29,41 +33,27 @@ export const AllProducts = () => {
 
   const selectedCategory = searchParams.get("category") || "all";
 
-  const categories = [
-    { id: "all", label: "All Products" },
-    { id: "Running", label: "Running" },
-    { id: "Basketball", label: "Basketball" },
-    { id: "Lifestyle", label: "Lifestyle" },
-    { id: "Training", label: "Training" },
-    { id: "Skateboarding", label: "Skateboarding" },
-  ];
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 300]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("featured");
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+  const [showLimitedOnly, setShowLimitedOnly] = useState(false);
 
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  useEffect(() => {
-    if (selectedCategory === "all") {
-      setFilteredProducts(products);
-    } else {
-      setFilteredProducts(
-        products.filter((p) => p.category === selectedCategory)
-      );
-    }
-  }, [selectedCategory, products]);
 
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, brand, price, images, category, is_featured, is_limited_edition, stock_total")
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-
       setProducts(data || []);
-      setFilteredProducts(data || []);
     } catch (error) {
       console.error("Error fetching products:", error);
       toast({
@@ -76,6 +66,58 @@ export const AllProducts = () => {
     }
   };
 
+  useEffect(() => {
+    let filtered = [...products];
+    
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(p => p.category === selectedCategory);
+    }
+
+    filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter(p => selectedBrands.includes(p.brand));
+    }
+
+    if (inStockOnly) {
+      filtered = filtered.filter(p => p.stock_total && p.stock_total > 0);
+    }
+
+    if (showFeaturedOnly) {
+      filtered = filtered.filter(p => p.is_featured);
+    }
+
+    if (showLimitedOnly) {
+      filtered = filtered.filter(p => p.is_limited_edition);
+    }
+
+    switch (sortBy) {
+      case "price-asc":
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case "name-asc":
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "newest":
+        filtered.sort((a, b) => 
+          new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+        );
+        break;
+      case "featured":
+      default:
+        filtered.sort((a, b) => {
+          if (a.is_featured && !b.is_featured) return -1;
+          if (!a.is_featured && b.is_featured) return 1;
+          return 0;
+        });
+    }
+    
+    setFilteredProducts(filtered);
+  }, [selectedCategory, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly]);
+
   const handleCategoryChange = (category: string) => {
     if (category === "all") {
       searchParams.delete("category");
@@ -83,6 +125,21 @@ export const AllProducts = () => {
       searchParams.set("category", category);
     }
     setSearchParams(searchParams);
+  };
+
+  const handleBrandToggle = (brand: string) => {
+    setSelectedBrands(prev =>
+      prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
+    );
+  };
+
+  const handleClearFilters = () => {
+    setPriceRange([0, 300]);
+    setSelectedBrands([]);
+    setInStockOnly(false);
+    setShowFeaturedOnly(false);
+    setShowLimitedOnly(false);
+    setSortBy("featured");
   };
 
   if (isLoading) {
@@ -95,14 +152,11 @@ export const AllProducts = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
-              <Card key={i} className="overflow-hidden">
-                <Skeleton className="aspect-square w-full" />
-                <div className="p-4 space-y-2">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-8 w-24" />
-                </div>
-              </Card>
+              <div key={i} className="space-y-3">
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
             ))}
           </div>
         </div>
@@ -113,98 +167,76 @@ export const AllProducts = () => {
   return (
     <section className="py-20 bg-background" id="all-products">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Our Complete Collection
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Browse our entire inventory of {products.length}+ premium sneakers
+        <div className="text-center mb-8">
+          <h2 className="text-4xl md:text-5xl font-bold mb-2">Our Complete Collection</h2>
+          <p className="text-lg text-muted-foreground">
+            {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"} found
           </p>
         </div>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {categories.map((category) => (
-            <Button
-              key={category.id}
-              variant={selectedCategory === category.id ? "default" : "outline"}
-              onClick={() => handleCategoryChange(category.id)}
-              className="font-semibold"
-            >
-              {category.label}
-              {category.id === "all" && ` (${products.length})`}
-              {category.id !== "all" && 
-                ` (${products.filter(p => p.category === category.id).length})`
-              }
-            </Button>
-          ))}
+        <div className="flex flex-wrap justify-center gap-3 mb-8">
+          <Badge
+            variant={selectedCategory === "all" ? "default" : "outline"}
+            className="cursor-pointer px-4 py-2 text-sm hover:bg-primary/20 transition-colors"
+            onClick={() => handleCategoryChange("all")}
+          >
+            All ({products.length})
+          </Badge>
+          {categories.map(cat => {
+            const count = products.filter(p => p.category === cat).length;
+            return (
+              <Badge
+                key={cat}
+                variant={selectedCategory === cat ? "default" : "outline"}
+                className="cursor-pointer px-4 py-2 text-sm hover:bg-primary/20 transition-colors"
+                onClick={() => handleCategoryChange(cat)}
+              >
+                {cat} ({count})
+              </Badge>
+            );
+          })}
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <Card
-              key={product.id}
-              className="group overflow-hidden cursor-pointer border-border hover:shadow-xl transition-all duration-300"
-              onClick={() => navigate(`/product/${product.id}`)}
-            >
-              <div className="relative aspect-square overflow-hidden bg-secondary">
-                <img
-                  src={product.images?.[0] || "/placeholder.svg"}
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                
-                {/* Badges */}
-                <div className="absolute top-3 left-3 flex flex-col gap-2">
-                  {product.is_limited_edition && (
-                    <Badge className="bg-destructive text-destructive-foreground">
-                      LIMITED
-                    </Badge>
-                  )}
-                  {product.is_featured && (
-                    <Badge className="bg-accent text-accent-foreground">
-                      FEATURED
-                    </Badge>
-                  )}
-                  {product.stock_total && product.stock_total < 10 && (
-                    <Badge variant="outline" className="bg-background/90">
-                      Low Stock
-                    </Badge>
-                  )}
-                  {product.stock_total === 0 && (
-                    <Badge variant="destructive">
-                      Out of Stock
-                    </Badge>
-                  )}
-                </div>
-              </div>
+        <div className="grid lg:grid-cols-[280px_1fr] gap-8">
+          <aside className="lg:sticky lg:top-4 lg:self-start">
+            <ProductFilters
+              priceRange={priceRange}
+              onPriceRangeChange={setPriceRange}
+              selectedBrands={selectedBrands}
+              onBrandToggle={handleBrandToggle}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              onClearFilters={handleClearFilters}
+              inStockOnly={inStockOnly}
+              onInStockToggle={() => setInStockOnly(!inStockOnly)}
+              showFeaturedOnly={showFeaturedOnly}
+              onFeaturedToggle={() => setShowFeaturedOnly(!showFeaturedOnly)}
+              showLimitedOnly={showLimitedOnly}
+              onLimitedToggle={() => setShowLimitedOnly(!showLimitedOnly)}
+            />
+          </aside>
 
-              <div className="p-4">
-                <div className="text-xs font-semibold text-accent uppercase tracking-wider mb-1">
-                  {product.brand}
-                </div>
-                <h3 className="font-semibold text-lg mb-2 truncate">
-                  {product.name}
-                </h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold">${product.price}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {product.category}
-                  </span>
-                </div>
+          <div>
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground text-lg mb-4">No products match your filters.</p>
+                <Button onClick={handleClearFilters} variant="outline">
+                  Clear all filters
+                </Button>
               </div>
-            </Card>
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground">
-              No products found in this category
-            </p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map(product => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={() => navigate(`/product/${product.id}`)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
