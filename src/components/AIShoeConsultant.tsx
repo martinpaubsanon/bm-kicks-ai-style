@@ -34,14 +34,24 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "👋 Hey! I'm your personal sneaker consultant. What kicks are you looking for today? Tell me your style, size, budget, or just describe your vibe!",
+      content: "👟 Find your perfect kicks instantly! Click a category or describe what you're looking for:",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const quickReplies = [
+    { label: "🏃 Running Shoes", query: "Show me running shoes" },
+    { label: "🔥 Limited Edition", query: "Show me limited edition sneakers" },
+    { label: "💎 Premium Picks", query: "Show me premium sneakers" },
+    { label: "💰 Under $150", query: "Show me shoes under $150" },
+    { label: "⭐ Featured", query: "Show me featured sneakers" },
+    { label: "🏀 Basketball", query: "Show me basketball shoes" },
+  ];
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -49,10 +59,12 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
     }
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (messageText?: string) => {
+    const textToSend = messageText || input.trim();
+    if (!textToSend || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input };
+    setShowQuickReplies(false);
+    const userMessage: Message = { role: "user", content: textToSend };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
@@ -182,6 +194,10 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
     }
   };
 
+  const handleQuickReply = (query: string) => {
+    sendMessage(query);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 bg-background/95 backdrop-blur-xl border-border">
@@ -265,7 +281,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
               disabled={isLoading}
             />
             <Button
-              onClick={sendMessage}
+              onClick={() => sendMessage()}
               disabled={!input.trim() || isLoading}
               size="icon"
               className="h-[60px] w-[60px] shrink-0"
