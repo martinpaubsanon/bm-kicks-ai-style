@@ -1,0 +1,186 @@
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { X } from "lucide-react";
+
+interface ProductFiltersProps {
+  priceRange: [number, number];
+  onPriceRangeChange: (range: [number, number]) => void;
+  selectedBrands: string[];
+  onBrandToggle: (brand: string) => void;
+  sortBy: string;
+  onSortChange: (value: string) => void;
+  onClearFilters: () => void;
+  inStockOnly: boolean;
+  onInStockToggle: () => void;
+  showFeaturedOnly: boolean;
+  onFeaturedToggle: () => void;
+  showLimitedOnly: boolean;
+  onLimitedToggle: () => void;
+}
+
+const brands = [
+  "Nike",
+  "Adidas",
+  "Jordan",
+  "New Balance",
+  "Puma",
+  "Under Armour",
+  "Brooks",
+  "ASICS",
+  "Reebok",
+  "Vans",
+  "Converse",
+  "On",
+];
+
+export const ProductFilters = ({
+  priceRange,
+  onPriceRangeChange,
+  selectedBrands,
+  onBrandToggle,
+  sortBy,
+  onSortChange,
+  onClearFilters,
+  inStockOnly,
+  onInStockToggle,
+  showFeaturedOnly,
+  onFeaturedToggle,
+  showLimitedOnly,
+  onLimitedToggle,
+}: ProductFiltersProps) => {
+  const hasActiveFilters =
+    priceRange[0] > 0 ||
+    priceRange[1] < 300 ||
+    selectedBrands.length > 0 ||
+    inStockOnly ||
+    showFeaturedOnly ||
+    showLimitedOnly;
+
+  return (
+    <div className="space-y-6 p-6 bg-card rounded-lg border">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-lg">Filters</h3>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearFilters}
+            className="h-8 px-2 text-xs"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Clear All
+          </Button>
+        )}
+      </div>
+
+      {/* Sort */}
+      <div className="space-y-2">
+        <Label>Sort By</Label>
+        <Select value={sortBy} onValueChange={onSortChange}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="featured">Featured</SelectItem>
+            <SelectItem value="price-asc">Price: Low to High</SelectItem>
+            <SelectItem value="price-desc">Price: High to Low</SelectItem>
+            <SelectItem value="name-asc">Name: A to Z</SelectItem>
+            <SelectItem value="newest">Newest First</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Price Range */}
+      <div className="space-y-3">
+        <Label>
+          Price Range: ${priceRange[0]} - ${priceRange[1]}
+        </Label>
+        <Slider
+          min={0}
+          max={300}
+          step={10}
+          value={priceRange}
+          onValueChange={(value) => onPriceRangeChange(value as [number, number])}
+          className="w-full"
+        />
+      </div>
+
+      {/* Brands */}
+      <div className="space-y-3">
+        <Label>Brands</Label>
+        <div className="space-y-2 max-h-48 overflow-y-auto">
+          {brands.map((brand) => (
+            <div key={brand} className="flex items-center space-x-2">
+              <Checkbox
+                id={`brand-${brand}`}
+                checked={selectedBrands.includes(brand)}
+                onCheckedChange={() => onBrandToggle(brand)}
+              />
+              <label
+                htmlFor={`brand-${brand}`}
+                className="text-sm cursor-pointer hover:text-primary transition-colors"
+              >
+                {brand}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Special Filters */}
+      <div className="space-y-3">
+        <Label>Special</Label>
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="in-stock"
+              checked={inStockOnly}
+              onCheckedChange={onInStockToggle}
+            />
+            <label
+              htmlFor="in-stock"
+              className="text-sm cursor-pointer hover:text-primary transition-colors"
+            >
+              In Stock Only
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="featured"
+              checked={showFeaturedOnly}
+              onCheckedChange={onFeaturedToggle}
+            />
+            <label
+              htmlFor="featured"
+              className="text-sm cursor-pointer hover:text-primary transition-colors"
+            >
+              Featured Products
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="limited"
+              checked={showLimitedOnly}
+              onCheckedChange={onLimitedToggle}
+            />
+            <label
+              htmlFor="limited"
+              className="text-sm cursor-pointer hover:text-primary transition-colors"
+            >
+              Limited Edition
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
