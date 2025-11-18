@@ -18,7 +18,7 @@ export default function CustomerProfile() {
     city: "",
     province: "",
     postalCode: "",
-    country: "Philippines",
+    country: "Qatar",
   });
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function CustomerProfile() {
         city: customerProfile.default_shipping_address?.city || "",
         province: customerProfile.default_shipping_address?.province || "",
         postalCode: customerProfile.default_shipping_address?.postalCode || "",
-        country: customerProfile.default_shipping_address?.country || "Philippines",
+        country: customerProfile.default_shipping_address?.country || "Qatar",
       });
     }
   }, [customerProfile]);
