@@ -27,7 +27,7 @@ export default function ProductForm() {
   const [formData, setFormData] = useState({
     name: "",
     brand: "",
-    category: "running",
+    category: "Running",
     description: "",
     price: "",
     images: [] as string[],
@@ -65,7 +65,7 @@ export default function ProductForm() {
       setFormData({
         name: data.name || "",
         brand: data.brand || "",
-        category: data.category || "running",
+        category: data.category || "Running",
         description: data.description || "",
         price: data.price?.toString() || "",
         images: data.images || [],
@@ -210,10 +210,11 @@ export default function ProductForm() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="running">Running</SelectItem>
-                    <SelectItem value="basketball">Basketball</SelectItem>
-                    <SelectItem value="lifestyle">Lifestyle</SelectItem>
-                    <SelectItem value="training">Training</SelectItem>
+                    <SelectItem value="Running">Running</SelectItem>
+                    <SelectItem value="Basketball">Basketball</SelectItem>
+                    <SelectItem value="Lifestyle">Lifestyle</SelectItem>
+                    <SelectItem value="Training">Training</SelectItem>
+                    <SelectItem value="Skateboarding">Skateboarding</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
