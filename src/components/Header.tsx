@@ -26,7 +26,21 @@ export const Header = () => {
 
         {/* Right Actions */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="hidden md:flex">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="hidden md:flex"
+            onClick={() => {
+              const productsSection = document.getElementById('all-products');
+              if (productsSection) {
+                productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => {
+                  const searchInput = document.getElementById('search');
+                  searchInput?.focus();
+                }, 500);
+              }
+            }}
+          >
             <Search className="h-5 w-5" />
           </Button>
           <Button variant="ghost" size="icon">

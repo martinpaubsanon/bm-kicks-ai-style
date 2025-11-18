@@ -2,6 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -9,9 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { X, Search } from "lucide-react";
 
 interface ProductFiltersProps {
+  searchQuery: string;
+  onSearchQueryChange: (query: string) => void;
   priceRange: [number, number];
   onPriceRangeChange: (range: [number, number]) => void;
   selectedBrands: string[];
@@ -43,6 +46,8 @@ const brands = [
 ];
 
 export const ProductFilters = ({
+  searchQuery,
+  onSearchQueryChange,
   priceRange,
   onPriceRangeChange,
   selectedBrands,
@@ -58,6 +63,7 @@ export const ProductFilters = ({
   onLimitedToggle,
 }: ProductFiltersProps) => {
   const hasActiveFilters =
+    searchQuery.length > 0 ||
     priceRange[0] > 0 ||
     priceRange[1] < 300 ||
     selectedBrands.length > 0 ||
@@ -80,6 +86,32 @@ export const ProductFilters = ({
             Clear All
           </Button>
         )}
+      </div>
+
+      {/* Search */}
+      <div className="space-y-2">
+        <Label htmlFor="search">Search Products</Label>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="search"
+            type="text"
+            placeholder="Search by name or description..."
+            value={searchQuery}
+            onChange={(e) => onSearchQueryChange(e.target.value)}
+            className="pl-9"
+          />
+          {searchQuery && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+              onClick={() => onSearchQueryChange("")}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Sort */}
