@@ -110,9 +110,13 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary/10">
+          <button
+            onClick={() => navigate("/")}
+            className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 transition-colors cursor-pointer"
+            aria-label="Go to home page"
+          >
             <Lock className="h-6 w-6 text-primary" />
-          </div>
+          </button>
           <h2 className="mt-6 text-3xl font-bold text-foreground">
             {mode === "signin" ? "Admin Login" : "Create Admin Account"}
           </h2>

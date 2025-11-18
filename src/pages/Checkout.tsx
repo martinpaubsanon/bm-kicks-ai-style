@@ -14,12 +14,15 @@ import { Loader2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { AuthRequiredModal } from "@/components/AuthRequiredModal";
 
 export default function Checkout() {
   const navigate = useNavigate();
   const { items, cartTotal, clearCart } = useCart();
   const { user, customerProfile } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [proceedAsGuest, setProceedAsGuest] = useState(false);
 
   const [shippingInfo, setShippingInfo] = useState({
     fullName: "",
@@ -71,6 +74,13 @@ export default function Checkout() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // If user is not logged in and hasn't chosen to proceed as guest, show auth modal
+    if (!user && !proceedAsGuest) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -320,6 +330,12 @@ export default function Checkout() {
         </form>
         </div>
       </div>
+      
+      <AuthRequiredModal
+        open={showAuthModal}
+        onOpenChange={setShowAuthModal}
+        onGuestCheckout={() => setProceedAsGuest(true)}
+      />
     </>
   );
 }
