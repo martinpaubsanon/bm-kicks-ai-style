@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 
 interface Product {
@@ -28,8 +29,10 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [addingToCart, setAddingToCart] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -60,7 +63,7 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id, navigate, toast]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!selectedSize) {
       toast({
         title: "Select a size",
@@ -70,10 +73,36 @@ const ProductDetail = () => {
       return;
     }
 
-    toast({
-      title: "Added to cart!",
-      description: `${product?.brand} ${product?.name} - Size ${selectedSize}`,
-    });
+    if (!product) return;
+
+    const sizes = product.sizes as Record<string, number> || {};
+    const availableStock = sizes[selectedSize] || 0;
+
+    if (availableStock === 0) {
+      toast({
+        title: "Out of stock",
+        description: `Size ${selectedSize} is currently out of stock`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setAddingToCart(true);
+    try {
+      await addToCart(product.id, selectedSize, 1);
+      toast({
+        title: "Added to cart!",
+        description: `${product.brand} ${product.name} - Size ${selectedSize}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add to cart",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
   if (loading) {

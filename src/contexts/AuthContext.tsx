@@ -4,12 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 
 type AppRole = "admin" | "moderator" | "user";
 
+interface CustomerProfile {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  default_shipping_address?: any;
+  created_at?: string;
+  updated_at?: string;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   role: AppRole | null;
   isAdmin: boolean;
   isLoading: boolean;
+  customerProfile: CustomerProfile | null;
   signOut: () => Promise<void>;
 }
 
@@ -19,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
+  const [customerProfile, setCustomerProfile] = useState<CustomerProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,6 +47,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .select("role")
               .eq("user_id", session.user.id)
               .single();
+            
+            // Fetch customer profile if not admin
+            const { data: profileData } = await supabase
+              .from("customer_profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single();
+            
+            if (profileData) {
+              setCustomerProfile(profileData);
+            }
             
             // Handle case where user role not assigned yet (race condition with trigger)
             if (error && error.code === 'PGRST116') {
@@ -57,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }, 0);
         } else {
           setRole(null);
+          setCustomerProfile(null);
           setIsLoading(false);
         }
       }
@@ -74,6 +97,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .select("role")
             .eq("user_id", session.user.id)
             .single();
+          
+          // Fetch customer profile
+          const { data: profileData } = await supabase
+            .from("customer_profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+          
+          if (profileData) {
+            setCustomerProfile(profileData);
+          }
           
           // Handle case where user role not assigned yet
           if (error && error.code === 'PGRST116') {
@@ -105,6 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setSession(null);
     setRole(null);
+    setCustomerProfile(null);
   };
 
   return (
@@ -115,6 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role,
         isAdmin: role === "admin",
         isLoading,
+        customerProfile,
         signOut,
       }}
     >

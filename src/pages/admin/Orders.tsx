@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Search, Eye } from "lucide-react";
+import { Search, Eye, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 export default function Orders() {
@@ -73,9 +73,17 @@ export default function Orders() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Orders</h1>
-        <p className="text-muted-foreground">Manage customer orders</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Orders</h1>
+          <p className="text-muted-foreground">Manage customer orders</p>
+        </div>
+        <Link to="/admin/orders/create">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Order
+          </Button>
+        </Link>
       </div>
 
       <div className="flex items-center gap-4">
