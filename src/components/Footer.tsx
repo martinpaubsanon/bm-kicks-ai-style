@@ -58,7 +58,7 @@ export const Footer = () => {
             </span> 2024 BM Kicks. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm">
-            <a href="#" className="text-primary-foreground/60 hover:text-accent transition-colors">Privacy Policy</a>
+            <a href="#" className="text-primary-foreground/60 hover:text-accent transition-colors">© 2025 BM Kicks. All rights reserved.  [Powered by StrategAIz - Tech Arm of Address Gateway]                               .</a>
             <a href="#" className="text-primary-foreground/60 hover:text-accent transition-colors">Terms of Service</a>
           </div>
         </div>
