@@ -28,29 +28,42 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Parse user intent with simple rules
+    // Parse user intent with enhanced brand and category detection
     let brandFilter: string | undefined;
     if (text.includes("nike")) brandFilter = "Nike";
     if (text.includes("adidas")) brandFilter = "Adidas";
     if (text.includes("new balance")) brandFilter = "New Balance";
     if (text.includes("jordan")) brandFilter = "Jordan";
     if (text.includes("puma")) brandFilter = "Puma";
+    if (text.includes("under armour")) brandFilter = "Under Armour";
+    if (text.includes("brooks")) brandFilter = "Brooks";
+    if (text.includes("asics")) brandFilter = "ASICS";
+    if (text.includes("reebok")) brandFilter = "Reebok";
+    if (text.includes("vans")) brandFilter = "Vans";
+    if (text.includes("converse")) brandFilter = "Converse";
+    if (text.includes("on running") || text.includes(" on ")) brandFilter = "On";
 
     let maxPrice: number | undefined;
     const underMatch = text.match(/under\s*\$?(\d+)/);
     if (underMatch) maxPrice = Number(underMatch[1]);
 
     let categoryFilter: string | undefined;
-    if (text.includes("running")) categoryFilter = "Running";
-    if (text.includes("basketball")) categoryFilter = "Basketball";
-    if (text.includes("lifestyle")) categoryFilter = "Lifestyle";
-    if (text.includes("training")) categoryFilter = "Training";
+    if (text.includes("running") || text.includes("run") || text.includes("marathon") || text.includes("jogging")) 
+      categoryFilter = "Running";
+    if (text.includes("basketball") || text.includes("ball") || text.includes("court") || text.includes("hoops")) 
+      categoryFilter = "Basketball";
+    if (text.includes("lifestyle") || text.includes("casual") || text.includes("daily") || text.includes("street")) 
+      categoryFilter = "Lifestyle";
+    if (text.includes("training") || text.includes("gym") || text.includes("workout") || text.includes("crossfit")) 
+      categoryFilter = "Training";
+    if (text.includes("skateboard") || text.includes("skate") || text.includes(" sb ")) 
+      categoryFilter = "Skateboarding";
     
     let limitedEdition = false;
     if (text.includes("limited")) limitedEdition = true;
     
     let featured = false;
-    if (text.includes("featured") || text.includes("premium") || text.includes("top")) featured = true;
+    if (text.includes("featured") || text.includes("premium") || text.includes("top") || text.includes("popular")) featured = true;
 
     console.log("📊 Filters:", { brandFilter, maxPrice, categoryFilter, limitedEdition, featured });
 
