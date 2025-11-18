@@ -101,7 +101,7 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Revenue (30d)"
-          value={`$${stats.totalRevenue.toFixed(2)}`}
+          value={`QAR ${stats.totalRevenue.toFixed(2)}`}
           icon={DollarSign}
           change={12}
         />
@@ -145,7 +145,7 @@ export default function Dashboard() {
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">{order.order_number}</TableCell>
                     <TableCell>{order.customer_name}</TableCell>
-                    <TableCell>${Number(order.total).toFixed(2)}</TableCell>
+                    <TableCell>QAR {Number(order.total).toFixed(2)}</TableCell>
                     <TableCell>
                       <StatusBadge status={order.order_status} type="order" />
                     </TableCell>

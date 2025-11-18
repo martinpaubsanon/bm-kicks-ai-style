@@ -1,11 +1,12 @@
 import { ShoppingCart, Menu, Search, User, LogOut, Package, UserCircle, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import logo from "@/assets/bm-kicks-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import CartDrawer from "@/components/CartDrawer";
+import { ProductSearchDialog } from "@/components/ProductSearchDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,12 +19,25 @@ import {
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { user, customerProfile, signOut } = useAuth();
   const { cartCount } = useCart();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setSearchOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/40 shadow-lg shadow-black/5 transition-all duration-300">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-8">
@@ -38,16 +52,7 @@ export const Header = () => {
             variant="ghost" 
             size="icon" 
             className="hidden md:flex"
-            onClick={() => {
-              const productsSection = document.getElementById('all-products');
-              if (productsSection) {
-                productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                setTimeout(() => {
-                  const searchInput = document.getElementById('search');
-                  searchInput?.focus();
-                }, 500);
-              }
-            }}
+            onClick={() => setSearchOpen(true)}
           >
             <Search className="h-5 w-5" />
           </Button>
@@ -133,6 +138,7 @@ export const Header = () => {
 
       
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
+      <ProductSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 };

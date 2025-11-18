@@ -173,7 +173,7 @@ export default function Products() {
                 </TableCell>
                 <TableCell>{product.brand}</TableCell>
                 <TableCell className="capitalize">{product.category}</TableCell>
-                <TableCell>${Number(product.price).toFixed(2)}</TableCell>
+                <TableCell>QAR {Number(product.price).toFixed(2)}</TableCell>
                 <TableCell>{product.stock_total}</TableCell>
                 <TableCell>
                   <StatusBadge

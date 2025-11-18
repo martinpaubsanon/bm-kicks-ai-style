@@ -179,7 +179,7 @@ const ProductDetail = () => {
                 {product.is_featured && <Badge>⭐ Featured</Badge>}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{product.name}</h1>
-              <div className="text-3xl font-bold text-primary">${product.price}</div>
+              <div className="text-3xl font-bold text-primary">QAR {product.price.toFixed(2)}</div>
             </div>
 
             {product.description && (

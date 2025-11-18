@@ -215,8 +215,8 @@ export default function OrderDetail() {
                   </TableCell>
                   <TableCell>{item.size}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
-                  <TableCell>${Number(item.price).toFixed(2)}</TableCell>
-                  <TableCell>${Number(item.subtotal).toFixed(2)}</TableCell>
+                  <TableCell>QAR {Number(item.price).toFixed(2)}</TableCell>
+                  <TableCell>QAR {Number(item.subtotal).toFixed(2)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -224,11 +224,11 @@ export default function OrderDetail() {
           <div className="mt-4 space-y-2 text-right">
             <div className="flex justify-end gap-4">
               <span className="text-muted-foreground">Subtotal:</span>
-              <span className="font-medium">${Number(order.subtotal).toFixed(2)}</span>
+              <span className="font-medium">QAR {Number(order.subtotal).toFixed(2)}</span>
             </div>
             <div className="flex justify-end gap-4 text-lg font-bold">
               <span>Total:</span>
-              <span>${Number(order.total).toFixed(2)}</span>
+              <span>QAR {Number(order.total).toFixed(2)}</span>
             </div>
           </div>
         </CardContent>

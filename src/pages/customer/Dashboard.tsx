@@ -142,7 +142,7 @@ export default function Dashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats.totalSpent.toFixed(2)}</div>
+            <div className="text-2xl font-bold">QAR {stats.totalSpent.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">Lifetime</p>
           </CardContent>
         </Card>
@@ -204,7 +204,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="font-bold text-foreground">${Number(order.total).toFixed(2)}</p>
+                      <p className="font-bold text-foreground">QAR {Number(order.total).toFixed(2)}</p>
                       <StatusBadge status={order.payment_status} type="payment" />
                     </div>
                     <Link to={`/customer/orders/${order.id}`}>

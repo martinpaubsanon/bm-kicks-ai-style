@@ -134,7 +134,7 @@ export const ProductFilters = ({
       {/* Price Range */}
       <div className="space-y-3">
         <Label>
-          Price Range: ${priceRange[0]} - ${priceRange[1]}
+          Price Range: QAR {priceRange[0]} - QAR {priceRange[1]}
         </Label>
         <Slider
           min={0}

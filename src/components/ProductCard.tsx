@@ -50,7 +50,7 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
         <div className="text-sm text-muted-foreground font-medium">{product.brand}</div>
         <h3 className="font-semibold text-foreground line-clamp-1 mt-1">{product.name}</h3>
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-xl font-bold text-primary">${product.price}</span>
+          <span className="text-xl font-bold text-primary">QAR {product.price.toFixed(2)}</span>
           <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors">
             View Details →
           </span>

@@ -49,7 +49,7 @@ export const CompactProductCard = ({ product, onClick }: CompactProductCardProps
           {product.brand}
         </p>
         <p className="font-bold text-sm mt-1 text-primary">
-          ${product.price.toFixed(2)}
+          QAR {product.price.toFixed(2)}
         </p>
       </div>
       

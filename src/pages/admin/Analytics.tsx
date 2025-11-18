@@ -145,7 +145,7 @@ export default function Analytics() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Revenue (30d)"
-          value={`$${stats.totalRevenue.toFixed(2)}`}
+          value={`QAR ${stats.totalRevenue.toFixed(2)}`}
           icon={DollarSign}
           change={12}
         />

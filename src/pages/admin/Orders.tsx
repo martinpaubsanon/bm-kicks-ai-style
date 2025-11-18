@@ -118,7 +118,7 @@ export default function Orders() {
                 <TableCell className="font-medium">{order.order_number}</TableCell>
                 <TableCell>{order.customer_name}</TableCell>
                 <TableCell>{order.customer_email}</TableCell>
-                <TableCell>${Number(order.total).toFixed(2)}</TableCell>
+                <TableCell>QAR {Number(order.total).toFixed(2)}</TableCell>
                 <TableCell>
                   <StatusBadge status={order.payment_status} type="payment" />
                 </TableCell>
