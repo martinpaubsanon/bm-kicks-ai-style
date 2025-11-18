@@ -1,86 +1,105 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ShoppingCart, Heart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   brand: string;
   price: number;
-  image: string;
+  images?: string[];
   category: string;
+  is_featured?: boolean;
+  is_limited_edition?: boolean;
+  stock_total?: number;
 }
 
-const sampleProducts: Product[] = [
-  {
-    id: 1,
-    name: "Air Max Velocity",
-    brand: "Nike",
-    price: 149.99,
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",
-    category: "Men's"
-  },
-  {
-    id: 2,
-    name: "Classic Suede",
-    brand: "Puma",
-    price: 89.99,
-    image: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=500",
-    category: "Men's"
-  },
-  {
-    id: 3,
-    name: "Court Vision",
-    brand: "Adidas",
-    price: 119.99,
-    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500",
-    category: "Women's"
-  },
-  {
-    id: 4,
-    name: "Street Runner",
-    brand: "Reebok",
-    price: 99.99,
-    image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500",
-    category: "Limited"
-  }
-];
-
 export const FeaturedProducts = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchFeaturedProducts();
+  }, []);
+
+  const fetchFeaturedProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, name, brand, price, images, category, is_featured, is_limited_edition, stock_total")
+        .eq("is_featured", true)
+        .limit(4);
+
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const scrollToProducts = () => {
+    document.getElementById("all-products")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-secondary/30" id="new-arrivals">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <Skeleton className="h-12 w-64 mx-auto mb-4" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="aspect-square w-full rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20 bg-secondary/30" id="new-arrivals">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">New Arrivals</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">Featured Collection</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Check out our latest collection of premium sneakers
+            Handpicked premium sneakers just for you
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sampleProducts.map((product) => (
+          {products.map((product) => (
             <Card 
               key={product.id} 
-              className="group overflow-hidden product-card-hover cursor-pointer border-border"
+              className="group overflow-hidden cursor-pointer border-border hover:shadow-xl transition-all duration-300"
+              onClick={() => navigate(`/product/${product.id}`)}
             >
               <div className="relative aspect-square overflow-hidden bg-secondary">
                 <img 
-                  src={product.image} 
+                  src={product.images?.[0] || "/placeholder.svg"} 
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="absolute top-3 right-3 h-9 w-9 bg-white/90 hover:bg-white shadow-md"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Button className="w-full bg-accent hover:bg-accent/90">
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    Add to Cart
-                  </Button>
+                <div className="absolute top-3 left-3 flex flex-col gap-2">
+                  {product.is_limited_edition && (
+                    <Badge className="bg-destructive text-destructive-foreground">
+                      LIMITED
+                    </Badge>
+                  )}
+                  {product.stock_total && product.stock_total < 10 && (
+                    <Badge variant="outline" className="bg-background/90">
+                      Low Stock
+                    </Badge>
+                  )}
                 </div>
               </div>
               
@@ -101,7 +120,12 @@ export const FeaturedProducts = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button size="lg" variant="outline" className="font-semibold">
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="font-semibold"
+            onClick={scrollToProducts}
+          >
             View All Products
           </Button>
         </div>
