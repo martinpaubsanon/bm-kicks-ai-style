@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,11 +24,11 @@ export default function Checkout() {
     fullName: customerProfile?.full_name || "",
     email: user?.email || "",
     phone: customerProfile?.phone || "",
-    address: "",
-    city: "",
-    province: "",
-    postalCode: "",
-    country: "Philippines",
+    address: customerProfile?.default_shipping_address?.address || "",
+    city: customerProfile?.default_shipping_address?.city || "",
+    province: customerProfile?.default_shipping_address?.province || "",
+    postalCode: customerProfile?.default_shipping_address?.postalCode || "",
+    country: customerProfile?.default_shipping_address?.country || "Philippines",
   });
 
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
@@ -56,6 +57,22 @@ export default function Checkout() {
         paymentMethod,
         userId: user?.id,
       });
+
+      // Save shipping address to customer profile for future use
+      if (user?.id) {
+        await supabase
+          .from("customer_profiles")
+          .update({
+            default_shipping_address: {
+              address: shippingInfo.address,
+              city: shippingInfo.city,
+              province: shippingInfo.province,
+              postalCode: shippingInfo.postalCode,
+              country: shippingInfo.country,
+            }
+          })
+          .eq("id", user.id);
+      }
 
       await clearCart();
 

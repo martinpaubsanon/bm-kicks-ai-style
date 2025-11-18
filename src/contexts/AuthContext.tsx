@@ -8,7 +8,13 @@ interface CustomerProfile {
   id: string;
   full_name: string | null;
   phone: string | null;
-  default_shipping_address?: any;
+  default_shipping_address?: {
+    address: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    country: string;
+  } | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -58,7 +64,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .single();
             
             if (profileData) {
-              setCustomerProfile(profileData);
+              setCustomerProfile({
+                ...profileData,
+                default_shipping_address: profileData.default_shipping_address as CustomerProfile['default_shipping_address']
+              });
             }
             
             // Handle case where user role not assigned yet (race condition with trigger)
@@ -108,7 +117,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .single();
           
           if (profileData) {
-            setCustomerProfile(profileData);
+            setCustomerProfile({
+              ...profileData,
+              default_shipping_address: profileData.default_shipping_address as CustomerProfile['default_shipping_address']
+            });
           }
           
           // Handle case where user role not assigned yet
