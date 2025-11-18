@@ -1,12 +1,12 @@
 import { ShoppingCart, Menu, Search, User, LogOut, Package, UserCircle, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import logo from "@/assets/bm-kicks-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import CartDrawer from "@/components/CartDrawer";
-import { ProductSearchDialog } from "@/components/ProductSearchDialog";
+import { InlineSearch } from "@/components/InlineSearch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,18 +24,6 @@ export const Header = () => {
   const { cartCount } = useCart();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setSearchOpen((open) => !open);
-      }
-    };
-
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
-
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/40 shadow-lg shadow-black/5 transition-all duration-300">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -47,15 +35,16 @@ export const Header = () => {
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 relative">
           <Button 
             variant="ghost" 
             size="icon" 
             className="hidden md:flex"
-            onClick={() => setSearchOpen(true)}
+            onClick={() => setSearchOpen(!searchOpen)}
           >
             <Search className="h-5 w-5" />
           </Button>
+          <InlineSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
@@ -138,7 +127,6 @@ export const Header = () => {
 
       
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
-      <ProductSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 };
