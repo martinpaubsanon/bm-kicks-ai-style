@@ -4,11 +4,11 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ProductCard } from "@/components/ProductCard";
+import { CompactProductCard } from "@/components/CompactProductCard";
 import { useToast } from "@/hooks/use-toast";
-import { Send, X, Sparkles } from "lucide-react";
+import { Send, X, Sparkles, Loader2 } from "lucide-react";
 
-interface Product {
+export interface Product {
   id: string;
   name: string;
   brand: string;
@@ -45,12 +45,11 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
   const { toast } = useToast();
 
   const quickReplies = [
-    { label: "🏃 Running Shoes", query: "Show me running shoes" },
-    { label: "🔥 Limited Edition", query: "Show me limited edition sneakers" },
-    { label: "💎 Premium Picks", query: "Show me premium sneakers" },
+    { label: "🏃 Running", query: "Show me running shoes" },
+    { label: "🔥 Limited", query: "Show me limited edition sneakers" },
+    { label: "💎 Premium", query: "Show me premium sneakers" },
     { label: "💰 Under $150", query: "Show me shoes under $150" },
     { label: "⭐ Featured", query: "Show me featured sneakers" },
-    { label: "🏀 Basketball", query: "Show me basketball shoes" },
   ];
 
   useEffect(() => {
@@ -122,7 +121,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
       const assistantMessage: Message = {
         role: "assistant",
         content: data.text,
-        products: data.products || [],
+        products: data.products,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -130,7 +129,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
       console.error("Error sending message:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to get response. Please try again.",
+        description: "Failed to get a response. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -138,7 +137,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -151,43 +150,50 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[80vh] p-0 flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b">
+      <DialogContent className="max-w-2xl h-[600px] p-0 gap-0 flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">AI Sneaker Consultant</h2>
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold">AI Shoe Consultant</h2>
+              <p className="text-xs text-muted-foreground">Powered by AI</p>
+            </div>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => onOpenChange(false)}
+            className="h-8 w-8"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
 
-        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-          <div className="space-y-4">
+        <ScrollArea className="flex-1 px-4 py-3" ref={scrollRef}>
+          <div className="space-y-3 pb-2">
             {messages.map((message, index) => (
               <div
                 key={index}
                 className={`flex ${
                   message.role === "user" ? "justify-end" : "justify-start"
-                }`}
+                } animate-fade-in`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
+                  className={`rounded-2xl px-4 py-2.5 ${
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "bg-primary text-primary-foreground max-w-[75%]"
+                      : message.products && message.products.length > 0
+                      ? "bg-muted/50 max-w-full"
+                      : "bg-muted max-w-[75%]"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                  
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                   {message.products && message.products.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                      {message.products.map((product) => (
-                        <ProductCard
+                    <div className="space-y-2 mt-3">
+                      {message.products.slice(0, 4).map((product) => (
+                        <CompactProductCard
                           key={product.id}
                           product={product}
                           onClick={() => {
@@ -196,20 +202,22 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
                           }}
                         />
                       ))}
+                      {message.products.length > 4 && (
+                        <p className="text-xs text-muted-foreground text-center pt-1">
+                          +{message.products.length - 4} more products available
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
             ))}
-
             {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-muted rounded-lg p-3">
+              <div className="flex justify-start animate-fade-in">
+                <div className="bg-muted rounded-2xl px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-                    <span className="text-sm text-muted-foreground">
-                      Finding perfect matches...
-                    </span>
+                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    <span className="text-sm text-muted-foreground">Thinking...</span>
                   </div>
                 </div>
               </div>
@@ -217,42 +225,52 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
           </div>
         </ScrollArea>
 
-        <div className="p-4 border-t space-y-3">
-          {showQuickReplies && (
-            <div className="flex flex-wrap gap-2">
+        {showQuickReplies && (
+          <div className="px-4 pb-2 border-t bg-background/95">
+            <p className="text-xs text-muted-foreground mb-2 mt-2">Quick suggestions:</p>
+            <div className="flex flex-wrap gap-1.5">
               {quickReplies.map((reply, index) => (
                 <Button
                   key={index}
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={() => handleQuickReply(reply.query)}
+                  className="text-xs h-7 rounded-full"
                   disabled={isLoading}
-                  className="text-xs"
                 >
                   {reply.label}
                 </Button>
               ))}
             </div>
-          )}
+          </div>
+        )}
 
+        <div className="p-3 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex gap-2">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Ask about shoes, brands, prices..."
-              className="min-h-[60px] resize-none"
+              onKeyPress={handleKeyPress}
+              placeholder="Describe your perfect shoe..."
+              className="min-h-[52px] max-h-[120px] resize-none text-sm"
               disabled={isLoading}
             />
             <Button
               onClick={() => sendMessage()}
               disabled={isLoading || !input.trim()}
               size="icon"
-              className="shrink-0"
+              className="h-[52px] w-[52px] flex-shrink-0"
             >
-              <Send className="h-4 w-4" />
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
             </Button>
           </div>
+          <p className="text-[10px] text-muted-foreground mt-2 text-center">
+            Press Enter to send • AI-powered recommendations
+          </p>
         </div>
       </DialogContent>
     </Dialog>
