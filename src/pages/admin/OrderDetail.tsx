@@ -98,23 +98,29 @@ export default function OrderDetail() {
 
   const updatePaymentStatus = async (status: string) => {
     try {
-      const { error } = await supabase
+      console.log("Updating payment status to:", status);
+      const { data, error } = await supabase
         .from("orders")
         .update({ payment_status: status })
-        .eq("id", id);
+        .eq("id", id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Payment status update error:", error);
+        throw error;
+      }
 
+      console.log("Payment status updated successfully:", data);
       toast({
         title: "Success",
         description: "Payment status updated successfully",
       });
       loadOrderDetails();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating payment:", error);
       toast({
         title: "Error",
-        description: "Failed to update payment status",
+        description: error.message || "Failed to update payment status",
         variant: "destructive",
       });
     }
@@ -249,7 +255,7 @@ export default function OrderDetail() {
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background z-50">
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="processing">Processing</SelectItem>
                   <SelectItem value="shipped">Shipped</SelectItem>
@@ -275,7 +281,7 @@ export default function OrderDetail() {
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background z-50">
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
                   <SelectItem value="failed">Failed</SelectItem>
