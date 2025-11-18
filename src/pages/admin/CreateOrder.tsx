@@ -55,7 +55,7 @@ export default function CreateOrder() {
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerProfile | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [shippingAddress, setShippingAddress] = useState<any>({});
-  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "bank_transfer">("bank_transfer");
   const [paymentStatus, setPaymentStatus] = useState("pending");
   const [orderStatus, setOrderStatus] = useState("pending");
   const [notes, setNotes] = useState("");
@@ -530,14 +530,16 @@ export default function CreateOrder() {
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label>Payment Method</Label>
-                <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <Select 
+                  value={paymentMethod} 
+                  onValueChange={(value) => setPaymentMethod(value as "cod" | "bank_transfer")}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                    <SelectItem value="credit_card">Credit Card</SelectItem>
-                    <SelectItem value="cash_on_delivery">Cash on Delivery</SelectItem>
+                    <SelectItem value="cod">Cash on Delivery</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

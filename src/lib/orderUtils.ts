@@ -23,7 +23,7 @@ interface ShippingInfo {
 interface CreateOrderParams {
   items: OrderItem[];
   shippingInfo: ShippingInfo;
-  paymentMethod: string;
+  paymentMethod: "cod" | "bank_transfer";
   userId?: string;
 }
 
@@ -33,6 +33,12 @@ export async function createOrder({
   paymentMethod,
   userId,
 }: CreateOrderParams): Promise<string> {
+  // Validate payment method
+  const allowedMethods = ["cod", "bank_transfer"] as const;
+  if (!allowedMethods.includes(paymentMethod)) {
+    throw new Error("Invalid payment method. Only 'cod' or 'bank_transfer' are allowed.");
+  }
+
   // Validate stock availability
   for (const item of items) {
     const { data: product, error } = await supabase
