@@ -32,7 +32,7 @@ export default function Checkout() {
     country: "Qatar",
   });
 
-  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "bank_transfer">("bank_transfer");
   const [showAddressForm, setShowAddressForm] = useState(true);
 
   // Load saved address when customerProfile is available
@@ -252,14 +252,13 @@ export default function Checkout() {
               <CardTitle>Payment Method</CardTitle>
             </CardHeader>
             <CardContent>
-              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+              <RadioGroup 
+                value={paymentMethod} 
+                onValueChange={(value) => setPaymentMethod(value as "cod" | "bank_transfer")}
+              >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="bank_transfer" id="bank_transfer" />
                   <Label htmlFor="bank_transfer">Bank Transfer</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="credit_card" id="credit_card" />
-                  <Label htmlFor="credit_card">Credit/Debit Card</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="cod" id="cod" />
