@@ -3,26 +3,38 @@ import { ArrowRight } from "lucide-react";
 
 const categories = [
   {
-    title: "Men's Collection",
-    description: "Bold styles for the modern gentleman",
-    image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800",
-    link: "#mens"
+    title: "Running",
+    description: "Performance shoes built for speed",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800",
+    category: "Running"
   },
   {
-    title: "Women's Collection",
-    description: "Elegant and powerful designs",
-    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800",
-    link: "#womens"
+    title: "Basketball",
+    description: "Court-ready with superior support",
+    image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800",
+    category: "Basketball"
   },
   {
-    title: "Limited Edition",
-    description: "Exclusive drops you won't find anywhere else",
-    image: "https://images.unsplash.com/photo-1612902376337-1221bb4d3f8c?w=800",
-    link: "#limited"
+    title: "Lifestyle",
+    description: "Street style meets everyday comfort",
+    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800",
+    category: "Lifestyle"
   }
 ];
 
 export const CategorySection = () => {
+  const scrollToCategory = (category: string) => {
+    const element = document.getElementById("all-products");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      // Add a small delay to ensure scroll completes before updating URL
+      setTimeout(() => {
+        window.history.pushState({}, "", `?category=${category}`);
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }, 500);
+    }
+  };
+
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -35,12 +47,12 @@ export const CategorySection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map((category, index) => (
-            <a 
+            <button 
               key={index}
-              href={category.link}
-              className="group"
+              onClick={() => scrollToCategory(category.category)}
+              className="group text-left"
             >
-              <Card className="overflow-hidden h-[400px] relative cursor-pointer border-border product-card-hover">
+              <Card className="overflow-hidden h-[400px] relative cursor-pointer border-border hover:shadow-2xl transition-all duration-300">
                 <div className="absolute inset-0">
                   <img 
                     src={category.image} 
@@ -59,7 +71,7 @@ export const CategorySection = () => {
                   </div>
                 </div>
               </Card>
-            </a>
+            </button>
           ))}
         </div>
       </div>
