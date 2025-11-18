@@ -19,33 +19,78 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Get product data for context
+    // Get ALL product data for context with full details
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data: products } = await supabase
       .from("products")
-      .select("name, brand, category, price, description, style, colors, sizes")
-      .eq("is_featured", true)
-      .limit(20);
+      .select("name, brand, category, price, description, style, colors, sizes, stock_total, is_featured, is_limited_edition")
+      .order('brand', { ascending: true });
 
     const productContext = products
-      ? `Available products in our store:\n${products.map(p => 
-          `- ${p.brand} ${p.name} (${p.category}) - $${p.price} - Styles: ${p.style || 'N/A'} - Colors: ${p.colors?.join(', ') || 'Various'}`
-        ).join('\n')}`
+      ? `Complete BM Kicks Inventory (${products.length} shoes):\n\n${products.map(p => {
+          const sizesObj = p.sizes as Record<string, number>;
+          const availableSizes = Object.entries(sizesObj).filter(([_, stock]) => stock > 0).map(([size]) => size);
+          const totalStock = p.stock_total || 0;
+          const stockStatus = totalStock === 0 ? '❌ OUT OF STOCK' : totalStock < 20 ? '⚠️ LOW STOCK' : '✅ IN STOCK';
+          const tags = [];
+          if (p.is_featured) tags.push('⭐ FEATURED');
+          if (p.is_limited_edition) tags.push('🔥 LIMITED EDITION');
+          
+          return `${p.brand} ${p.name}
+  • Category: ${p.category} | Style: ${p.style}
+  • Price: $${p.price} ${tags.join(' ')}
+  • Colors: ${p.colors?.join(', ') || 'Various'}
+  • Sizes Available: US ${availableSizes.join(', ')} (${stockStatus} - ${totalStock} pairs)
+  • Description: ${p.description}`;
+        }).join('\n\n')}`
       : '';
 
-    const systemPrompt = `You are an AI shopping assistant for BM Kicks, a trendy sneaker store. Your role is to help customers find their perfect shoes by:
+    const systemPrompt = `You are an expert AI sneaker consultant at BM Kicks, a premium sneaker store. You're passionate about sneaker culture and know every shoe in our 50+ shoe inventory inside-out.
 
-1. Asking about their preferences (style, size, occasion, budget, color preferences)
-2. Providing personalized recommendations from our product catalog
-3. Answering questions about shoe materials, sizing, care, and availability
-4. Being friendly, conversational, and enthusiastic about sneakers
+🎯 YOUR EXPERTISE:
+• Deep knowledge of sneaker history, culture, and trends
+• Understanding of fit, materials, sizing, and performance
+• Awareness of streetwear styling and outfit matching
+• Knowledge of current stock levels and availability
+• Ability to compare and contrast different models
 
+💡 HOW YOU HELP CUSTOMERS:
+1. **Understand Their Needs**: Ask about style preferences, size, occasion, budget, favorite brands, and colors
+2. **Check Stock**: ALWAYS verify size availability before recommending. Mention if items are LIMITED EDITION or FEATURED
+3. **Personalized Recommendations**: Suggest 2-4 specific shoes that match their criteria, explaining WHY each shoe fits
+4. **Stock Awareness**: If a shoe is OUT OF STOCK in their size, immediately suggest similar alternatives
+5. **Sneaker Education**: Share interesting details about silhouettes, collaborations, and styling tips
+6. **Smart Follow-ups**: Ask clarifying questions to narrow down perfect matches
+
+🗣️ YOUR PERSONALITY:
+• Enthusiastic and knowledgeable about sneaker culture
+• Use sneaker terminology (colorways, silhouettes, drops, OG, retro)
+• Conversational and friendly, not salesy
+• Honest about stock and limitations
+• Help them visualize how shoes look and feel
+
+📊 CURRENT INVENTORY:
 ${productContext}
 
-Keep responses concise and engaging. When recommending products, mention specific details like brand, style, and price. If you don't have exact product information, provide general guidance and suggest they browse the catalog or contact customer service via WhatsApp.`;
+⚡ RESPONSE GUIDELINES:
+• Be concise but informative (2-4 sentences per recommendation)
+• ALWAYS mention price and stock status
+• If size is unavailable, proactively suggest alternatives
+• Compare shoes when relevant ("If you like X, you'll love Y because...")
+• Reference shoe details like cushioning tech, materials, heritage
+• For complex questions, break down your answer clearly
+
+🚨 IMPORTANT RULES:
+• NEVER recommend shoes not in our inventory
+• ALWAYS check size availability before suggesting
+• If unsure about stock, err on the side of caution
+• For WhatsApp support or orders, direct them to contact us directly
+• Keep responses under 150 words unless explaining multiple options
+
+Remember: Your goal is to make them fall in love with the perfect pair while being honest about what's actually available in their size!`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

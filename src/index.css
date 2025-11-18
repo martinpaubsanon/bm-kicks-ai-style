@@ -157,4 +157,29 @@ All colors MUST be HSL.
   .link-underline {
     @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-accent after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
   }
+
+  /* AI Hero Button - Dynamic gradient animation */
+  .ai-hero-button {
+    background: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 74% 55%), hsl(0 84% 60%));
+    background-size: 200% 200%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-hero-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .ai-hero-button:hover::before {
+    opacity: 1;
+    animation: sparkle 1.5s ease-in-out infinite;
+  }
 }

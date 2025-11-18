@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
@@ -7,15 +8,17 @@ import { FloatingButtons } from "@/components/FloatingButtons";
 import { AIShoeConsultant } from "@/components/AIShoeConsultant";
 
 const Index = () => {
+  const [isAIOpen, setIsAIOpen] = useState(false);
+
   return (
     <div className="min-h-screen">
       <Header />
-      <HeroSection />
+      <HeroSection onAIClick={() => setIsAIOpen(true)} />
       <FeaturedProducts />
       <CategorySection />
       <Footer />
       <FloatingButtons />
-      <AIShoeConsultant />
+      <AIShoeConsultant isOpen={isAIOpen} onOpenChange={setIsAIOpen} />
     </div>
   );
 };
