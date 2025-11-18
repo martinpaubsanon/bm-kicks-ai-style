@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-type PaymentStatus = "pending" | "confirmed" | "failed";
+type PaymentStatus = "pending" | "paid" | "failed";
 type StockStatus = "in_stock" | "low_stock" | "out_of_stock";
 
 interface StatusBadgeProps {
@@ -20,7 +20,7 @@ const statusConfig = {
   },
   payment: {
     pending: { label: "Pending", className: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20" },
-    confirmed: { label: "Confirmed", className: "bg-green-500/10 text-green-500 hover:bg-green-500/20" },
+    paid: { label: "Paid", className: "bg-green-500/10 text-green-500 hover:bg-green-500/20" },
     failed: { label: "Failed", className: "bg-red-500/10 text-red-500 hover:bg-red-500/20" },
   },
   stock: {

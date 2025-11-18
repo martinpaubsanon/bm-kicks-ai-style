@@ -283,7 +283,7 @@ export default function OrderDetail() {
                 </SelectTrigger>
                 <SelectContent className="bg-background z-50">
                   <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
                   <SelectItem value="failed">Failed</SelectItem>
                 </SelectContent>
               </Select>

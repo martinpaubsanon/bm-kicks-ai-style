@@ -56,7 +56,7 @@ export default function CreateOrder() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [shippingAddress, setShippingAddress] = useState<any>({});
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "bank_transfer">("bank_transfer");
-  const [paymentStatus, setPaymentStatus] = useState("pending");
+  const [paymentStatus, setPaymentStatus] = useState<"pending" | "paid" | "failed">("pending");
   const [orderStatus, setOrderStatus] = useState("pending");
   const [notes, setNotes] = useState("");
   const [productSearchOpen, setProductSearchOpen] = useState(false);
@@ -545,13 +545,16 @@ export default function CreateOrder() {
               </div>
               <div>
                 <Label>Payment Status</Label>
-                <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+                <Select 
+                  value={paymentStatus} 
+                  onValueChange={(value) => setPaymentStatus(value as "pending" | "paid" | "failed")}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
                     <SelectItem value="failed">Failed</SelectItem>
                   </SelectContent>
                 </Select>

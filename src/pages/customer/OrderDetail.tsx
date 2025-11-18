@@ -121,7 +121,7 @@ export default function CustomerOrderDetail() {
           <Badge variant={order.order_status === "delivered" ? "default" : "secondary"}>
             {order.order_status}
           </Badge>
-          <Badge variant={order.payment_status === "confirmed" ? "default" : "secondary"}>
+          <Badge variant={order.payment_status === "paid" ? "default" : "secondary"}>
             {order.payment_status}
           </Badge>
         </div>
