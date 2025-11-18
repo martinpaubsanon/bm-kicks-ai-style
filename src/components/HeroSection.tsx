@@ -50,6 +50,12 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
             <Button 
               size="lg" 
               variant="outline" 
+              onClick={() => {
+                const element = document.getElementById("all-products");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
               className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 font-semibold text-lg h-14 px-8"
             >
               Shop Collection
