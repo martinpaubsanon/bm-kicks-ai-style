@@ -35,14 +35,7 @@ export const Header = () => {
           <nav className="hidden md:flex items-center gap-6">
             <button 
               onClick={() => {
-                const element = document.getElementById("all-products");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                  setTimeout(() => {
-                    window.history.pushState({}, "", "?sortBy=newest");
-                    window.dispatchEvent(new PopStateEvent("popstate"));
-                  }, 500);
-                }
+                navigate('/?sortBy=newest');
               }}
               className="text-sm font-medium link-underline"
             >
@@ -50,14 +43,7 @@ export const Header = () => {
             </button>
             <button 
               onClick={() => {
-                const element = document.getElementById("all-products");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                  setTimeout(() => {
-                    window.history.pushState({}, "", "?category=Lifestyle");
-                    window.dispatchEvent(new PopStateEvent("popstate"));
-                  }, 500);
-                }
+                navigate('/?category=Lifestyle');
               }}
               className="text-sm font-medium link-underline"
             >
@@ -65,14 +51,7 @@ export const Header = () => {
             </button>
             <button 
               onClick={() => {
-                const element = document.getElementById("all-products");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                  setTimeout(() => {
-                    window.history.pushState({}, "", "?category=Lifestyle");
-                    window.dispatchEvent(new PopStateEvent("popstate"));
-                  }, 500);
-                }
+                navigate('/?category=Lifestyle');
               }}
               className="text-sm font-medium link-underline"
             >
@@ -80,16 +59,7 @@ export const Header = () => {
             </button>
             <button 
               onClick={() => {
-                const element = document.getElementById("all-products");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                  setTimeout(() => {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    urlParams.set("limited", "true");
-                    window.history.pushState({}, "", `?${urlParams.toString()}`);
-                    window.dispatchEvent(new PopStateEvent("popstate"));
-                  }, 500);
-                }
+                navigate('/?limited=true');
               }}
               className="text-sm font-medium link-underline"
             >
@@ -204,14 +174,7 @@ export const Header = () => {
             <button 
               onClick={() => {
                 setMobileMenuOpen(false);
-                const element = document.getElementById("all-products");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                  setTimeout(() => {
-                    window.history.pushState({}, "", "?sortBy=newest");
-                    window.dispatchEvent(new PopStateEvent("popstate"));
-                  }, 500);
-                }
+                navigate('/?sortBy=newest');
               }}
               className="py-2 font-medium text-left"
             >
@@ -220,14 +183,7 @@ export const Header = () => {
             <button 
               onClick={() => {
                 setMobileMenuOpen(false);
-                const element = document.getElementById("all-products");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                  setTimeout(() => {
-                    window.history.pushState({}, "", "?category=Lifestyle");
-                    window.dispatchEvent(new PopStateEvent("popstate"));
-                  }, 500);
-                }
+                navigate('/?category=Lifestyle');
               }}
               className="py-2 font-medium text-left"
             >
@@ -236,14 +192,7 @@ export const Header = () => {
             <button 
               onClick={() => {
                 setMobileMenuOpen(false);
-                const element = document.getElementById("all-products");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                  setTimeout(() => {
-                    window.history.pushState({}, "", "?category=Lifestyle");
-                    window.dispatchEvent(new PopStateEvent("popstate"));
-                  }, 500);
-                }
+                navigate('/?category=Lifestyle');
               }}
               className="py-2 font-medium text-left"
             >
@@ -252,16 +201,7 @@ export const Header = () => {
             <button 
               onClick={() => {
                 setMobileMenuOpen(false);
-                const element = document.getElementById("all-products");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                  setTimeout(() => {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    urlParams.set("limited", "true");
-                    window.history.pushState({}, "", `?${urlParams.toString()}`);
-                    window.dispatchEvent(new PopStateEvent("popstate"));
-                  }, 500);
-                }
+                navigate('/?limited=true');
               }}
               className="py-2 font-medium text-left"
             >

@@ -123,10 +123,10 @@ const ProductDetail = () => {
   const availableSizes = Object.entries(sizes).filter(([_, stock]) => stock > 0);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 flex-1">
         <Button
           variant="ghost"
           onClick={() => navigate("/")}
