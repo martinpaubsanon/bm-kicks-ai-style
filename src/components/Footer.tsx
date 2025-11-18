@@ -1,10 +1,8 @@
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import logo from "@/assets/bm-kicks-logo.png";
 import { WhatsAppButton } from "./WhatsAppButton";
-
 export const Footer = () => {
-  return (
-    <footer className="bg-primary text-primary-foreground">
+  return <footer className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
@@ -26,10 +24,7 @@ export const Footer = () => {
                 </a>
               </div>
               <div className="max-w-xs">
-                <WhatsAppButton 
-                  message="Hi BM Kicks! I'd like to know more about your products."
-                  size="sm"
-                />
+                <WhatsAppButton message="Hi BM Kicks! I'd like to know more about your products." size="sm" />
               </div>
             </div>
           </div>
@@ -58,12 +53,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-primary-foreground/60">
-            <span 
-              onClick={() => window.location.href = '/admin/login'} 
-              className="cursor-pointer hover:text-accent transition-colors"
-              title="Admin Access"
-            >
+          <p className="text-sm text-primary-foreground/60">© 2025 BM Kicks. All rights reserved.  [powered by StrategAIz - Tech Arm of Address Gateway]                                  <span onClick={() => window.location.href = '/admin/login'} className="cursor-pointer hover:text-accent transition-colors" title="Admin Access">
               ©
             </span> 2024 BM Kicks. All rights reserved.
           </p>
@@ -73,6 +63,5 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
