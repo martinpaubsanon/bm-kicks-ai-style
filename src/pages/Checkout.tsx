@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,17 +21,39 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
 
   const [shippingInfo, setShippingInfo] = useState({
-    fullName: customerProfile?.full_name || "",
-    email: user?.email || "",
-    phone: customerProfile?.phone || "",
-    address: customerProfile?.default_shipping_address?.address || "",
-    city: customerProfile?.default_shipping_address?.city || "",
-    province: customerProfile?.default_shipping_address?.province || "",
-    postalCode: customerProfile?.default_shipping_address?.postalCode || "",
-    country: customerProfile?.default_shipping_address?.country || "Philippines",
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    province: "",
+    postalCode: "",
+    country: "Qatar",
   });
 
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
+  const [showAddressForm, setShowAddressForm] = useState(true);
+
+  // Load saved address when customerProfile is available
+  useEffect(() => {
+    if (customerProfile) {
+      setShippingInfo({
+        fullName: customerProfile.full_name || "",
+        email: user?.email || "",
+        phone: customerProfile.phone || "",
+        address: customerProfile.default_shipping_address?.address || "",
+        city: customerProfile.default_shipping_address?.city || "",
+        province: customerProfile.default_shipping_address?.province || "",
+        postalCode: customerProfile.default_shipping_address?.postalCode || "",
+        country: customerProfile.default_shipping_address?.country || "Qatar",
+      });
+      
+      // Hide form if we have a saved address
+      if (customerProfile.default_shipping_address) {
+        setShowAddressForm(false);
+      }
+    }
+  }, [customerProfile, user?.email]);
 
   if (items.length === 0) {
     return (
@@ -107,6 +129,38 @@ export default function Checkout() {
               <CardTitle>Shipping Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Saved Address Display */}
+              {!showAddressForm && customerProfile?.default_shipping_address && (
+                <div className="p-4 bg-muted/50 rounded-lg border">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-primary font-medium">✓</span>
+                      <p className="font-medium text-sm">Using your saved address</p>
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setShowAddressForm(true)}
+                    >
+                      Edit
+                    </Button>
+                  </div>
+                  <div className="text-sm text-muted-foreground space-y-1 ml-6">
+                    <p className="font-medium">{shippingInfo.fullName}</p>
+                    <p>{shippingInfo.email} • {shippingInfo.phone}</p>
+                    <p>{customerProfile.default_shipping_address.address}</p>
+                    <p>
+                      {customerProfile.default_shipping_address.city}, {customerProfile.default_shipping_address.province} {customerProfile.default_shipping_address.postalCode}
+                    </p>
+                    <p>{customerProfile.default_shipping_address.country}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Address Form (shown when editing or no saved address) */}
+              {showAddressForm && (
+                <>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name</Label>
@@ -187,6 +241,8 @@ export default function Checkout() {
                   />
                 </div>
               </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
