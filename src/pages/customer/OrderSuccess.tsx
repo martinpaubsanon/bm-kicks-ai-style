@@ -102,7 +102,7 @@ export default function OrderSuccess() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-muted-foreground">Total Amount</span>
-                  <span className="text-sm font-bold">₱{order?.total.toLocaleString()}</span>
+                  <span className="text-sm font-bold">QAR {order?.total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-muted-foreground">Payment Method</span>
@@ -126,7 +126,7 @@ export default function OrderSuccess() {
                       <span className="text-muted-foreground">
                         {item.product_name} x{item.quantity}
                       </span>
-                      <span className="font-medium">₱{(item.price * item.quantity).toLocaleString()}</span>
+                      <span className="font-medium">QAR {(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>

@@ -341,7 +341,7 @@ export default function CreateOrder() {
                 <SelectContent>
                   {products.map((product) => (
                     <SelectItem key={product.id} value={product.id}>
-                      {product.brand} {product.name} - ${product.price}
+                      {product.brand} {product.name} - QAR {product.price.toFixed(2)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -363,7 +363,7 @@ export default function CreateOrder() {
                     <div className="flex-1">
                       <p className="font-medium">{item.product_name}</p>
                       <p className="text-sm text-muted-foreground">
-                        Size {item.size} | ${item.price}
+                        Size {item.size} | QAR {item.price.toFixed(2)}
                       </p>
                     </div>
                     <Input
@@ -378,7 +378,7 @@ export default function CreateOrder() {
                       className="w-20"
                     />
                     <p className="font-bold min-w-[80px] text-right">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      QAR {(item.price * item.quantity).toFixed(2)}
                     </p>
                     <Button
                       variant="ghost"
@@ -510,11 +510,11 @@ export default function CreateOrder() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span className="font-bold">${calculateSubtotal().toFixed(2)}</span>
+                <span className="font-bold">QAR {calculateSubtotal().toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold pt-2 border-t">
                 <span>Total:</span>
-                <span>${calculateSubtotal().toFixed(2)}</span>
+                <span>QAR {calculateSubtotal().toFixed(2)}</span>
               </div>
             </div>
           </CardContent>

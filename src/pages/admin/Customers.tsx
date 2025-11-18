@@ -125,7 +125,7 @@ export default function Customers() {
                 <TableCell className="font-medium">{customer.name}</TableCell>
                 <TableCell>{customer.email}</TableCell>
                 <TableCell>{customer.orderCount}</TableCell>
-                <TableCell>${customer.totalSpent.toFixed(2)}</TableCell>
+                <TableCell>QAR {customer.totalSpent.toFixed(2)}</TableCell>
                 <TableCell>
                   {new Date(customer.lastOrder).toLocaleDateString()}
                 </TableCell>

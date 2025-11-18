@@ -111,7 +111,7 @@ export const FeaturedProducts = () => {
                   {product.name}
                 </h3>
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold">${product.price}</span>
+                  <span className="text-2xl font-bold">QAR {product.price.toFixed(2)}</span>
                   <span className="text-sm text-muted-foreground">{product.category}</span>
                 </div>
               </div>

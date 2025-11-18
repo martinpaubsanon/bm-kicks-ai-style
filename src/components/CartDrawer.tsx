@@ -50,7 +50,7 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                       <p className="font-semibold text-sm">{item.product_name}</p>
                       <p className="text-xs text-muted-foreground">Size: {item.size}</p>
                       <p className="text-sm font-bold mt-1">
-                        ₱{(item.product_price * item.quantity).toLocaleString()}
+                        QAR {(item.product_price * item.quantity).toFixed(2)}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <Button
@@ -88,7 +88,7 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             <div className="border-t pt-4 space-y-4">
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
-                <span>₱{cartTotal.toLocaleString()}</span>
+                <span>QAR {cartTotal.toFixed(2)}</span>
               </div>
               <div className="space-y-2">
                 <Button className="w-full" onClick={handleCheckout}>

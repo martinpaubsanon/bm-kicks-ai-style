@@ -89,7 +89,7 @@ export default function CustomerOrders() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold">₱{order.total.toLocaleString()}</p>
+                    <p className="font-bold">QAR {order.total.toFixed(2)}</p>
                     <Button asChild size="sm" className="mt-2">
                       <Link to={`/customer/orders/${order.id}`}>View Details</Link>
                     </Button>
