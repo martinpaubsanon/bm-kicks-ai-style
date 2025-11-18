@@ -30,42 +30,6 @@ export const Header = () => {
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="BM Kicks" className="h-10 w-auto" />
           </Link>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            <button 
-              onClick={() => {
-                navigate('/?sortBy=newest');
-              }}
-              className="text-sm font-medium link-underline"
-            >
-              New Arrivals
-            </button>
-            <button 
-              onClick={() => {
-                navigate('/?category=Lifestyle');
-              }}
-              className="text-sm font-medium link-underline"
-            >
-              Men's
-            </button>
-            <button 
-              onClick={() => {
-                navigate('/?category=Lifestyle');
-              }}
-              className="text-sm font-medium link-underline"
-            >
-              Women's
-            </button>
-            <button 
-              onClick={() => {
-                navigate('/?limited=true');
-              }}
-              className="text-sm font-medium link-underline"
-            >
-              Limited Edition
-            </button>
-          </nav>
         </div>
 
         {/* Right Actions */}
@@ -167,49 +131,6 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background animate-slide-up">
-          <nav className="container mx-auto px-4 py-4 flex flex-col gap-3">
-            <button 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigate('/?sortBy=newest');
-              }}
-              className="py-2 font-medium text-left"
-            >
-              New Arrivals
-            </button>
-            <button 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigate('/?category=Lifestyle');
-              }}
-              className="py-2 font-medium text-left"
-            >
-              Men's
-            </button>
-            <button 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigate('/?category=Lifestyle');
-              }}
-              className="py-2 font-medium text-left"
-            >
-              Women's
-            </button>
-            <button 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigate('/?limited=true');
-              }}
-              className="py-2 font-medium text-left"
-            >
-              Limited Edition
-            </button>
-          </nav>
-        </div>
-      )}
       
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
     </header>
