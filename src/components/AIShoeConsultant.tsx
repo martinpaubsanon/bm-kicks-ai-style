@@ -171,7 +171,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
           </Button>
         </div>
 
-        <ScrollArea className="flex-1 px-4 py-3" ref={scrollRef}>
+        <ScrollArea className="flex-1 px-4 py-3 bg-background" ref={scrollRef}>
           <div className="space-y-3 pb-2">
             {messages.map((message, index) => (
               <div
@@ -181,17 +181,19 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
                 } animate-fade-in`}
               >
                 <div
-                  className={`rounded-2xl px-4 py-2.5 ${
+                  className={`rounded-2xl overflow-hidden ${
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground max-w-[75%]"
+                      ? "bg-primary text-primary-foreground max-w-[75%] px-4 py-2.5"
                       : message.products && message.products.length > 0
-                      ? "bg-muted/50 max-w-full"
-                      : "bg-muted max-w-[75%]"
+                      ? "bg-muted max-w-full"
+                      : "bg-muted max-w-[75%] px-4 py-2.5"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                  <div className={message.products && message.products.length > 0 ? "px-4 pt-3 pb-2" : ""}>
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                  </div>
                   {message.products && message.products.length > 0 && (
-                    <div className="space-y-2 mt-3">
+                    <div className="px-3 pb-3 space-y-2">
                       {message.products.slice(0, 4).map((product) => (
                         <CompactProductCard
                           key={product.id}
