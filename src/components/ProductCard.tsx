@@ -31,6 +31,9 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
           src={imageSrc}
           alt={`${product.brand} ${product.name}`}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          onError={(e) => {
+            e.currentTarget.src = "/placeholder.svg";
+          }}
         />
         <div className="absolute top-2 right-2 flex flex-col gap-1">
           {product.is_limited_edition && (

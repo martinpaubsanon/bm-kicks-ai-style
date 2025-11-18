@@ -88,6 +88,9 @@ export const FeaturedProducts = () => {
                   src={product.images?.[0] || "/placeholder.svg"} 
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  onError={(e) => {
+                    e.currentTarget.src = "/placeholder.svg";
+                  }}
                 />
                 <div className="absolute top-3 left-3 flex flex-col gap-2">
                   {product.is_limited_edition && (
