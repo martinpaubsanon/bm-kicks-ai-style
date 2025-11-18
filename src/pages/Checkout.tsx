@@ -10,6 +10,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "@/hooks/use-toast";
 import { createOrder } from "@/lib/orderUtils";
 import { Loader2 } from "lucide-react";
+import { Header } from "@/components/Header";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ export default function Checkout() {
         description: `Your order has been confirmed.`,
       });
 
-      navigate(user ? `/customer/orders/${orderId}` : "/");
+      navigate(`/customer/order-success?orderId=${orderId}`);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -75,9 +77,12 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8">
-      <div className="container max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+    <>
+      <Header />
+      <div className="min-h-screen bg-background pt-24 pb-8">
+        <div className="container max-w-4xl">
+          <Breadcrumbs items={[{ label: "Cart", href: "/" }, { label: "Checkout" }]} />
+          <h1 className="text-3xl font-bold my-6">Checkout</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card>
@@ -224,7 +229,8 @@ export default function Checkout() {
             </Button>
           </div>
         </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
