@@ -145,6 +145,9 @@ const ProductDetail = () => {
                 src={images[currentImageIndex]}
                 alt={`${product.brand} ${product.name}`}
                 className="h-full w-full object-cover transition-transform hover:scale-110 duration-500"
+                onError={(e) => {
+                  e.currentTarget.src = "/placeholder.svg";
+                }}
               />
               {product.is_limited_edition && (
                 <Badge variant="destructive" className="absolute top-4 right-4 animate-pulse">

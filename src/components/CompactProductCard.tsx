@@ -20,6 +20,9 @@ export const CompactProductCard = ({ product, onClick }: CompactProductCardProps
           src={imageUrl} 
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          onError={(e) => {
+            e.currentTarget.src = "/placeholder.svg";
+          }}
         />
         {product.is_limited_edition && (
           <Badge 
