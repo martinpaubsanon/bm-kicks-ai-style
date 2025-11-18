@@ -109,97 +109,31 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
         throw new Error("Failed to get response");
       }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let assistantMessage = "";
-      let products: Product[] = [];
+      const data = await response.json() as {
+        text: string;
+        products?: Product[];
+        error?: string;
+      };
 
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          const lines = chunk.split("\n");
-
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
-              if (data === "[DONE]") continue;
-
-              try {
-                const parsed = JSON.parse(data);
-                
-                // Handle tool calls for product recommendations
-                if (parsed.choices?.[0]?.delta?.tool_calls) {
-                  const toolCall = parsed.choices[0].delta.tool_calls[0];
-                  if (toolCall?.function?.arguments) {
-                    try {
-                      const args = JSON.parse(toolCall.function.arguments);
-                      console.log("🔍 Tool call arguments parsed:", args);
-                      if (args.products && Array.isArray(args.products)) {
-                        console.log("✅ Setting products:", args.products.length, "items");
-                        products = args.products;
-                      }
-                    } catch (e) {
-                      console.error("❌ Error parsing tool arguments:", e);
-                    }
-                  }
-                }
-
-                // Handle regular content
-                const content = parsed.choices?.[0]?.delta?.content;
-                if (content) {
-                  assistantMessage += content;
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    if (newMessages[newMessages.length - 1]?.role === "assistant") {
-                      newMessages[newMessages.length - 1] = {
-                        role: "assistant",
-                        content: assistantMessage,
-                        products: products.length > 0 ? products : undefined,
-                      };
-                    } else {
-                      newMessages.push({
-                        role: "assistant",
-                        content: assistantMessage,
-                        products: products.length > 0 ? products : undefined,
-                      });
-                    }
-                    return newMessages;
-                  });
-                }
-              } catch (e) {
-                console.error("❌ Error parsing SSE data:", e);
-              }
-            }
-          }
-        }
+      if (data.error) {
+        throw new Error(data.error);
       }
 
-      // Final update to ensure products are attached to the message
-      if (products.length > 0) {
-        console.log("🎨 Final products to display:", products);
-        setMessages((prev) => {
-          const newMessages = [...prev];
-          if (newMessages[newMessages.length - 1]?.role === "assistant") {
-            newMessages[newMessages.length - 1] = {
-              ...newMessages[newMessages.length - 1],
-              products: products,
-            };
-          }
-          return newMessages;
-        });
-      }
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: data.text,
+        products: data.products || [],
+      };
 
-      setIsLoading(false);
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error sending message:", error);
       toast({
         title: "Error",
-        description: "Failed to get AI response. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to get response. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -217,43 +151,39 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 bg-background/95 backdrop-blur-xl border-border">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">AI Sneaker Consultant</h2>
-              <p className="text-sm text-muted-foreground">Find your perfect kicks</p>
-            </div>
+      <DialogContent className="max-w-4xl h-[80vh] p-0 flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold">AI Sneaker Consultant</h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onOpenChange(false)}
+          >
             <X className="h-5 w-5" />
           </Button>
         </div>
 
-        {/* Chat Area */}
-        <ScrollArea className="flex-1 px-6" ref={scrollRef}>
-          <div className="space-y-6 py-6">
+        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+          <div className="space-y-4">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
+                }`}
               >
-                <div className="space-y-4 max-w-3xl">
-                  <div
-                    className={`rounded-2xl px-4 py-3 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground ml-auto"
-                        : "bg-card border border-border"
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap text-sm">{message.content}</p>
-                  </div>
-
-                  {/* Product Cards */}
+                <div
+                  className={`max-w-[80%] rounded-lg p-3 ${
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                  }`}
+                >
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  
                   {message.products && message.products.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                       {message.products.map((product) => (
@@ -274,11 +204,12 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
 
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-card border border-border rounded-2xl px-4 py-3">
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-primary rounded-full animate-bounce" />
-                    <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
-                    <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.4s]" />
+                <div className="bg-muted rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                    <span className="text-sm text-muted-foreground">
+                      Finding perfect matches...
+                    </span>
                   </div>
                 </div>
               </div>
@@ -286,24 +217,40 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
           </div>
         </ScrollArea>
 
-        {/* Input Area */}
-        <div className="px-6 py-4 border-t border-border bg-card/50">
+        <div className="p-4 border-t space-y-3">
+          {showQuickReplies && (
+            <div className="flex flex-wrap gap-2">
+              {quickReplies.map((reply, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuickReply(reply.query)}
+                  disabled={isLoading}
+                  className="text-xs"
+                >
+                  {reply.label}
+                </Button>
+              ))}
+            </div>
+          )}
+
           <div className="flex gap-2">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask me anything about sneakers..."
-              className="min-h-[60px] resize-none bg-background border-border"
+              onKeyDown={handleKeyPress}
+              placeholder="Ask about shoes, brands, prices..."
+              className="min-h-[60px] resize-none"
               disabled={isLoading}
             />
             <Button
               onClick={() => sendMessage()}
-              disabled={!input.trim() || isLoading}
+              disabled={isLoading || !input.trim()}
               size="icon"
-              className="h-[60px] w-[60px] shrink-0"
+              className="shrink-0"
             >
-              <Send className="h-5 w-5" />
+              <Send className="h-4 w-4" />
             </Button>
           </div>
         </div>
