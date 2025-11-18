@@ -136,11 +136,13 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
                   if (toolCall?.function?.arguments) {
                     try {
                       const args = JSON.parse(toolCall.function.arguments);
-                      if (args.products) {
+                      console.log("🔍 Tool call arguments parsed:", args);
+                      if (args.products && Array.isArray(args.products)) {
+                        console.log("✅ Setting products:", args.products.length, "items");
                         products = args.products;
                       }
                     } catch (e) {
-                      console.error("Error parsing tool arguments:", e);
+                      console.error("❌ Error parsing tool arguments:", e);
                     }
                   }
                 }
@@ -168,11 +170,26 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
                   });
                 }
               } catch (e) {
-                console.error("Error parsing SSE data:", e);
+                console.error("❌ Error parsing SSE data:", e);
               }
             }
           }
         }
+      }
+
+      // Final update to ensure products are attached to the message
+      if (products.length > 0) {
+        console.log("🎨 Final products to display:", products);
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          if (newMessages[newMessages.length - 1]?.role === "assistant") {
+            newMessages[newMessages.length - 1] = {
+              ...newMessages[newMessages.length - 1],
+              products: products,
+            };
+          }
+          return newMessages;
+        });
       }
 
       setIsLoading(false);

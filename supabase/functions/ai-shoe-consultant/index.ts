@@ -90,6 +90,7 @@ serve(async (req) => {
 3. 💬 Keep text BRIEF (1-2 sentences max) - let product images do the talking
 4. 🎯 Show products FIRST, ask questions AFTER (if needed)
 5. 🔧 Use the recommend_products tool for EVERY response that mentions specific shoes
+6. ⚠️ CRITICAL: Use the EXACT product UUIDs (id field) from the inventory below - DO NOT make up IDs!
 
 📊 CURRENT INVENTORY:
 ${productContext}
@@ -105,17 +106,34 @@ ${productContext}
 
 💡 RESPONSE FORMAT:
 1. Brief text (10-20 words): "Here are perfect matches for you!"
-2. IMMEDIATELY call recommend_products with 3-4 products
+2. IMMEDIATELY call recommend_products with 3-4 products using EXACT product data from inventory above
 3. That's it! No lengthy explanations.
 
 🎯 PRODUCT SELECTION LOGIC:
-• Always include complete product data: id, name, brand, price, images, is_featured, is_limited_edition, stock_total
+• CRITICAL: Copy the EXACT 'id' field (UUID format like 'a1b2c3d4-...') from the inventory above
+• Copy ALL fields exactly: id, name, brand, price, images, is_featured, is_limited_edition, stock_total
 • Prioritize: featured items → limited editions → high stock → diverse brands
 • Mix styles for variety unless user specifies
 • If size mentioned, only show products with that size in stock
 
 🚨 MANDATORY TOOL USAGE:
-You MUST call recommend_products in your first response. Visual results are MORE important than conversation.`;
+You MUST call recommend_products in your first response. Visual results are MORE important than conversation.
+
+Example tool call format:
+{
+  "products": [
+    {
+      "id": "7fecc456-3708-405b-b57a-5fd7c8db35a5",  // EXACT UUID from inventory
+      "name": "Air Force 1 Low Triple White",
+      "brand": "Nike",
+      "price": 110,
+      "images": ["url1", "url2"],
+      "is_featured": true,
+      "is_limited_edition": false,
+      "stock_total": 118
+    }
+  ]
+}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
