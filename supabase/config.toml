@@ -1,1 +1,4 @@
 project_id = "optuhyfoqurwgadcdqnb"
+
+[functions.ai-shoe-consultant]
+verify_jwt = false

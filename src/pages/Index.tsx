@@ -4,6 +4,7 @@ import { FeaturedProducts } from "@/components/FeaturedProducts";
 import { CategorySection } from "@/components/CategorySection";
 import { Footer } from "@/components/Footer";
 import { FloatingButtons } from "@/components/FloatingButtons";
+import { AIShoeConsultant } from "@/components/AIShoeConsultant";
 
 const Index = () => {
   return (
@@ -14,6 +15,7 @@ const Index = () => {
       <CategorySection />
       <Footer />
       <FloatingButtons />
+      <AIShoeConsultant />
     </div>
   );
 };
