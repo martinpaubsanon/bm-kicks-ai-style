@@ -1,28 +1,34 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Package, User, LogOut } from "lucide-react";
+import { Package, User, LogOut, ShoppingBag, LayoutDashboard } from "lucide-react";
+import { Header } from "@/components/Header";
 
 export default function CustomerLayout() {
   const { customerProfile, signOut } = useAuth();
   const location = useLocation();
 
   const navigation = [
+    { name: "Dashboard", href: "/customer", icon: LayoutDashboard },
     { name: "My Orders", href: "/customer/orders", icon: Package },
     { name: "Profile", href: "/customer/profile", icon: User },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container py-8">
-        <div className="flex gap-8">
-          <aside className="w-64 space-y-4">
-            <div className="bg-card p-4 rounded-lg border">
-              <p className="text-sm text-muted-foreground">Welcome back,</p>
-              <p className="font-semibold">{customerProfile?.full_name || "Customer"}</p>
-            </div>
+    <>
+      <Header />
+      <div className="min-h-screen bg-background pt-20">
+        <div className="container py-8">
+          <div className="flex gap-8">
+            <aside className="w-64 space-y-4">
+              <Link to="/">
+                <Button variant="default" className="w-full justify-start mb-4">
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  Continue Shopping
+                </Button>
+              </Link>
 
-            <nav className="space-y-2">
+              <nav className="space-y-2">
               {navigation.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.href;
@@ -52,8 +58,9 @@ export default function CustomerLayout() {
           <main className="flex-1">
             <Outlet />
           </main>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -5,8 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/admin/StatusBadge";
-import { Package, TrendingUp, Clock, CheckCircle } from "lucide-react";
+import { Package, TrendingUp, Clock, CheckCircle, ShoppingBag } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function Dashboard() {
   const { user, customerProfile } = useAuth();
@@ -78,6 +79,8 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      <Breadcrumbs items={[{ label: "Dashboard" }]} />
+      
       <div>
         <h1 className="text-3xl font-bold text-foreground">
           Welcome back, {customerProfile?.full_name || 'Customer'}!
@@ -87,6 +90,18 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Link to="/" className="block">
+          <Card className="hover:bg-accent/5 transition-colors cursor-pointer border-2 border-primary/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Browse Products</CardTitle>
+              <ShoppingBag className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary">Shop Now</div>
+              <p className="text-xs text-muted-foreground">Check out new arrivals</p>
+            </CardContent>
+          </Card>
+        </Link>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>

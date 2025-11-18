@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { format } from "date-fns";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 interface OrderItem {
   id: string;
@@ -88,10 +89,25 @@ export default function CustomerOrderDetail() {
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" onClick={() => navigate("/customer/orders")}>
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Orders
-      </Button>
+      <Breadcrumbs 
+        items={[
+          { label: "My Orders", href: "/customer/orders" },
+          { label: `Order #${order.order_number}` }
+        ]} 
+      />
+      
+      <div className="flex gap-2">
+        <Button variant="ghost" onClick={() => navigate("/customer/orders")}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Orders
+        </Button>
+        <Link to="/">
+          <Button variant="default">
+            <ShoppingBag className="mr-2 h-4 w-4" />
+            Continue Shopping
+          </Button>
+        </Link>
+      </div>
 
       <div className="flex justify-between items-start">
         <div>

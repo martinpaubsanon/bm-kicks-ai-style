@@ -28,6 +28,7 @@ import CustomerDashboard from "./pages/customer/Dashboard";
 import CustomerOrders from "./pages/customer/Orders";
 import CustomerOrderDetail from "./pages/customer/OrderDetail";
 import CustomerProfile from "./pages/customer/Profile";
+import OrderSuccess from "./pages/customer/OrderSuccess";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/auth" element={<CustomerAuth />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/customer/order-success" element={<OrderSuccess />} />
               
               {/* Customer portal routes */}
               <Route
