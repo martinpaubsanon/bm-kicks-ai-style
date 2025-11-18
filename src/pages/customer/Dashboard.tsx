@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Package, TrendingUp, Clock, CheckCircle, ShoppingBag } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export default function Dashboard() {
   const { user, customerProfile } = useAuth();
@@ -146,6 +147,22 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Need Help Section */}
+      <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-1">Need Help with Your Order?</h3>
+              <p className="text-sm text-muted-foreground">Our team is available 24/7 to assist you via WhatsApp</p>
+            </div>
+            <WhatsAppButton 
+              message="Hi! I need help with my order from BM Kicks."
+              size="lg"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Recent Orders */}
       <Card>

@@ -1,5 +1,6 @@
-import { Facebook, Instagram, Twitter, MessageCircle } from "lucide-react";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 import logo from "@/assets/bm-kicks-logo.png";
+import { WhatsAppButton } from "./WhatsAppButton";
 
 export const Footer = () => {
   return (
@@ -12,19 +13,24 @@ export const Footer = () => {
             <p className="text-primary-foreground/80 mb-4 max-w-md">
               The world under your kicks. Premium sneakers for every style, backed by AI-powered recommendations and 24/7 support.
             </p>
-            <div className="flex gap-4">
-              <a href="#" className="hover:text-accent transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="hover:text-accent transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="hover:text-accent transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="hover:text-accent transition-colors">
-                <MessageCircle className="h-5 w-5" />
-              </a>
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-4">
+                <a href="#" className="hover:text-accent transition-colors" aria-label="Facebook">
+                  <Facebook className="h-5 w-5" />
+                </a>
+                <a href="#" className="hover:text-accent transition-colors" aria-label="Instagram">
+                  <Instagram className="h-5 w-5" />
+                </a>
+                <a href="#" className="hover:text-accent transition-colors" aria-label="Twitter">
+                  <Twitter className="h-5 w-5" />
+                </a>
+              </div>
+              <div className="max-w-xs">
+                <WhatsAppButton 
+                  message="Hi BM Kicks! I'd like to know more about your products."
+                  size="sm"
+                />
+              </div>
             </div>
           </div>
 

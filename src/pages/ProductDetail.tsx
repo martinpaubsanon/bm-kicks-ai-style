@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 interface Product {
   id: string;
@@ -253,6 +254,20 @@ const ProductDetail = () => {
               <ShoppingCart className="mr-2 h-5 w-5" />
               Add to Cart
             </Button>
+
+            {/* WhatsApp Help Section */}
+            <div className="pt-6 border-t border-border">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-medium text-sm">Questions about this product?</p>
+                  <p className="text-xs text-muted-foreground">Chat with us on WhatsApp</p>
+                </div>
+                <WhatsAppButton 
+                  message={`Hi! I'm interested in the ${product.brand} ${product.name}. Can you help me?`}
+                  size="sm"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

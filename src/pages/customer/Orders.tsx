@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 interface Order {
   id: string;
@@ -50,7 +51,13 @@ export default function CustomerOrders() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">My Orders</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-3xl font-bold">My Orders</h1>
+        <WhatsAppButton 
+          message="Hi! I have a question about my order from BM Kicks."
+          size="sm"
+        />
+      </div>
 
       {orders.length === 0 ? (
         <Card>
