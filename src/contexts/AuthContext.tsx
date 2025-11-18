@@ -21,6 +21,8 @@ interface AuthContextType {
   isLoading: boolean;
   customerProfile: CustomerProfile | null;
   signOut: () => Promise<void>;
+  signUpCustomer: (email: string, password: string, fullName: string, phone: string) => Promise<void>;
+  signInCustomer: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -142,6 +144,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setCustomerProfile(null);
   };
 
+  const signUpCustomer = async (email: string, password: string, fullName: string, phone: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          full_name: fullName,
+          phone: phone,
+        }
+      }
+    });
+
+    if (error) throw error;
+  };
+
+  const signInCustomer = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) throw error;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -152,6 +181,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         customerProfile,
         signOut,
+        signUpCustomer,
+        signInCustomer,
       }}
     >
       {children}
