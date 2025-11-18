@@ -7,6 +7,7 @@ import { Badge } from "./ui/badge";
 import { ProductFilters } from "./ProductFilters";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
+import { useDebounce } from "@/hooks/use-debounce";
 
 interface Product {
   id: string;
@@ -33,6 +34,8 @@ export const AllProducts = () => {
 
   const selectedCategory = searchParams.get("category") || "all";
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 300]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("featured");
@@ -71,6 +74,15 @@ export const AllProducts = () => {
     
     if (selectedCategory !== "all") {
       filtered = filtered.filter(p => p.category === selectedCategory);
+    }
+
+    // Search filter - checks name, description, and brand
+    if (debouncedSearchQuery.trim()) {
+      const query = debouncedSearchQuery.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(query) ||
+        p.brand.toLowerCase().includes(query)
+      );
     }
 
     filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
@@ -116,7 +128,7 @@ export const AllProducts = () => {
     }
     
     setFilteredProducts(filtered);
-  }, [selectedCategory, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly]);
+  }, [selectedCategory, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly, debouncedSearchQuery]);
 
   const handleCategoryChange = (category: string) => {
     if (category === "all") {
@@ -134,6 +146,7 @@ export const AllProducts = () => {
   };
 
   const handleClearFilters = () => {
+    setSearchQuery("");
     setPriceRange([0, 300]);
     setSelectedBrands([]);
     setInStockOnly(false);
@@ -171,6 +184,7 @@ export const AllProducts = () => {
           <h2 className="text-4xl md:text-5xl font-bold mb-2">Our Complete Collection</h2>
           <p className="text-lg text-muted-foreground">
             {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"} found
+            {debouncedSearchQuery && ` for "${debouncedSearchQuery}"`}
           </p>
         </div>
 
@@ -200,6 +214,8 @@ export const AllProducts = () => {
         <div className="grid lg:grid-cols-[280px_1fr] gap-8">
           <aside className="lg:sticky lg:top-4 lg:self-start">
             <ProductFilters
+              searchQuery={searchQuery}
+              onSearchQueryChange={setSearchQuery}
               priceRange={priceRange}
               onPriceRangeChange={setPriceRange}
               selectedBrands={selectedBrands}
@@ -219,7 +235,14 @@ export const AllProducts = () => {
           <div>
             {filteredProducts.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-muted-foreground text-lg mb-4">No products match your filters.</p>
+                <p className="text-muted-foreground text-lg mb-2">
+                  {debouncedSearchQuery 
+                    ? `No products found for "${debouncedSearchQuery}"`
+                    : "No products match your filters."}
+                </p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Try adjusting your search or filters
+                </p>
                 <Button onClick={handleClearFilters} variant="outline">
                   Clear all filters
                 </Button>
