@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { resolveProductImage } from "@/lib/productImageOverrides";
 
 interface Product {
   id: string;
@@ -119,7 +120,9 @@ const ProductDetail = () => {
 
   if (!product) return null;
 
-  const images = product.images || ["/placeholder.svg"];
+  const images = product.images && product.images.length > 0
+    ? [resolveProductImage(product.id, product.images[0]), ...product.images.slice(1)]
+    : [resolveProductImage(product.id)];
   const sizes = product.sizes as Record<string, number> || {};
   const availableSizes = Object.entries(sizes).filter(([_, stock]) => stock > 0);
 
