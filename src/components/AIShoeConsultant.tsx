@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CompactProductCard } from "@/components/CompactProductCard";
 import { useToast } from "@/hooks/use-toast";
-import { Send, X, Sparkles, Loader2 } from "lucide-react";
+import { Send, Sparkles, Loader2 } from "lucide-react";
 
 export interface Product {
   id: string;
@@ -150,128 +150,154 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl h-[600px] p-0 gap-0 flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary" />
+      <DialogContent className="max-w-2xl h-[600px] p-0 flex flex-col gap-0">
+        {/* Redesigned Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border/50 bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg animate-pulse">
+              <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h2 className="text-base font-semibold">AI Shoe Consultant</h2>
-              <p className="text-xs text-muted-foreground">Powered by AI</p>
+              <h2 className="text-lg font-bold tracking-tight">AI Shoe Consultant</h2>
+              <p className="text-xs text-muted-foreground">Powered by AI • Instant Recommendations</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onOpenChange(false)}
-            className="h-8 w-8"
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </div>
 
-        <ScrollArea className="flex-1 px-4 py-3 bg-background" ref={scrollRef}>
-          <div className="space-y-3 pb-2">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                } animate-fade-in`}
-              >
-                <div
-                  className={`rounded-2xl overflow-hidden ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground max-w-[75%] px-4 py-2.5"
-                      : message.products && message.products.length > 0
-                      ? "bg-muted max-w-full"
-                      : "bg-muted max-w-[75%] px-4 py-2.5"
-                  }`}
-                >
-                  <div className={message.products && message.products.length > 0 ? "px-4 pt-3 pb-2" : ""}>
-                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
-                  </div>
-                  {message.products && message.products.length > 0 && (
-                    <div className="px-3 pb-3 space-y-2">
-                      {message.products.slice(0, 4).map((product) => (
-                        <CompactProductCard
-                          key={product.id}
-                          product={product}
-                          onClick={() => {
-                            navigate(`/product/${product.id}`);
-                            onOpenChange(false);
-                          }}
-                        />
-                      ))}
-                      {message.products.length > 4 && (
-                        <p className="text-xs text-muted-foreground text-center pt-1">
-                          +{message.products.length - 4} more products available
-                        </p>
-                      )}
-                    </div>
-                  )}
+        {/* Welcome State (only shown on initial message) */}
+        {messages.length === 1 && messages[0].role === "assistant" && (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="text-center space-y-6 max-w-md">
+              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-2xl animate-bounce">
+                <Sparkles className="w-10 h-10 text-primary-foreground" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold mb-2">Find Your Perfect Kicks!</h3>
+                <p className="text-muted-foreground">
+                  Tell me what you're looking for, and I'll recommend the best shoes for you.
+                </p>
+              </div>
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-muted-foreground">Quick suggestions:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickReplies.map((reply, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      onClick={() => handleQuickReply(reply.query)}
+                      className="h-auto py-3 text-sm hover:scale-105 transition-transform"
+                    >
+                      {reply.label}
+                    </Button>
+                  ))}
                 </div>
               </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start animate-fade-in">
-                <div className="bg-muted rounded-2xl px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                    <span className="text-sm text-muted-foreground">Thinking...</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-
-        {showQuickReplies && (
-          <div className="px-4 pb-2 border-t bg-background/95">
-            <p className="text-xs text-muted-foreground mb-2 mt-2">Quick suggestions:</p>
-            <div className="flex flex-wrap gap-1.5">
-              {quickReplies.map((reply, index) => (
-                <Button
-                  key={index}
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleQuickReply(reply.query)}
-                  className="text-xs h-7 rounded-full"
-                  disabled={isLoading}
-                >
-                  {reply.label}
-                </Button>
-              ))}
             </div>
           </div>
         )}
 
-        <div className="p-3 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        {/* Chat Area (hidden during welcome state) */}
+        {!(messages.length === 1 && messages[0].role === "assistant") && (
+          <ScrollArea className="flex-1 px-4 py-3 bg-gradient-to-b from-muted/20 to-background" ref={scrollRef}>
+            <div className="space-y-4">
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-lg p-3 shadow-md ${
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted"
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+
+                    {message.products && message.products.length > 0 && (
+                      <div className="grid gap-2 mt-3 border-t border-border/20 pt-3">
+                        {message.products.map((product) => (
+                          <div
+                            key={product.id}
+                            className="hover:scale-[1.02] transition-transform"
+                          >
+                            <CompactProductCard
+                              product={product}
+                              onClick={() => {
+                                navigate(`/product/${product.id}`);
+                                onOpenChange(false);
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {isLoading && (
+                <div className="flex justify-start animate-fade-in">
+                  <div className="max-w-[80%] rounded-lg p-3 bg-muted shadow-md">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      <span className="text-sm text-muted-foreground">AI is thinking</span>
+                      <span className="flex gap-1">
+                        <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {showQuickReplies && messages.length > 1 && (
+                <div className="flex flex-wrap gap-2 mt-4 animate-fade-in">
+                  {quickReplies.map((reply, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleQuickReply(reply.query)}
+                      disabled={isLoading}
+                      className="text-xs hover:scale-105 transition-transform"
+                    >
+                      {reply.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        )}
+
+        {/* Modernized Input Area */}
+        <div className="p-4 border-t bg-background shadow-lg">
           <div className="flex gap-2">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Describe your perfect shoe..."
-              className="min-h-[52px] max-h-[120px] resize-none text-sm"
+              className="min-h-[56px] max-h-[120px] resize-none text-sm border-2 focus:border-primary transition-colors"
               disabled={isLoading}
             />
             <Button
               onClick={() => sendMessage()}
               disabled={isLoading || !input.trim()}
               size="icon"
-              className="h-[52px] w-[52px] flex-shrink-0"
+              className="h-[56px] w-[56px] flex-shrink-0 bg-gradient-to-br from-primary to-primary/80 hover:scale-105 transition-transform shadow-lg"
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <Send className="h-4 w-4" />
+                <Send className="h-5 w-5" />
               )}
             </Button>
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2 text-center">
-            Press Enter to send • AI-powered recommendations
+          <p className="text-[10px] text-muted-foreground mt-2 text-center flex items-center justify-center gap-1">
+            Press Enter to send • <Sparkles className="w-3 h-3" /> AI-powered recommendations
           </p>
         </div>
       </DialogContent>

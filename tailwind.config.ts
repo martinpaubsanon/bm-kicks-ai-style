@@ -111,6 +111,8 @@ export default {
         "gradient-shift": "gradient-shift 3s ease infinite",
         "float": "float 3s ease-in-out infinite",
         "sparkle": "sparkle 1.5s ease-in-out infinite",
+        "pulse-subtle": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "bounce-subtle": "bounce 2s infinite",
       },
     },
   },
