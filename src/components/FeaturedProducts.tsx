@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { resolveProductImage } from "@/lib/productImageOverrides";
 
 interface Product {
   id: string;
@@ -85,7 +86,7 @@ export const FeaturedProducts = () => {
             >
               <div className="relative aspect-square overflow-hidden bg-secondary">
                 <img 
-                  src={product.images?.[0] || "/placeholder.svg"} 
+                  src={resolveProductImage(product.id, product.images?.[0])} 
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   onError={(e) => {

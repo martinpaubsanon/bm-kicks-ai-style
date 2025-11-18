@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-
+import { resolveProductImage } from "@/lib/productImageOverrides";
 interface Product {
   id: string;
   name: string;
@@ -18,7 +18,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, onClick }: ProductCardProps) => {
-  const imageSrc = product.images?.[0] || "/placeholder.svg";
+  const imageSrc = resolveProductImage(product.id, product.images?.[0]);
   const isLowStock = (product.stock_total || 0) < 10 && (product.stock_total || 0) > 0;
 
   return (
