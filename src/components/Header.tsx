@@ -33,10 +33,68 @@ export const Header = () => {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <a href="#new-arrivals" className="text-sm font-medium link-underline">New Arrivals</a>
-            <a href="#mens" className="text-sm font-medium link-underline">Men's</a>
-            <a href="#womens" className="text-sm font-medium link-underline">Women's</a>
-            <a href="#limited" className="text-sm font-medium link-underline">Limited Edition</a>
+            <button 
+              onClick={() => {
+                const element = document.getElementById("all-products");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    window.history.pushState({}, "", "?sortBy=newest");
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                  }, 500);
+                }
+              }}
+              className="text-sm font-medium link-underline"
+            >
+              New Arrivals
+            </button>
+            <button 
+              onClick={() => {
+                const element = document.getElementById("all-products");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    window.history.pushState({}, "", "?category=Lifestyle");
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                  }, 500);
+                }
+              }}
+              className="text-sm font-medium link-underline"
+            >
+              Men's
+            </button>
+            <button 
+              onClick={() => {
+                const element = document.getElementById("all-products");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    window.history.pushState({}, "", "?category=Lifestyle");
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                  }, 500);
+                }
+              }}
+              className="text-sm font-medium link-underline"
+            >
+              Women's
+            </button>
+            <button 
+              onClick={() => {
+                const element = document.getElementById("all-products");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    urlParams.set("limited", "true");
+                    window.history.pushState({}, "", `?${urlParams.toString()}`);
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                  }, 500);
+                }
+              }}
+              className="text-sm font-medium link-underline"
+            >
+              Limited Edition
+            </button>
           </nav>
         </div>
 
@@ -143,10 +201,72 @@ export const Header = () => {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-background animate-slide-up">
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-3">
-            <a href="#new-arrivals" className="py-2 font-medium">New Arrivals</a>
-            <a href="#mens" className="py-2 font-medium">Men's</a>
-            <a href="#womens" className="py-2 font-medium">Women's</a>
-            <a href="#limited" className="py-2 font-medium">Limited Edition</a>
+            <button 
+              onClick={() => {
+                setMobileMenuOpen(false);
+                const element = document.getElementById("all-products");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    window.history.pushState({}, "", "?sortBy=newest");
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                  }, 500);
+                }
+              }}
+              className="py-2 font-medium text-left"
+            >
+              New Arrivals
+            </button>
+            <button 
+              onClick={() => {
+                setMobileMenuOpen(false);
+                const element = document.getElementById("all-products");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    window.history.pushState({}, "", "?category=Lifestyle");
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                  }, 500);
+                }
+              }}
+              className="py-2 font-medium text-left"
+            >
+              Men's
+            </button>
+            <button 
+              onClick={() => {
+                setMobileMenuOpen(false);
+                const element = document.getElementById("all-products");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    window.history.pushState({}, "", "?category=Lifestyle");
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                  }, 500);
+                }
+              }}
+              className="py-2 font-medium text-left"
+            >
+              Women's
+            </button>
+            <button 
+              onClick={() => {
+                setMobileMenuOpen(false);
+                const element = document.getElementById("all-products");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    urlParams.set("limited", "true");
+                    window.history.pushState({}, "", `?${urlParams.toString()}`);
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                  }, 500);
+                }
+              }}
+              className="py-2 font-medium text-left"
+            >
+              Limited Edition
+            </button>
           </nav>
         </div>
       )}
