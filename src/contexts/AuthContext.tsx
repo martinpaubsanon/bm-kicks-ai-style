@@ -29,16 +29,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user role
+          // Fetch user role with retry logic for race conditions
           setTimeout(async () => {
-            const { data } = await supabase
+            const { data, error } = await supabase
               .from("user_roles")
               .select("role")
               .eq("user_id", session.user.id)
               .single();
             
-            setRole(data?.role as AppRole || "user");
-            setIsLoading(false);
+            // Handle case where user role not assigned yet (race condition with trigger)
+            if (error && error.code === 'PGRST116') {
+              // No rows returned - wait and retry
+              setTimeout(async () => {
+                const { data: retryData } = await supabase
+                  .from("user_roles")
+                  .select("role")
+                  .eq("user_id", session.user.id)
+                  .single();
+                
+                setRole(retryData?.role as AppRole || "user");
+                setIsLoading(false);
+              }, 1000);
+            } else {
+              setRole(data?.role as AppRole || "user");
+              setIsLoading(false);
+            }
           }, 0);
         } else {
           setRole(null);
@@ -54,14 +69,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (session?.user) {
         setTimeout(async () => {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from("user_roles")
             .select("role")
             .eq("user_id", session.user.id)
             .single();
           
-          setRole(data?.role as AppRole || "user");
-          setIsLoading(false);
+          // Handle case where user role not assigned yet
+          if (error && error.code === 'PGRST116') {
+            setTimeout(async () => {
+              const { data: retryData } = await supabase
+                .from("user_roles")
+                .select("role")
+                .eq("user_id", session.user.id)
+                .single();
+              
+              setRole(retryData?.role as AppRole || "user");
+              setIsLoading(false);
+            }, 1000);
+          } else {
+            setRole(data?.role as AppRole || "user");
+            setIsLoading(false);
+          }
         }, 0);
       } else {
         setIsLoading(false);

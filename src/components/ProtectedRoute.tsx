@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, isLoading } = useAuth();
@@ -17,11 +18,23 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!isAdmin) {
+    const { role, signOut } = useAuth();
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
+        <div className="text-center max-w-md px-4">
           <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
-          <p className="text-muted-foreground">You don't have permission to access this area.</p>
+          <p className="text-muted-foreground mb-4">
+            You don't have admin privileges to access this area.
+          </p>
+          <p className="text-sm text-muted-foreground mb-6">
+            {role === "user" 
+              ? "If you need admin access, please contact an administrator."
+              : "Your account is pending approval."
+            }
+          </p>
+          <Button onClick={() => signOut()} variant="outline">
+            Sign Out
+          </Button>
         </div>
       </div>
     );
