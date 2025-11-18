@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -15,6 +16,9 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
+import ImageUploader from "@/components/admin/ImageUploader";
+import SizeStockManager from "@/components/admin/SizeStockManager";
+import ColorManager from "@/components/admin/ColorManager";
 
 export default function ProductForm() {
   const { id } = useParams();
@@ -26,10 +30,10 @@ export default function ProductForm() {
     category: "running",
     description: "",
     price: "",
-    images: [""],
-    colors: [""],
-    sizes: "{}",
-    stock_total: "",
+    images: [] as string[],
+    colors: [] as string[],
+    sizes: {} as Record<string, number>,
+    stock_total: 0,
     style: "",
     is_featured: false,
     is_limited_edition: false,
@@ -51,16 +55,23 @@ export default function ProductForm() {
 
       if (error) throw error;
 
+      // Calculate total stock from sizes
+      const sizes = (data.sizes as Record<string, number>) || {};
+      const stock_total = Object.values(sizes).reduce(
+        (sum, stock) => sum + (typeof stock === "number" ? stock : 0),
+        0
+      );
+
       setFormData({
         name: data.name || "",
         brand: data.brand || "",
         category: data.category || "running",
         description: data.description || "",
         price: data.price?.toString() || "",
-        images: data.images || [""],
-        colors: data.colors || [""],
-        sizes: JSON.stringify(data.sizes || {}, null, 2),
-        stock_total: data.stock_total?.toString() || "",
+        images: data.images || [],
+        colors: data.colors || [],
+        sizes: sizes,
+        stock_total,
         style: data.style || "",
         is_featured: data.is_featured || false,
         is_limited_edition: data.is_limited_edition || false,
@@ -77,6 +88,26 @@ export default function ProductForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation
+    if (formData.images.length === 0) {
+      toast({
+        title: "Images required",
+        description: "Please upload at least one product image",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (Object.keys(formData.sizes).length === 0) {
+      toast({
+        title: "Sizes required",
+        description: "Please add at least one size with stock",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -86,10 +117,10 @@ export default function ProductForm() {
         category: formData.category,
         description: formData.description,
         price: parseFloat(formData.price),
-        images: formData.images.filter((img) => img.trim() !== ""),
-        colors: formData.colors.filter((color) => color.trim() !== ""),
-        sizes: JSON.parse(formData.sizes),
-        stock_total: parseInt(formData.stock_total) || 0,
+        images: formData.images,
+        colors: formData.colors,
+        sizes: formData.sizes,
+        stock_total: formData.stock_total,
         style: formData.style,
         is_featured: formData.is_featured,
         is_limited_edition: formData.is_limited_edition,
@@ -126,7 +157,7 @@ export default function ProductForm() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" onClick={() => navigate("/admin/products")}>
+        <Button variant="ghost" size="icon" onClick={() => navigate("/admin/products")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -139,130 +170,162 @@ export default function ProductForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="name">Name *</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+        {/* Basic Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Basic Information</CardTitle>
+            <CardDescription>Product name, brand, and description</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="brand">Brand *</Label>
+              <Label htmlFor="name">Product Name *</Label>
               <Input
-                id="brand"
-                value={formData.brand}
-                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
+                placeholder="Nike Air Max 90"
               />
             </div>
-            <div>
-              <Label htmlFor="category">Category *</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="running">Running</SelectItem>
-                  <SelectItem value="basketball">Basketball</SelectItem>
-                  <SelectItem value="lifestyle">Lifestyle</SelectItem>
-                  <SelectItem value="training">Training</SelectItem>
-                </SelectContent>
-              </Select>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="brand">Brand *</Label>
+                <Input
+                  id="brand"
+                  value={formData.brand}
+                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                  required
+                  placeholder="Nike"
+                />
+              </div>
+              <div>
+                <Label htmlFor="category">Category *</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="running">Running</SelectItem>
+                    <SelectItem value="basketball">Basketball</SelectItem>
+                    <SelectItem value="lifestyle">Lifestyle</SelectItem>
+                    <SelectItem value="training">Training</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
 
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={4}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="price">Price *</Label>
-              <Input
-                id="price"
-                type="number"
-                step="0.01"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                required
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
+                placeholder="Describe the product features, materials, and benefits..."
               />
             </div>
-            <div>
-              <Label htmlFor="stock">Stock Total *</Label>
-              <Input
-                id="stock"
-                type="number"
-                value={formData.stock_total}
-                onChange={(e) => setFormData({ ...formData, stock_total: e.target.value })}
-                required
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="price">Price (USD) *</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  required
+                  placeholder="129.99"
+                />
+              </div>
+              <div>
+                <Label htmlFor="style">Style Code</Label>
+                <Input
+                  id="style"
+                  value={formData.style}
+                  onChange={(e) => setFormData({ ...formData, style: e.target.value })}
+                  placeholder="CD0113-100"
+                />
+              </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          <div>
-            <Label htmlFor="images">Image URLs (one per line)</Label>
-            <Textarea
-              id="images"
-              value={formData.images.join("\n")}
-              onChange={(e) =>
-                setFormData({ ...formData, images: e.target.value.split("\n") })
-              }
-              rows={3}
-              placeholder="https://example.com/image1.jpg"
+        {/* Product Images */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Product Images</CardTitle>
+            <CardDescription>Upload up to 5 high-quality product images</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ImageUploader
+              images={formData.images}
+              onChange={(images) => setFormData({ ...formData, images })}
+              maxImages={5}
+              productId={id || "new"}
             />
-          </div>
+          </CardContent>
+        </Card>
 
-          <div>
-            <Label htmlFor="colors">Colors (comma-separated)</Label>
-            <Input
-              id="colors"
-              value={formData.colors.join(", ")}
-              onChange={(e) =>
-                setFormData({ ...formData, colors: e.target.value.split(",").map((c) => c.trim()) })
-              }
-              placeholder="Black, White, Red"
-            />
-          </div>
+        {/* Product Variants */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Product Variants</CardTitle>
+            <CardDescription>Colors, sizes, and stock management</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <Label>Available Colors</Label>
+              <div className="mt-2">
+                <ColorManager
+                  colors={formData.colors}
+                  onChange={(colors) => setFormData({ ...formData, colors })}
+                />
+              </div>
+            </div>
 
-          <div>
-            <Label htmlFor="sizes">Sizes (JSON format)</Label>
-            <Textarea
-              id="sizes"
-              value={formData.sizes}
-              onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
-              rows={6}
-              placeholder='{"8": 10, "9": 15, "10": 20}'
-              className="font-mono text-sm"
-            />
-          </div>
+            <div>
+              <Label>Sizes & Stock</Label>
+              <div className="mt-2">
+                <SizeStockManager
+                  sizes={formData.sizes}
+                  onChange={(sizes) => {
+                    // Auto-calculate total stock
+                    const total = Object.values(sizes).reduce((sum, stock) => sum + stock, 0);
+                    setFormData({
+                      ...formData,
+                      sizes,
+                      stock_total: total,
+                    });
+                  }}
+                />
+              </div>
+              <p className="text-sm text-muted-foreground mt-3">
+                Total Stock: <strong className="text-foreground">{formData.stock_total}</strong> items
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
-          <div>
-            <Label htmlFor="style">Style/Model Number</Label>
-            <Input
-              id="style"
-              value={formData.style}
-              onChange={(e) => setFormData({ ...formData, style: e.target.value })}
-              placeholder="DX1234-001"
-            />
-          </div>
-
-          <div className="flex items-center gap-6">
-            <div className="flex items-center space-x-2">
+        {/* Product Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Product Settings</CardTitle>
+            <CardDescription>Feature flags and special designations</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="featured">Featured Product</Label>
+                <p className="text-sm text-muted-foreground">
+                  Display this product on the homepage
+                </p>
+              </div>
               <Switch
                 id="featured"
                 checked={formData.is_featured}
@@ -270,9 +333,15 @@ export default function ProductForm() {
                   setFormData({ ...formData, is_featured: checked })
                 }
               />
-              <Label htmlFor="featured">Featured Product</Label>
             </div>
-            <div className="flex items-center space-x-2">
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="limited">Limited Edition</Label>
+                <p className="text-sm text-muted-foreground">
+                  Mark as limited edition product
+                </p>
+              </div>
               <Switch
                 id="limited"
                 checked={formData.is_limited_edition}
@@ -280,18 +349,19 @@ export default function ProductForm() {
                   setFormData({ ...formData, is_limited_edition: checked })
                 }
               />
-              <Label htmlFor="limited">Limited Edition</Label>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
+        {/* Form Actions */}
         <div className="flex gap-4">
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} size="lg">
             {loading ? "Saving..." : id ? "Update Product" : "Create Product"}
           </Button>
           <Button
             type="button"
             variant="outline"
+            size="lg"
             onClick={() => navigate("/admin/products")}
           >
             Cancel
