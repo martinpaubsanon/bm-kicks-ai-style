@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { format } from "date-fns";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 interface OrderItem {
   id: string;
@@ -201,6 +202,22 @@ export default function CustomerOrderDetail() {
                 <span>₱{order.total.toLocaleString()}</span>
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* WhatsApp Support Card */}
+      <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-1">Questions About This Order?</h3>
+              <p className="text-sm text-muted-foreground">Our support team is here to help via WhatsApp</p>
+            </div>
+            <WhatsAppButton 
+              message={`Hi! I have a question about my order ${order.order_number} from BM Kicks.`}
+              size="lg"
+            />
           </div>
         </CardContent>
       </Card>

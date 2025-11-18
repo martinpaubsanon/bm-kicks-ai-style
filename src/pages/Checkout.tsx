@@ -13,6 +13,7 @@ import { createOrder } from "@/lib/orderUtils";
 import { Loader2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -288,6 +289,22 @@ export default function Checkout() {
                     <span>₱{cartTotal.toLocaleString()}</span>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
+            <CardContent className="pt-6">
+              <div className="flex flex-col gap-3">
+                <div>
+                  <p className="font-medium text-sm">Need help with your order?</p>
+                  <p className="text-xs text-muted-foreground">Contact us on WhatsApp for instant support</p>
+                </div>
+                <WhatsAppButton 
+                  message="Hi! I need help completing my order at BM Kicks."
+                  size="sm"
+                  className="w-full"
+                />
               </div>
             </CardContent>
           </Card>
