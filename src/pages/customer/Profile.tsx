@@ -14,6 +14,11 @@ export default function CustomerProfile() {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
+    address: "",
+    city: "",
+    province: "",
+    postalCode: "",
+    country: "Philippines",
   });
 
   useEffect(() => {
@@ -21,6 +26,11 @@ export default function CustomerProfile() {
       setFormData({
         fullName: customerProfile.full_name || "",
         phone: customerProfile.phone || "",
+        address: customerProfile.default_shipping_address?.address || "",
+        city: customerProfile.default_shipping_address?.city || "",
+        province: customerProfile.default_shipping_address?.province || "",
+        postalCode: customerProfile.default_shipping_address?.postalCode || "",
+        country: customerProfile.default_shipping_address?.country || "Philippines",
       });
     }
   }, [customerProfile]);
@@ -36,6 +46,13 @@ export default function CustomerProfile() {
         .update({
           full_name: formData.fullName,
           phone: formData.phone,
+          default_shipping_address: {
+            address: formData.address,
+            city: formData.city,
+            province: formData.province,
+            postalCode: formData.postalCode,
+            country: formData.country,
+          }
         })
         .eq("id", user.id);
 
@@ -90,6 +107,70 @@ export default function CustomerProfile() {
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 required
               />
+            </div>
+
+            <Button type="submit" disabled={loading}>
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Save Changes
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Default Shipping Address</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="address">Address</Label>
+              <Input
+                id="address"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                placeholder="Street address"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="province">Province</Label>
+                <Input
+                  id="province"
+                  value={formData.province}
+                  onChange={(e) => setFormData({ ...formData, province: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="postalCode">Postal Code</Label>
+                <Input
+                  id="postalCode"
+                  value={formData.postalCode}
+                  onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                />
+              </div>
             </div>
 
             <Button type="submit" disabled={loading}>
