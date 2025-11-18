@@ -13,122 +13,161 @@ serve(async (req) => {
 
   try {
     const { messages } = await req.json();
-    
-    // Get the last user message
-    const lastUserMessage = messages
-      .slice()
-      .reverse()
-      .find((m: any) => m.role === "user")?.content ?? "";
-    
-    const text = lastUserMessage.toLowerCase().trim();
-    console.log("🔍 Processing query:", text);
+    console.log("🔍 Processing AI shoe consultation with", messages.length, "messages");
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Parse user intent with enhanced brand and category detection
-    let brandFilter: string | undefined;
-    if (text.includes("nike")) brandFilter = "Nike";
-    if (text.includes("adidas")) brandFilter = "Adidas";
-    if (text.includes("new balance")) brandFilter = "New Balance";
-    if (text.includes("jordan")) brandFilter = "Jordan";
-    if (text.includes("puma")) brandFilter = "Puma";
-    if (text.includes("under armour")) brandFilter = "Under Armour";
-    if (text.includes("brooks")) brandFilter = "Brooks";
-    if (text.includes("asics")) brandFilter = "ASICS";
-    if (text.includes("reebok")) brandFilter = "Reebok";
-    if (text.includes("vans")) brandFilter = "Vans";
-    if (text.includes("converse")) brandFilter = "Converse";
-    if (text.includes("on running") || text.includes(" on ")) brandFilter = "On";
+    // Get Lovable AI key
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY not configured");
+    }
 
-    let maxPrice: number | undefined;
-    const underMatch = text.match(/under\s*\$?(\d+)/);
-    if (underMatch) maxPrice = Number(underMatch[1]);
+    // Fetch all available products for AI context
+    const { data: allProducts, error: productsError } = await supabase
+      .from("products")
+      .select("id, name, brand, price, category, is_featured, is_limited_edition, stock_total, description")
+      .gt("stock_total", 0);
 
-    let categoryFilter: string | undefined;
-    if (text.includes("running") || text.includes("run") || text.includes("marathon") || text.includes("jogging")) 
-      categoryFilter = "Running";
-    if (text.includes("basketball") || text.includes("ball") || text.includes("court") || text.includes("hoops")) 
-      categoryFilter = "Basketball";
-    if (text.includes("lifestyle") || text.includes("casual") || text.includes("daily") || text.includes("street")) 
-      categoryFilter = "Lifestyle";
-    if (text.includes("training") || text.includes("gym") || text.includes("workout") || text.includes("crossfit")) 
-      categoryFilter = "Training";
-    if (text.includes("skateboard") || text.includes("skate") || text.includes(" sb ")) 
-      categoryFilter = "Skateboarding";
+    if (productsError) {
+      console.error("Error fetching products:", productsError);
+      throw productsError;
+    }
+
+    console.log("📦 Loaded", allProducts?.length || 0, "products for AI context");
+
+    // Create intelligent system prompt with product context
+    const systemPrompt = `You are an expert sneaker consultant for BM Kicks. Your job is to recommend the perfect shoes based on customer needs.
+
+AVAILABLE PRODUCTS:
+${JSON.stringify(allProducts, null, 2)}
+
+INSTRUCTIONS:
+- Understand the customer's needs (activity, style, budget, brand preference)
+- Recommend 2-4 products that best match their needs
+- Explain WHY each shoe is a good match in a friendly, conversational way
+- Be helpful and enthusiastic about sneakers
+- If they ask about specific brands/categories, focus on those
+- If budget is mentioned, respect it strictly
+- Highlight limited edition or featured items when relevant
+- Keep explanations concise but informative (2-3 sentences max)
+
+RESPONSE FORMAT:
+Use the recommend_shoes tool to return your recommendations with a friendly explanation.`;
+
+    // Call Lovable AI with tool calling
+    console.log("🤖 Calling Lovable AI...");
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...messages
+        ],
+        tools: [{
+          type: "function",
+          function: {
+            name: "recommend_shoes",
+            description: "Recommend shoes to the customer with explanations",
+            parameters: {
+              type: "object",
+              properties: {
+                explanation: {
+                  type: "string",
+                  description: "Friendly explanation of why these shoes match their needs (2-3 sentences)"
+                },
+                product_ids: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "Array of product IDs to recommend (2-4 products)"
+                }
+              },
+              required: ["explanation", "product_ids"],
+              additionalProperties: false
+            }
+          }
+        }],
+        tool_choice: { type: "function", function: { name: "recommend_shoes" } }
+      })
+    });
+
+    if (!aiResponse.ok) {
+      const errorText = await aiResponse.text();
+      console.error("AI API error:", aiResponse.status, errorText);
+      
+      if (aiResponse.status === 429) {
+        return new Response(JSON.stringify({ 
+          error: "Rate limit exceeded",
+          text: "I'm getting too many requests right now. Please try again in a moment! 😊",
+          products: []
+        }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      if (aiResponse.status === 402) {
+        // Fallback to featured products
+        const { data: fallbackProducts } = await supabase
+          .from("products")
+          .select("id, name, brand, price, images, is_featured, is_limited_edition, stock_total, category")
+          .gt("stock_total", 0)
+          .eq("is_featured", true)
+          .limit(4);
+        
+        return new Response(JSON.stringify({ 
+          error: "Payment required",
+          text: "AI service temporarily unavailable. Here are our featured products instead! 😊",
+          products: fallbackProducts || []
+        }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      throw new Error(`AI API error: ${aiResponse.status}`);
+    }
+
+    const aiData = await aiResponse.json();
+    console.log("🎯 AI response received");
     
-    let limitedEdition = false;
-    if (text.includes("limited")) limitedEdition = true;
-    
-    let featured = false;
-    if (text.includes("featured") || text.includes("premium") || text.includes("top") || text.includes("popular")) featured = true;
+    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
 
-    console.log("📊 Filters:", { brandFilter, maxPrice, categoryFilter, limitedEdition, featured });
+    if (!toolCall) {
+      console.error("No tool call in AI response");
+      throw new Error("No tool call in AI response");
+    }
 
-    // Build query
-    let query = supabase
+    const recommendation = JSON.parse(toolCall.function.arguments);
+    const productIds = recommendation.product_ids || [];
+    const explanation = recommendation.explanation || "Here are some great options for you!";
+
+    console.log("✅ AI recommended:", productIds.length, "products");
+    console.log("💬 AI explanation:", explanation);
+
+    // Fetch the recommended products
+    const { data: recommendedProducts, error: fetchError } = await supabase
       .from("products")
       .select("id, name, brand, price, images, is_featured, is_limited_edition, stock_total, category")
-      .gt("stock_total", 0)
-      .order("stock_total", { ascending: false })
-      .limit(4);
+      .in("id", productIds);
 
-    if (brandFilter) query = query.eq("brand", brandFilter);
-    if (categoryFilter) query = query.eq("category", categoryFilter);
-    if (maxPrice) query = query.lte("price", maxPrice);
-    if (limitedEdition) query = query.eq("is_limited_edition", true);
-    if (featured) query = query.eq("is_featured", true);
-
-    const { data: products, error } = await query;
-
-    if (error) {
-      console.error("Database error:", error);
-      throw error;
+    if (fetchError) {
+      console.error("Error fetching recommended products:", fetchError);
+      throw fetchError;
     }
-
-    console.log("✅ Found products:", products?.length || 0);
-
-    // Fallback if no products found
-    let finalProducts = products || [];
-    if (finalProducts.length === 0) {
-      console.log("⚠️ No products found with filters, falling back to featured");
-      const { data: fallbackProducts } = await supabase
-        .from("products")
-        .select("id, name, brand, price, images, is_featured, is_limited_edition, stock_total, category")
-        .gt("stock_total", 0)
-        .eq("is_featured", true)
-        .order("stock_total", { ascending: false })
-        .limit(4);
-      finalProducts = fallbackProducts || [];
-    }
-
-    // Generate helper text
-    let helperText = "Here are some great options for you!";
-
-    if (brandFilter && maxPrice) {
-      helperText = `Here are ${brandFilter} sneakers under $${maxPrice}:`;
-    } else if (brandFilter && categoryFilter) {
-      helperText = `Here are ${brandFilter} ${categoryFilter.toLowerCase()} shoes:`;
-    } else if (brandFilter) {
-      helperText = `Here are some popular ${brandFilter} sneakers:`;
-    } else if (maxPrice) {
-      helperText = `Here are some options under $${maxPrice}:`;
-    } else if (categoryFilter) {
-      helperText = `Here are top ${categoryFilter.toLowerCase()} shoes:`;
-    } else if (limitedEdition) {
-      helperText = `Here are our limited edition sneakers:`;
-    } else if (featured) {
-      helperText = `Here are our featured premium picks:`;
-    }
-
-    console.log("💬 Response text:", helperText);
 
     return new Response(
       JSON.stringify({
-        text: helperText,
-        products: finalProducts,
+        text: explanation,
+        products: recommendedProducts || [],
       }),
       {
         status: 200,
@@ -137,13 +176,38 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("AI consultant error:", error);
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Unknown error",
-        text: "Sorry, I encountered an error. Please try again.",
-        products: []
-      }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    
+    // Fallback to featured products on any error
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      
+      const { data: fallbackProducts } = await supabase
+        .from("products")
+        .select("id, name, brand, price, images, is_featured, is_limited_edition, stock_total, category")
+        .gt("stock_total", 0)
+        .eq("is_featured", true)
+        .limit(4);
+      
+      return new Response(
+        JSON.stringify({ 
+          error: error instanceof Error ? error.message : "Unknown error",
+          text: "I'm having trouble right now, but here are some of our top picks! 😊",
+          products: fallbackProducts || []
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    } catch (fallbackError) {
+      console.error("Fallback error:", fallbackError);
+      return new Response(
+        JSON.stringify({ 
+          error: error instanceof Error ? error.message : "Unknown error",
+          text: "Sorry, I encountered an error. Please try again.",
+          products: []
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
   }
 });
