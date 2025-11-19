@@ -20,9 +20,10 @@ interface AuthRequiredModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onGuestCheckout: () => void;
+  hideGuestOption?: boolean;
 }
 
-export function AuthRequiredModal({ open, onOpenChange, onGuestCheckout }: AuthRequiredModalProps) {
+export function AuthRequiredModal({ open, onOpenChange, onGuestCheckout, hideGuestOption = false }: AuthRequiredModalProps) {
   const navigate = useNavigate();
   const { signUpCustomer, signInCustomer } = useAuth();
   const [mode, setMode] = useState<"choice" | "signin" | "signup">("choice");
@@ -120,9 +121,12 @@ export function AuthRequiredModal({ open, onOpenChange, onGuestCheckout }: AuthR
         {mode === "choice" && (
           <>
             <DialogHeader>
-              <DialogTitle>Sign in to continue</DialogTitle>
+              <DialogTitle>{hideGuestOption ? "Create an account to continue" : "Sign in to continue"}</DialogTitle>
               <DialogDescription>
-                Create an account to track your orders and save your information for faster checkout
+                {hideGuestOption 
+                  ? "You need an account to add items to your cart and track your orders"
+                  : "Create an account to track your orders and save your information for faster checkout"
+                }
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-3 py-4">
@@ -132,9 +136,11 @@ export function AuthRequiredModal({ open, onOpenChange, onGuestCheckout }: AuthR
               <Button onClick={() => setMode("signin")} variant="outline" size="lg">
                 Sign In
               </Button>
-              <Button onClick={handleGuestCheckout} variant="ghost" size="lg">
-                Continue as Guest
-              </Button>
+              {!hideGuestOption && (
+                <Button onClick={handleGuestCheckout} variant="ghost" size="lg">
+                  Continue as Guest
+                </Button>
+              )}
             </div>
           </>
         )}
