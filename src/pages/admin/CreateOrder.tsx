@@ -29,6 +29,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { createOrderSchema } from "@/lib/validationSchemas";
 
 interface OrderItem {
   product_id: string;
@@ -147,19 +148,34 @@ export default function CreateOrder() {
       return;
     }
 
-    if (isNewCustomer && (!newCustomer.full_name || !newCustomer.email || !newCustomer.phone)) {
+    if (orderItems.length === 0) {
       toast({
-        title: "Complete customer info",
-        description: "Please fill in all customer details",
+        title: "Add products",
+        description: "Please add at least one product to the order",
         variant: "destructive",
       });
       return;
     }
 
-    if (orderItems.length === 0) {
+    // Validate customer data with zod schema
+    const customerData = {
+      customerName: isNewCustomer ? newCustomer.full_name : selectedCustomer?.full_name || "",
+      customerEmail: isNewCustomer ? newCustomer.email : `${selectedCustomer?.full_name?.toLowerCase().replace(/\s+/g, '.')}@bmkicks.customer`,
+      customerPhone: isNewCustomer ? newCustomer.phone : selectedCustomer?.phone || "",
+      address: shippingAddress.address_line1 || "",
+      city: shippingAddress.city || "",
+      province: shippingAddress.state || "",
+      postalCode: shippingAddress.postal_code || "",
+      country: shippingAddress.country || "Qatar",
+    };
+
+    const validation = createOrderSchema.safeParse(customerData);
+    
+    if (!validation.success) {
+      const errors = validation.error.errors;
       toast({
-        title: "Add products",
-        description: "Please add at least one product to the order",
+        title: "Validation Error",
+        description: errors[0]?.message || "Please check customer and shipping information",
         variant: "destructive",
       });
       return;
@@ -171,17 +187,12 @@ export default function CreateOrder() {
       const subtotal = calculateSubtotal();
       const total = subtotal;
 
-      // Get customer email
-      const customerEmail = isNewCustomer 
-        ? newCustomer.email 
-        : `${selectedCustomer?.full_name?.toLowerCase().replace(/\s+/g, '.')}@bmkicks.customer`;
-
-      // Create order
+      // Create order with validated data
       const orderData: any = {
         user_id: selectedCustomer?.id || null,
-        customer_name: isNewCustomer ? newCustomer.full_name : selectedCustomer?.full_name || "",
-        customer_email: customerEmail,
-        customer_phone: isNewCustomer ? newCustomer.phone : selectedCustomer?.phone || "",
+        customer_name: validation.data.customerName,
+        customer_email: validation.data.customerEmail,
+        customer_phone: validation.data.customerPhone,
         shipping_address: shippingAddress,
         subtotal,
         total,
@@ -192,8 +203,6 @@ export default function CreateOrder() {
         order_number: "",
       };
 
-      console.log("Creating order with data:", orderData);
-
       // Create order
       const { data: order, error: orderError } = await supabase
         .from("orders")
@@ -201,10 +210,7 @@ export default function CreateOrder() {
         .select()
         .single();
 
-      if (orderError) {
-        console.error("Order creation error:", orderError);
-        throw orderError;
-      }
+      if (orderError) throw orderError;
 
       // Create order items
       const { error: itemsError } = await supabase.from("order_items").insert(
@@ -229,7 +235,6 @@ export default function CreateOrder() {
 
       navigate("/admin/orders");
     } catch (error: any) {
-      console.error("Error creating order:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to create order",

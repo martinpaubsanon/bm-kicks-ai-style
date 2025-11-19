@@ -61,7 +61,6 @@ export default function OrderDetail() {
       if (paymentsError) throw paymentsError;
       setPaymentConfirmations(paymentsData || []);
     } catch (error) {
-      console.error("Error loading order:", error);
       toast({
         title: "Error",
         description: "Failed to load order details",
@@ -87,7 +86,6 @@ export default function OrderDetail() {
       });
       loadOrderDetails();
     } catch (error) {
-      console.error("Error updating order:", error);
       toast({
         title: "Error",
         description: "Failed to update order status",
@@ -98,26 +96,20 @@ export default function OrderDetail() {
 
   const updatePaymentStatus = async (status: string) => {
     try {
-      console.log("Updating payment status to:", status);
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("orders")
         .update({ payment_status: status })
         .eq("id", id)
         .select();
 
-      if (error) {
-        console.error("Payment status update error:", error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log("Payment status updated successfully:", data);
       toast({
         title: "Success",
         description: "Payment status updated successfully",
       });
       loadOrderDetails();
     } catch (error: any) {
-      console.error("Error updating payment:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to update payment status",

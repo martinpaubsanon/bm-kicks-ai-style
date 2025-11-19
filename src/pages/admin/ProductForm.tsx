@@ -19,6 +19,7 @@ import { ArrowLeft } from "lucide-react";
 import ImageUploader from "@/components/admin/ImageUploader";
 import SizeStockManager from "@/components/admin/SizeStockManager";
 import ColorManager from "@/components/admin/ColorManager";
+import { productSchema } from "@/lib/validationSchemas";
 
 export default function ProductForm() {
   const { id } = useParams();
@@ -77,7 +78,6 @@ export default function ProductForm() {
         is_limited_edition: data.is_limited_edition || false,
       });
     } catch (error) {
-      console.error("Error loading product:", error);
       toast({
         title: "Error",
         description: "Failed to load product",
@@ -89,7 +89,7 @@ export default function ProductForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
+    // Image and size validation
     if (formData.images.length === 0) {
       toast({
         title: "Images required",
@@ -108,6 +108,26 @@ export default function ProductForm() {
       return;
     }
 
+    // Validate product data with zod schema
+    const validation = productSchema.safeParse({
+      name: formData.name,
+      brand: formData.brand,
+      category: formData.category,
+      price: parseFloat(formData.price),
+      description: formData.description || undefined,
+      style: formData.style || undefined,
+    });
+
+    if (!validation.success) {
+      const errors = validation.error.errors;
+      toast({
+        title: "Validation Error",
+        description: errors[0]?.message || "Please check your input",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -116,7 +136,7 @@ export default function ProductForm() {
         brand: formData.brand,
         category: formData.category,
         description: formData.description,
-        price: parseFloat(formData.price),
+        price: validation.data.price,
         images: formData.images,
         colors: formData.colors,
         sizes: formData.sizes,
@@ -143,7 +163,6 @@ export default function ProductForm() {
 
       navigate("/admin/products");
     } catch (error: any) {
-      console.error("Error saving product:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to save product",
