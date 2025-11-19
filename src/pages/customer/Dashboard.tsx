@@ -79,18 +79,18 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       <Breadcrumbs items={[{ label: "Dashboard" }]} />
       
       <div>
-        <h1 className="text-3xl font-bold text-foreground">
+        <h1 className="text-xl md:text-3xl font-bold text-foreground">
           Welcome back, {customerProfile?.full_name || 'Customer'}!
         </h1>
-        <p className="text-muted-foreground">Here's what's happening with your orders</p>
+        <p className="text-xs md:text-base text-muted-foreground">Here's what's happening with your orders</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
         <Link to="/" className="block">
           <Card className="hover:bg-accent/5 transition-colors cursor-pointer border-2 border-primary/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

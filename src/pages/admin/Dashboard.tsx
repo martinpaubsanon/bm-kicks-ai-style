@@ -137,14 +137,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome to your admin dashboard</p>
+        <h1 className="text-xl md:text-3xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-xs md:text-base text-muted-foreground">Welcome to your admin dashboard</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Revenue (30d)"
           value={`QAR ${stats.totalRevenue.toFixed(2)}`}

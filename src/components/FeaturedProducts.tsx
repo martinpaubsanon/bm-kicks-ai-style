@@ -68,12 +68,12 @@ export const FeaturedProducts = () => {
   }
 
   return (
-    <section className="py-12 md:py-20 bg-secondary/30" id="new-arrivals">
+    <section className="py-8 md:py-20 bg-secondary/30" id="new-arrivals">
       <div className="container mx-auto px-3 md:px-4">
-        <div className="text-center mb-8 md:mb-12">
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4">Featured Collection</h2>
-          <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Handpicked premium sneakers just for you
+        <div className="text-center mb-6 md:mb-12">
+          <h2 className="text-xl md:text-4xl lg:text-5xl font-bold mb-1.5 md:mb-4">Featured Collection</h2>
+          <p className="text-xs md:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Handpicked premium sneakers
           </p>
         </div>
 
@@ -123,11 +123,11 @@ export const FeaturedProducts = () => {
           ))}
         </div>
 
-        <div className="text-center mt-8 md:mt-12">
+        <div className="text-center mt-6 md:mt-12">
           <Button 
-            size="lg" 
+            size="sm"
             variant="outline" 
-            className="font-semibold text-sm md:text-base"
+            className="font-semibold"
             onClick={scrollToProducts}
           >
             View All Products
