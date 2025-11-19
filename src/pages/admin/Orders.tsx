@@ -102,28 +102,28 @@ export default function Orders() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-0">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Orders</h1>
-          <p className="text-muted-foreground">Manage customer orders</p>
+          <h1 className="text-xl md:text-3xl font-bold text-foreground">Orders</h1>
+          <p className="text-xs md:text-base text-muted-foreground">Manage customer orders</p>
         </div>
         <Link to="/admin/orders/create">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Order
+          <Button size="sm">
+            <Plus className="mr-1.5 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
+            <span className="text-xs md:text-sm">Create Order</span>
           </Button>
         </Link>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 md:gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by order number, customer name, or email..."
+            placeholder="Search orders..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
+            className="pl-7 md:pl-9 text-xs md:text-sm"
           />
         </div>
       </div>

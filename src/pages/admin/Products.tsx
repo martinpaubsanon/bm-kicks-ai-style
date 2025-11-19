@@ -102,98 +102,87 @@ export default function Products() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-0">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Products</h1>
-          <p className="text-muted-foreground">Manage your product catalog</p>
+          <h1 className="text-xl md:text-3xl font-bold text-foreground">Products</h1>
+          <p className="text-xs md:text-base text-muted-foreground">Manage your product catalog</p>
         </div>
-        <Button asChild>
+        <Button asChild size="sm">
           <Link to="/admin/products/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
+            <Plus className="mr-1.5 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
+            <span className="text-xs md:text-sm">Add Product</span>
           </Link>
         </Button>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 md:gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
           <Input
-            placeholder="Search products by name, brand, or category..."
+            placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
+            className="pl-7 md:pl-9 text-xs md:text-sm"
           />
         </div>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-lg overflow-x-auto -mx-3 md:mx-0">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Image</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Brand</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-[10px] md:text-sm px-2 md:px-4">Image</TableHead>
+              <TableHead className="text-[10px] md:text-sm px-2 md:px-4">Name</TableHead>
+              <TableHead className="text-[10px] md:text-sm px-2 md:px-4 hidden sm:table-cell">Brand</TableHead>
+              <TableHead className="text-[10px] md:text-sm px-2 md:px-4 hidden md:table-cell">Category</TableHead>
+              <TableHead className="text-[10px] md:text-sm px-2 md:px-4">Price</TableHead>
+              <TableHead className="text-[10px] md:text-sm px-2 md:px-4 hidden lg:table-cell">Stock</TableHead>
+              <TableHead className="text-[10px] md:text-sm px-2 md:px-4 hidden sm:table-cell">Status</TableHead>
+              <TableHead className="text-[10px] md:text-sm px-2 md:px-4">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredProducts.map((product) => (
               <TableRow key={product.id}>
-                <TableCell>
+                <TableCell className="px-2 md:px-4 py-2 md:py-3">
                   {product.images?.[0] && (
                     <img
                       src={product.images[0]}
                       alt={product.name}
-                      className="w-12 h-12 object-cover rounded"
+                      className="w-10 h-10 md:w-12 md:h-12 object-cover rounded"
                     />
                   )}
                 </TableCell>
-                <TableCell className="font-medium">
-                  <div>
-                    {product.name}
-                    <div className="flex gap-1 mt-1">
-                      {product.is_featured && (
-                        <Badge variant="secondary" className="text-xs">
-                          Featured
-                        </Badge>
-                      )}
-                      {product.is_limited_edition && (
-                        <Badge variant="secondary" className="text-xs">
-                          Limited
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
+                <TableCell className="px-2 md:px-4 py-2 md:py-3 text-[10px] md:text-sm">
+                  <div className="max-w-[120px] md:max-w-none truncate">{product.name}</div>
                 </TableCell>
-                <TableCell>{product.brand}</TableCell>
-                <TableCell className="capitalize">{product.category}</TableCell>
-                <TableCell>QAR {Number(product.price).toFixed(2)}</TableCell>
-                <TableCell>{product.stock_total}</TableCell>
-                <TableCell>
-                  <StatusBadge
-                    status={getStockStatus(product.stock_total)}
-                    type="stock"
-                  />
+                <TableCell className="px-2 md:px-4 py-2 md:py-3 text-[10px] md:text-sm hidden sm:table-cell">{product.brand}</TableCell>
+                <TableCell className="px-2 md:px-4 py-2 md:py-3 text-[10px] md:text-sm hidden md:table-cell">{product.category}</TableCell>
+                <TableCell className="px-2 md:px-4 py-2 md:py-3 text-[10px] md:text-sm font-semibold">QAR {product.price}</TableCell>
+                <TableCell className="px-2 md:px-4 py-2 md:py-3 text-[10px] md:text-sm hidden lg:table-cell">{product.stock_total || 0}</TableCell>
+                <TableCell className="px-2 md:px-4 py-2 md:py-3 hidden sm:table-cell">
+                  <StatusBadge status={getStockStatus(product.stock_total || 0)} />
                 </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to={`/admin/products/${product.id}/edit`}>
-                        <Pencil className="h-4 w-4" />
+                <TableCell className="px-2 md:px-4 py-2 md:py-3">
+                  <div className="flex gap-1 md:gap-2">
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="xs"
+                      className="h-6 w-6 md:h-8 md:w-8 p-0"
+                    >
+                      <Link to={`/admin/products/${product.id}`}>
+                        <Pencil className="h-2.5 w-2.5 md:h-3 md:w-3" />
                       </Link>
                     </Button>
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant="ghost"
+                      size="xs"
+                      className="h-6 w-6 md:h-8 md:w-8 p-0 text-destructive"
                       onClick={() => handleDelete(product.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-2.5 w-2.5 md:h-3 md:w-3" />
                     </Button>
                   </div>
                 </TableCell>

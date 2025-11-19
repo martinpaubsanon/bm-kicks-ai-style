@@ -50,9 +50,9 @@ export default function CustomerOrders() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-3xl font-bold">My Orders</h1>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
+        <h1 className="text-xl md:text-3xl font-bold">My Orders</h1>
         <WhatsAppButton 
           message="Hi! I have a question about my order from BM Kicks."
           size="sm"
@@ -61,37 +61,39 @@ export default function CustomerOrders() {
 
       {orders.length === 0 ? (
         <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground mb-4">You haven't placed any orders yet</p>
-            <Button asChild>
+          <CardContent className="pt-4 md:pt-6 text-center">
+            <p className="text-xs md:text-base text-muted-foreground mb-3 md:mb-4">You haven't placed any orders yet</p>
+            <Button asChild size="sm">
               <Link to="/">Start Shopping</Link>
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {orders.map((order) => (
             <Card key={order.id}>
-              <CardContent className="pt-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-semibold">Order #{order.order_number}</p>
-                    <p className="text-sm text-muted-foreground">
+              <CardContent className="pt-4 md:pt-6 p-3 md:p-6">
+                <div className="flex justify-between items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-xs md:text-base truncate">Order #{order.order_number}</p>
+                    <p className="text-[10px] md:text-sm text-muted-foreground">
                       {format(new Date(order.created_at), "MMM dd, yyyy")}
                     </p>
-                    <div className="flex gap-2 mt-2">
-                      <Badge variant={order.order_status === "delivered" ? "default" : "secondary"}>
+                    <div className="flex gap-1.5 md:gap-2 mt-1.5 md:mt-2 flex-wrap">
+                      <Badge variant={order.order_status === "delivered" ? "default" : "secondary"} className="text-[9px] md:text-xs px-1.5 md:px-2 py-0 h-4 md:h-5">
                         {order.order_status}
                       </Badge>
-                      <Badge variant={order.payment_status === "paid" ? "default" : "secondary"}>
+                      <Badge variant={order.payment_status === "paid" ? "default" : "secondary"} className="text-[9px] md:text-xs px-1.5 md:px-2 py-0 h-4 md:h-5">
                         {order.payment_status}
                       </Badge>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold">QAR {order.total.toFixed(2)}</p>
-                    <Button asChild size="sm" className="mt-2">
-                      <Link to={`/customer/orders/${order.id}`}>View Details</Link>
+                  <div className="text-right flex-shrink-0">
+                    <p className="font-bold text-sm md:text-base">QAR {order.total.toFixed(2)}</p>
+                    <Button asChild size="xs" className="mt-1.5 md:mt-2">
+                      <Link to={`/customer/orders/${order.id}`}>
+                        <span className="text-[10px] md:text-xs">View</span>
+                      </Link>
                     </Button>
                   </div>
                 </div>

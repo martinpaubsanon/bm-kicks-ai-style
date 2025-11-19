@@ -35,27 +35,27 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
             e.currentTarget.src = "/placeholder.svg";
           }}
         />
-        <div className="absolute top-2 right-2 flex flex-col gap-1">
+        <div className="absolute top-1 md:top-2 right-1 md:right-2 flex flex-col gap-0.5 md:gap-1">
           {product.is_limited_edition && (
-            <Badge variant="destructive" className="animate-pulse text-[10px] md:text-xs px-1 md:px-2">
+            <Badge variant="destructive" className="animate-pulse text-[9px] md:text-xs px-1 md:px-2 py-0 h-4 md:h-5">
               🔥 LIMITED
             </Badge>
           )}
           {product.is_featured && (
-            <Badge variant="default" className="text-[10px] md:text-xs px-1 md:px-2">⭐ FEATURED</Badge>
+            <Badge variant="default" className="text-[9px] md:text-xs px-1 md:px-2 py-0 h-4 md:h-5">⭐ FEATURED</Badge>
           )}
           {isLowStock && (
-            <Badge variant="secondary" className="text-[10px] md:text-xs px-1 md:px-2">⚠️ LOW STOCK</Badge>
+            <Badge variant="secondary" className="text-[9px] md:text-xs px-1 md:px-2 py-0 h-4 md:h-5">⚠️ LOW</Badge>
           )}
         </div>
       </div>
-      <div className="p-2 md:p-4">
-        <div className="text-xs md:text-sm text-muted-foreground font-medium">{product.brand}</div>
-        <h3 className="font-semibold text-sm md:text-base text-foreground line-clamp-1 mt-1">{product.name}</h3>
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-lg md:text-xl font-bold text-primary">QAR {product.price.toFixed(2)}</span>
-          <span className="text-xs md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
-            View Details →
+      <div className="p-1.5 md:p-4">
+        <div className="text-[10px] md:text-sm text-muted-foreground font-medium">{product.brand}</div>
+        <h3 className="font-semibold text-xs md:text-base text-foreground line-clamp-1 mt-0.5 md:mt-1">{product.name}</h3>
+        <div className="mt-1 md:mt-2 flex items-center justify-between">
+          <span className="text-sm md:text-xl font-bold text-primary">QAR {product.price.toFixed(2)}</span>
+          <span className="text-[10px] md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
+            Details →
           </span>
         </div>
       </div>
