@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,34 +12,64 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Search, Eye, Plus } from "lucide-react";
+import { Search, Eye, Plus, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 export default function Orders() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [orders, setOrders] = useState<any[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  
+  const ageFilter = searchParams.get("ageFilter");
+  const statusFilter = searchParams.get("status");
 
   useEffect(() => {
     loadOrders();
   }, []);
 
   useEffect(() => {
+    let filtered = [...orders];
+
+    // Apply age filter
+    if (ageFilter && statusFilter) {
+      const now = new Date();
+      filtered = filtered.filter((order) => {
+        if (order.order_status !== statusFilter) return false;
+        
+        const orderDate = new Date(order.created_at);
+        const daysDiff = Math.floor((now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        switch (ageFilter) {
+          case "0-7":
+            return daysDiff <= 7;
+          case "8-30":
+            return daysDiff > 7 && daysDiff <= 30;
+          case "31-60":
+            return daysDiff > 30 && daysDiff <= 60;
+          case "60plus":
+            return daysDiff > 60;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      setFilteredOrders(
-        orders.filter(
-          (o) =>
-            o.order_number.toLowerCase().includes(query) ||
-            o.customer_name.toLowerCase().includes(query) ||
-            o.customer_email.toLowerCase().includes(query)
-        )
+      filtered = filtered.filter(
+        (o) =>
+          o.order_number.toLowerCase().includes(query) ||
+          o.customer_name.toLowerCase().includes(query) ||
+          o.customer_email.toLowerCase().includes(query)
       );
-    } else {
-      setFilteredOrders(orders);
     }
-  }, [searchQuery, orders]);
+
+    setFilteredOrders(filtered);
+  }, [searchQuery, orders, ageFilter, statusFilter]);
 
   const loadOrders = async () => {
     try {
@@ -97,6 +127,46 @@ export default function Orders() {
           />
         </div>
       </div>
+
+      {/* Active Filters */}
+      {(ageFilter || statusFilter) && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Active Filters:</span>
+          {ageFilter && (
+            <Badge variant="secondary" className="gap-2">
+              Age: {ageFilter === "60plus" ? "60+ days" : `${ageFilter} days`}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams);
+                  params.delete("ageFilter");
+                  setSearchParams(params);
+                }}
+              />
+            </Badge>
+          )}
+          {statusFilter && (
+            <Badge variant="secondary" className="gap-2">
+              Status: {statusFilter}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams);
+                  params.delete("status");
+                  setSearchParams(params);
+                }}
+              />
+            </Badge>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSearchParams(new URLSearchParams())}
+          >
+            Clear All
+          </Button>
+        </div>
+      )}
 
       <div className="border rounded-lg">
         <Table>
