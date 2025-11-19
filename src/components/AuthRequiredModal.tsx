@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { signUpSchema, signInSchema } from "@/lib/validationSchemas";
 
 interface AuthRequiredModalProps {
   open: boolean;
@@ -34,6 +35,20 @@ export function AuthRequiredModal({ open, onOpenChange, onGuestCheckout }: AuthR
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs
+    const validation = signInSchema.safeParse({ email, password });
+    if (!validation.success) {
+      const errors = validation.error.flatten().fieldErrors;
+      const firstError = Object.values(errors)[0]?.[0];
+      toast({
+        title: "Validation Error",
+        description: firstError || "Please check your inputs",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     try {
       await signInCustomer(email, password);
@@ -55,6 +70,26 @@ export function AuthRequiredModal({ open, onOpenChange, onGuestCheckout }: AuthR
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs
+    const validation = signUpSchema.safeParse({ 
+      email, 
+      password, 
+      confirmPassword: password, // Modal doesn't have confirm field, so use password
+      fullName, 
+      phone 
+    });
+    if (!validation.success) {
+      const errors = validation.error.flatten().fieldErrors;
+      const firstError = Object.values(errors)[0]?.[0];
+      toast({
+        title: "Validation Error",
+        description: firstError || "Please check your inputs",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     try {
       await signUpCustomer(email, password, fullName, phone);

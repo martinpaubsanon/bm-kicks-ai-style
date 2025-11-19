@@ -15,6 +15,7 @@ import { Header } from "@/components/Header";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { AuthRequiredModal } from "@/components/AuthRequiredModal";
+import { shippingInfoSchema } from "@/lib/validationSchemas";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -78,6 +79,19 @@ export default function Checkout() {
     // If user is not logged in and hasn't chosen to proceed as guest, show auth modal
     if (!user && !proceedAsGuest) {
       setShowAuthModal(true);
+      return;
+    }
+    
+    // Validate shipping information
+    const validation = shippingInfoSchema.safeParse(shippingInfo);
+    if (!validation.success) {
+      const errors = validation.error.flatten().fieldErrors;
+      const firstError = Object.values(errors)[0]?.[0];
+      toast({
+        title: "Validation Error",
+        description: firstError || "Please check your shipping information",
+        variant: "destructive",
+      });
       return;
     }
     
