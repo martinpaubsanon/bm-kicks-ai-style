@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { signUpSchema, signInSchema } from "@/lib/validationSchemas";
 
 export default function CustomerAuth() {
   const navigate = useNavigate();
@@ -39,19 +40,14 @@ export default function CustomerAuth() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (signUpData.password !== signUpData.confirmPassword) {
+    // Validate inputs
+    const validation = signUpSchema.safeParse(signUpData);
+    if (!validation.success) {
+      const errors = validation.error.flatten().fieldErrors;
+      const firstError = Object.values(errors)[0]?.[0];
       toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (signUpData.password.length < 8) {
-      toast({
-        title: "Error",
-        description: "Password must be at least 8 characters",
+        title: "Validation Error",
+        description: firstError || "Please check your inputs",
         variant: "destructive",
       });
       return;
@@ -83,6 +79,20 @@ export default function CustomerAuth() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs
+    const validation = signInSchema.safeParse(signInData);
+    if (!validation.success) {
+      const errors = validation.error.flatten().fieldErrors;
+      const firstError = Object.values(errors)[0]?.[0];
+      toast({
+        title: "Validation Error",
+        description: firstError || "Please check your inputs",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       await signInCustomer(signInData.email, signInData.password);
