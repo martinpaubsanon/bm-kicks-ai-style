@@ -10,7 +10,7 @@ interface WhatsAppButtonProps {
 }
 
 export const WhatsAppButton = ({ 
-  phoneNumber = "97450000000", // Default Qatar number format
+  phoneNumber = "97433467115", // Default Qatar number format
   message = "Hi, I'm interested in your products!",
   variant = "inline",
   size = "default",
