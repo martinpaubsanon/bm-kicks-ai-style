@@ -28,21 +28,21 @@ export const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/40 shadow-lg shadow-black/5 transition-all duration-300">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 md:gap-8">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="BM Kicks" className="h-10 w-auto" />
+            <img src={logo} alt="BM Kicks" className="h-8 md:h-10 w-auto" />
           </Link>
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-3 relative">
+        <div className="flex items-center gap-2 md:gap-3 relative">
           <Button 
             variant="ghost" 
             size="icon" 
             className="hidden md:flex"
             onClick={() => setSearchOpen(!searchOpen)}
           >
-            <Search className="h-5 w-5" />
+            <Search className="h-4 w-4 md:h-5 md:w-5" />
           </Button>
           <InlineSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
           <DropdownMenu>
@@ -53,11 +53,11 @@ export const Header = () => {
                 className={user ? "bg-accent/20" : ""}
               >
                 {user && customerProfile ? (
-                  <div className="h-8 w-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-semibold text-sm">
+                  <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-semibold text-xs md:text-sm">
                     {customerProfile.full_name?.charAt(0) || "U"}
                   </div>
                 ) : (
-                  <User className="h-5 w-5" />
+                  <User className="h-4 w-4 md:h-5 md:w-5" />
                 )}
               </Button>
             </DropdownMenuTrigger>

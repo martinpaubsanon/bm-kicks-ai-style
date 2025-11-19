@@ -178,20 +178,20 @@ export const AllProducts = () => {
   }
 
   return (
-    <section className="py-20 bg-background" id="all-products">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-bold mb-2">Our Complete Collection</h2>
-          <p className="text-lg text-muted-foreground">
+    <section className="py-12 md:py-20 bg-background" id="all-products">
+      <div className="container mx-auto px-3 md:px-4">
+        <div className="text-center mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2">Our Complete Collection</h2>
+          <p className="text-sm md:text-lg text-muted-foreground">
             {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"} found
             {debouncedSearchQuery && ` for "${debouncedSearchQuery}"`}
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3 mb-8">
+        <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-6 md:mb-8">
           <Badge
             variant={selectedCategory === "all" ? "default" : "outline"}
-            className="cursor-pointer px-4 py-2 text-sm hover:bg-primary/20 transition-colors"
+            className="cursor-pointer px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-primary/20 transition-colors"
             onClick={() => handleCategoryChange("all")}
           >
             All ({products.length})
@@ -202,7 +202,7 @@ export const AllProducts = () => {
               <Badge
                 key={cat}
                 variant={selectedCategory === cat ? "default" : "outline"}
-                className="cursor-pointer px-4 py-2 text-sm hover:bg-primary/20 transition-colors"
+                className="cursor-pointer px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-primary/20 transition-colors"
                 onClick={() => handleCategoryChange(cat)}
               >
                 {cat} ({count})
@@ -211,7 +211,7 @@ export const AllProducts = () => {
           })}
         </div>
 
-        <div className="grid lg:grid-cols-[280px_1fr] gap-8">
+        <div className="grid lg:grid-cols-[280px_1fr] gap-4 md:gap-8">
           <aside className="lg:sticky lg:top-4 lg:self-start">
             <ProductFilters
               searchQuery={searchQuery}
