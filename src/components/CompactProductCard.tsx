@@ -13,9 +13,9 @@ export const CompactProductCard = ({ product, onClick }: CompactProductCardProps
   return (
     <div
       onClick={onClick}
-      className="flex gap-3 items-center p-3 border border-border rounded-lg hover:bg-accent/50 hover:border-primary/30 transition-all cursor-pointer group animate-fade-in"
+      className="flex gap-2 md:gap-3 items-center p-2 md:p-3 border border-border rounded-lg hover:bg-accent/50 hover:border-primary/30 transition-all cursor-pointer group animate-fade-in"
     >
-      <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
+      <div className="relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
         <img 
           src={imageUrl} 
           alt={product.name}
@@ -45,20 +45,20 @@ export const CompactProductCard = ({ product, onClick }: CompactProductCardProps
       </div>
       
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm truncate text-foreground group-hover:text-primary transition-colors">
+        <p className="font-semibold text-xs md:text-sm truncate text-foreground group-hover:text-primary transition-colors">
           {product.name}
         </p>
-        <p className="text-xs text-muted-foreground truncate">
+        <p className="text-[10px] md:text-xs text-muted-foreground truncate">
           {product.brand}
         </p>
-        <p className="font-bold text-sm mt-1 text-primary">
+        <p className="font-bold text-xs md:text-sm mt-0.5 md:mt-1 text-primary">
           QAR {product.price.toFixed(2)}
         </p>
       </div>
       
       {product.stock_total !== undefined && product.stock_total <= 5 && product.stock_total > 0 && (
-        <Badge variant="outline" className="text-[10px] px-2 py-0 h-5">
-          Only {product.stock_total} left
+        <Badge variant="outline" className="text-[9px] md:text-[10px] px-1.5 md:px-2 py-0 h-4 md:h-5">
+          {product.stock_total} left
         </Badge>
       )}
     </div>

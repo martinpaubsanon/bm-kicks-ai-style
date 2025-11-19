@@ -24,7 +24,7 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
   return (
     <Card
       onClick={onClick}
-      className="group cursor-pointer overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:shadow-xl hover:shadow-primary/20"
+      className="group cursor-pointer overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:scale-[1.03] hover:shadow-xl hover:shadow-primary/20"
     >
       <div className="relative aspect-square overflow-hidden">
         <img
@@ -37,24 +37,24 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
         />
         <div className="absolute top-2 right-2 flex flex-col gap-1">
           {product.is_limited_edition && (
-            <Badge variant="destructive" className="animate-pulse">
+            <Badge variant="destructive" className="animate-pulse text-[10px] md:text-xs px-1 md:px-2">
               🔥 LIMITED
             </Badge>
           )}
           {product.is_featured && (
-            <Badge variant="default">⭐ FEATURED</Badge>
+            <Badge variant="default" className="text-[10px] md:text-xs px-1 md:px-2">⭐ FEATURED</Badge>
           )}
           {isLowStock && (
-            <Badge variant="secondary">⚠️ LOW STOCK</Badge>
+            <Badge variant="secondary" className="text-[10px] md:text-xs px-1 md:px-2">⚠️ LOW STOCK</Badge>
           )}
         </div>
       </div>
-      <div className="p-4">
-        <div className="text-sm text-muted-foreground font-medium">{product.brand}</div>
-        <h3 className="font-semibold text-foreground line-clamp-1 mt-1">{product.name}</h3>
+      <div className="p-2 md:p-4">
+        <div className="text-xs md:text-sm text-muted-foreground font-medium">{product.brand}</div>
+        <h3 className="font-semibold text-sm md:text-base text-foreground line-clamp-1 mt-1">{product.name}</h3>
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-xl font-bold text-primary">QAR {product.price.toFixed(2)}</span>
-          <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors">
+          <span className="text-lg md:text-xl font-bold text-primary">QAR {product.price.toFixed(2)}</span>
+          <span className="text-xs md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
             View Details →
           </span>
         </div>

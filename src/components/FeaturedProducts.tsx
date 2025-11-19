@@ -68,16 +68,16 @@ export const FeaturedProducts = () => {
   }
 
   return (
-    <section className="py-20 bg-secondary/30" id="new-arrivals">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Featured Collection</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+    <section className="py-12 md:py-20 bg-secondary/30" id="new-arrivals">
+      <div className="container mx-auto px-3 md:px-4">
+        <div className="text-center mb-8 md:mb-12">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4">Featured Collection</h2>
+          <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto">
             Handpicked premium sneakers just for you
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6">
           {products.map((product) => (
             <Card 
               key={product.id} 
@@ -123,11 +123,11 @@ export const FeaturedProducts = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
+        <div className="text-center mt-8 md:mt-12">
           <Button 
             size="lg" 
             variant="outline" 
-            className="font-semibold"
+            className="font-semibold text-sm md:text-base"
             onClick={scrollToProducts}
           >
             View All Products
