@@ -24,10 +24,10 @@ export default function Dashboard() {
     totalProducts: 0,
   });
   const [agingStats, setAgingStats] = useState({
-    week1: 0,
-    week2to4: 0,
-    month2: 0,
-    older: 0,
+    week1: { count: 0, amount: 0 },
+    week2to4: { count: 0, amount: 0 },
+    month2: { count: 0, amount: 0 },
+    older: { count: 0, amount: 0 },
   });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
@@ -72,26 +72,32 @@ export default function Dashboard() {
 
       const { data: pendingOrders } = await supabase
         .from("orders")
-        .select("created_at")
+        .select("created_at, total")
         .eq("order_status", "pending");
 
       const aging = {
-        week1: 0,
-        week2to4: 0,
-        month2: 0,
-        older: 0,
+        week1: { count: 0, amount: 0 },
+        week2to4: { count: 0, amount: 0 },
+        month2: { count: 0, amount: 0 },
+        older: { count: 0, amount: 0 },
       };
 
       pendingOrders?.forEach((order) => {
         const orderDate = new Date(order.created_at);
+        const orderTotal = Number(order.total);
+        
         if (orderDate >= sevenDaysAgo) {
-          aging.week1++;
+          aging.week1.count++;
+          aging.week1.amount += orderTotal;
         } else if (orderDate >= thirtyDaysAgoDate) {
-          aging.week2to4++;
+          aging.week2to4.count++;
+          aging.week2to4.amount += orderTotal;
         } else if (orderDate >= sixtyDaysAgo) {
-          aging.month2++;
+          aging.month2.count++;
+          aging.month2.amount += orderTotal;
         } else {
-          aging.older++;
+          aging.older.count++;
+          aging.older.amount += orderTotal;
         }
       });
 
@@ -174,30 +180,30 @@ export default function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="0-7 Days"
-            value={agingStats.week1}
+            value={agingStats.week1.count}
             icon={Clock}
-            description="Recent pending orders"
+            description={`QAR ${agingStats.week1.amount.toFixed(2)} outstanding`}
             onClick={() => navigate("/admin/orders?ageFilter=0-7&status=pending")}
           />
           <StatCard
             title="8-30 Days"
-            value={agingStats.week2to4}
+            value={agingStats.week2to4.count}
             icon={Clock}
-            description="Pending 1-4 weeks"
+            description={`QAR ${agingStats.week2to4.amount.toFixed(2)} outstanding`}
             onClick={() => navigate("/admin/orders?ageFilter=8-30&status=pending")}
           />
           <StatCard
             title="31-60 Days"
-            value={agingStats.month2}
+            value={agingStats.month2.count}
             icon={Clock}
-            description="Pending 1-2 months"
+            description={`QAR ${agingStats.month2.amount.toFixed(2)} outstanding`}
             onClick={() => navigate("/admin/orders?ageFilter=31-60&status=pending")}
           />
           <StatCard
             title="60+ Days"
-            value={agingStats.older}
+            value={agingStats.older.count}
             icon={Clock}
-            description="Overdue orders"
+            description={`QAR ${agingStats.older.amount.toFixed(2)} outstanding`}
             onClick={() => navigate("/admin/orders?ageFilter=60plus&status=pending")}
           />
         </div>
