@@ -6,6 +6,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resolveProductImage } from "@/lib/productImageOverrides";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface Product {
   id: string;
@@ -34,7 +41,7 @@ export const FeaturedProducts = () => {
         .from("products")
         .select("id, name, brand, price, images, category, is_featured, is_limited_edition, stock_total")
         .eq("is_featured", true)
-        .limit(4);
+        .limit(15);
 
       if (error) throw error;
       setProducts(data || []);
@@ -77,53 +84,64 @@ export const FeaturedProducts = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6">
-          {products.map((product) => (
-            <Card 
-              key={product.id} 
-              className="group overflow-hidden cursor-pointer border-border hover:shadow-xl transition-all duration-300"
-              onClick={() => navigate(`/product/${product.id}`)}
-            >
-              <div className="relative aspect-square overflow-hidden bg-secondary">
-                <img 
-                  src={resolveProductImage(product.id, product.images?.[0])} 
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  onError={(e) => {
-                    e.currentTarget.src = "/placeholder.svg";
-                  }}
-                />
-                <div className="absolute top-3 left-3 flex flex-col gap-2">
-                  {product.is_limited_edition && (
-                    <Badge className="bg-destructive text-destructive-foreground">
-                      LIMITED
-                    </Badge>
-                  )}
-                  {product.stock_total && product.stock_total < 10 && (
-                    <Badge variant="outline" className="bg-background/90">
-                      Low Stock
-                    </Badge>
-                  )}
-                </div>
-              </div>
-              
-              <div className="p-4">
-                <div className="text-xs font-semibold text-accent uppercase tracking-wider mb-1">
-                  {product.brand}
-                </div>
-                <h3 className="font-semibold text-lg mb-2 truncate">
-                  {product.name}
-                </h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold">QAR {product.price.toFixed(2)}</span>
-                  <span className="text-sm text-muted-foreground">{product.category}</span>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {products.map((product) => (
+              <CarouselItem key={product.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+                <Card 
+                  className="group overflow-hidden cursor-pointer border-border hover:shadow-xl transition-all duration-300"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
+                  <div className="relative aspect-square overflow-hidden bg-secondary">
+                    <img 
+                      src={resolveProductImage(product.id, product.images?.[0])} 
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
+                    />
+                    <div className="absolute top-3 left-3 flex flex-col gap-2">
+                      {product.is_limited_edition && (
+                        <Badge className="bg-destructive text-destructive-foreground">
+                          LIMITED
+                        </Badge>
+                      )}
+                      {product.stock_total && product.stock_total < 10 && (
+                        <Badge variant="outline" className="bg-background/90">
+                          Low Stock
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="p-4">
+                    <div className="text-xs font-semibold text-accent uppercase tracking-wider mb-1">
+                      {product.brand}
+                    </div>
+                    <h3 className="font-semibold text-lg mb-2 truncate">
+                      {product.name}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold">QAR {product.price.toFixed(2)}</span>
+                      <span className="text-sm text-muted-foreground">{product.category}</span>
+                    </div>
+                  </div>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="hidden md:flex -left-4 lg:-left-6" />
+          <CarouselNext className="hidden md:flex -right-4 lg:-right-6" />
+        </Carousel>
 
-        <div className="text-center mt-6 md:mt-12">
+        <div className="text-center mt-8 md:mt-12">
           <Button 
             size="sm"
             variant="outline" 
