@@ -150,16 +150,16 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl h-[600px] p-0 flex flex-col gap-0">
+      <DialogContent className="max-w-2xl h-[85vh] md:h-[600px] p-0 flex flex-col gap-0 overflow-hidden rounded-2xl">
         {/* Redesigned Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border/50 bg-gradient-to-r from-primary/10 via-primary/5 to-background">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg animate-pulse">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
+        <div className="flex items-center justify-between p-3 md:p-4 border-b border-border/50 bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg animate-pulse">
+              <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary-foreground" />
             </div>
             <div>
-              <h2 className="text-lg font-bold tracking-tight">AI Shoe Consultant</h2>
-              <p className="text-xs text-muted-foreground">Powered by AI • Instant Recommendations</p>
+              <h2 className="text-base md:text-lg font-bold tracking-tight">AI Shoe Consultant</h2>
+              <p className="text-[10px] md:text-xs text-muted-foreground">Powered by AI • Instant Recommendations</p>
             </div>
           </div>
         </div>
