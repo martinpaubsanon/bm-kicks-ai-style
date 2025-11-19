@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-sneakers.jpg";
+import bmKicksLogo from "@/assets/bm-kicks-logo.png";
 
 interface HeroSectionProps {
   onAIClick: () => void;
@@ -27,11 +28,18 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
             <span className="text-[10px] md:text-sm font-medium text-white">AI-Powered Recommendations</span>
           </div>
           
-          <h1 className="text-2xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-3 md:mb-6 leading-tight animate-slide-up">
-            The World Under
-            <br />
-            <span className="text-accent">Your Kicks</span>
-          </h1>
+          <div className="flex items-start md:items-center gap-3 md:gap-6 mb-3 md:mb-6 animate-slide-up">
+            <img 
+              src={bmKicksLogo} 
+              alt="BM Kicks Logo" 
+              className="w-16 h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 opacity-90 md:opacity-95 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] animate-fade-in"
+            />
+            <h1 className="text-2xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight">
+              The World Under
+              <br />
+              <span className="text-accent">Your Kicks</span>
+            </h1>
+          </div>
           
           <p className="text-xs md:text-xl lg:text-2xl text-white/90 mb-4 md:mb-8 max-w-2xl animate-fade-in leading-relaxed" style={{ animationDelay: "0.2s" }}>
             Discover your perfect sneakers with our AI consultant. From streetwear to sports.
