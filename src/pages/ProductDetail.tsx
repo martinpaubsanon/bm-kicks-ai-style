@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { resolveProductImage } from "@/lib/productImageOverrides";
+import { AuthRequiredModal } from "@/components/AuthRequiredModal";
 
 interface Product {
   id: string;
@@ -32,11 +34,14 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingCartAction, setPendingCartAction] = useState<{ productId: string; size: string } | null>(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -89,13 +94,27 @@ const ProductDetail = () => {
       return;
     }
 
+    // Check if user is authenticated
+    if (!user) {
+      setPendingCartAction({ productId: product.id, size: selectedSize });
+      setShowAuthModal(true);
+      return;
+    }
+
+    // User is authenticated, proceed with adding to cart
+    await performAddToCart(product.id, selectedSize);
+  };
+
+  const performAddToCart = async (productId: string, size: string) => {
     setAddingToCart(true);
     try {
-      await addToCart(product.id, selectedSize, 1);
+      await addToCart(productId, size, 1);
+      const currentProduct = product;
       toast({
         title: "Added to cart!",
-        description: `${product.brand} ${product.name} - Size ${selectedSize}`,
+        description: `${currentProduct?.brand} ${currentProduct?.name} - Size ${size}`,
       });
+      setPendingCartAction(null);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -106,6 +125,13 @@ const ProductDetail = () => {
       setAddingToCart(false);
     }
   };
+
+  // Complete pending cart action after successful authentication
+  useEffect(() => {
+    if (user && pendingCartAction) {
+      performAddToCart(pendingCartAction.productId, pendingCartAction.size);
+    }
+  }, [user, pendingCartAction]);
 
   if (loading) {
     return (
@@ -279,6 +305,16 @@ const ProductDetail = () => {
       </div>
 
       <Footer />
+      
+      <AuthRequiredModal
+        open={showAuthModal}
+        onOpenChange={setShowAuthModal}
+        onGuestCheckout={() => {
+          setShowAuthModal(false);
+          setPendingCartAction(null);
+        }}
+        hideGuestOption={true}
+      />
     </div>
   );
 };
