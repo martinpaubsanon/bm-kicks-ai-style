@@ -146,8 +146,8 @@ export default function BrandDisclaimer() {
               <ul className="space-y-2 text-foreground/80">
                 <li>
                   <strong>Email:</strong>{" "}
-                  <a href="mailto:legal@bmkicks.com" className="text-accent hover:underline">
-                    legal@bmkicks.com
+                  <a href="mailto:legal@bmkicks.shop" className="text-accent hover:underline">
+                    legal@bmkicks.shop
                   </a>
                 </li>
                 <li>

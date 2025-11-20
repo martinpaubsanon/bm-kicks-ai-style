@@ -131,7 +131,7 @@ export default function ShippingPolicy() {
 
             <h3 className="text-xl font-semibold mb-3 mt-6 text-foreground">6.3 Address Accuracy</h3>
             <p className="text-foreground/80 leading-relaxed">
-              Please ensure your shipping address is accurate and complete. We are not responsible for lost or delayed packages due to incorrect or incomplete address information. If you need to change the delivery address after placing an order, contact us immediately at <strong>support@bmkicks.com</strong>. Address changes may not be possible once the order has been shipped.
+              Please ensure your shipping address is accurate and complete. We are not responsible for lost or delayed packages due to incorrect or incomplete address information. If you need to change the delivery address after placing an order, contact us immediately at <strong>support@bmkicks.shop</strong>. Address changes may not be possible once the order has been shipped.
             </p>
           </section>
 
@@ -154,7 +154,7 @@ export default function ShippingPolicy() {
             <h2 className="text-2xl font-semibold mb-4 text-foreground">8. Lost or Damaged Packages</h2>
             <h3 className="text-xl font-semibold mb-3 text-foreground">8.1 Lost Packages</h3>
             <p className="text-foreground/80 leading-relaxed">
-              If your tracking shows that your package was delivered but you did not receive it, please check with neighbors, household members, or building reception. If you still cannot locate your package, contact us within 48 hours at <strong>support@bmkicks.com</strong> so we can investigate with the courier.
+              If your tracking shows that your package was delivered but you did not receive it, please check with neighbors, household members, or building reception. If you still cannot locate your package, contact us within 48 hours at <strong>support@bmkicks.shop</strong> so we can investigate with the courier.
             </p>
 
             <h3 className="text-xl font-semibold mb-3 mt-6 text-foreground">8.2 Damaged Packages</h3>
@@ -191,7 +191,7 @@ export default function ShippingPolicy() {
               If you have any questions about shipping or need assistance with your order, please contact us:
             </p>
             <div className="mt-4 p-4 bg-muted rounded-lg">
-              <p className="text-foreground/80"><strong>Email:</strong> support@bmkicks.com</p>
+              <p className="text-foreground/80"><strong>Email:</strong> support@bmkicks.shop</p>
               <p className="text-foreground/80"><strong>WhatsApp:</strong> Available through our website</p>
               <p className="text-foreground/80"><strong>Response Time:</strong> Within 24 hours during business days</p>
             </div>

@@ -68,7 +68,7 @@ export default function ReturnPolicy() {
             <h2 className="text-2xl font-semibold mb-4 text-foreground">5. How to Initiate a Return</h2>
             <h3 className="text-xl font-semibold mb-3 text-foreground">Step 1: Contact Us</h3>
             <p className="text-foreground/80 leading-relaxed mb-4">
-              Email us at <strong>returns@bmkicks.com</strong> with:
+              Email us at <strong>returns@bmkicks.shop</strong> with:
             </p>
             <ul className="list-disc pl-6 space-y-2 text-foreground/80">
               <li>Your order number</li>
@@ -135,7 +135,7 @@ export default function ReturnPolicy() {
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-foreground">8. Exchanges</h2>
             <p className="text-foreground/80 leading-relaxed">
-              We currently offer exchanges on a case-by-case basis, subject to product availability. If you would like to exchange an item for a different size or color, please contact us at <strong>support@bmkicks.com</strong> to check availability before initiating a return.
+              We currently offer exchanges on a case-by-case basis, subject to product availability. If you would like to exchange an item for a different size or color, please contact us at <strong>support@bmkicks.shop</strong> to check availability before initiating a return.
             </p>
             <p className="text-foreground/80 leading-relaxed mt-4">
               <strong>Exchange Process:</strong> If an exchange is available, we will provide instructions. You may need to return the original item and place a new order, or we may arrange a direct exchange depending on the situation.
@@ -145,7 +145,7 @@ export default function ReturnPolicy() {
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-foreground">9. Defective or Damaged Items</h2>
             <p className="text-foreground/80 leading-relaxed mb-4">
-              If you receive a defective or damaged item, please contact us immediately at <strong>support@bmkicks.com</strong> with:
+              If you receive a defective or damaged item, please contact us immediately at <strong>support@bmkicks.shop</strong> with:
             </p>
             <ul className="list-disc pl-6 space-y-2 text-foreground/80">
               <li>Your order number</li>
@@ -167,7 +167,7 @@ export default function ReturnPolicy() {
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-foreground">11. Cancellations</h2>
             <p className="text-foreground/80 leading-relaxed">
-              You may cancel your order within <strong>2 hours</strong> of placing it by contacting us immediately at <strong>support@bmkicks.com</strong>. Once an order has been processed and shipped, it cannot be cancelled, but you may return it according to our return policy.
+              You may cancel your order within <strong>2 hours</strong> of placing it by contacting us immediately at <strong>support@bmkicks.shop</strong>. Once an order has been processed and shipped, it cannot be cancelled, but you may return it according to our return policy.
             </p>
           </section>
 

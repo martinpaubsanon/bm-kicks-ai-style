@@ -201,8 +201,8 @@ export default function CookiePolicy() {
               If you have any questions about our use of cookies or this Cookie Policy, please contact us:
             </p>
             <div className="mt-4 p-4 bg-muted rounded-lg">
-              <p className="text-foreground/80"><strong>Email:</strong> privacy@bmkicks.com</p>
-              <p className="text-foreground/80"><strong>Website:</strong> www.bmkicks.com</p>
+              <p className="text-foreground/80"><strong>Email:</strong> privacy@bmkicks.shop</p>
+              <p className="text-foreground/80"><strong>Website:</strong> www.bmkicks.shop</p>
             </div>
           </section>
         </div>
