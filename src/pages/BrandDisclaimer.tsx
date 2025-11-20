@@ -152,8 +152,8 @@ export default function BrandDisclaimer() {
                 </li>
                 <li>
                   <strong>WhatsApp:</strong>{" "}
-                  <a href="https://wa.me/97433398906" className="text-accent hover:underline">
-                    +974 3339 8906
+                  <a href="https://wa.me/97433467115" className="text-accent hover:underline">
+                    +974 3346 7115
                   </a>
                 </li>
               </ul>
