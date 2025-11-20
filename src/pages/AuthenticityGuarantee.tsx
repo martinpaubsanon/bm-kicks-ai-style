@@ -190,7 +190,7 @@ export default function AuthenticityGuarantee() {
               </ul>
 
               <h3 className="text-xl font-semibold mb-3 text-foreground">Step 2: Contact Us Immediately</h3>
-              <p className="text-foreground/80 mb-2">Email: <strong>authenticity@bmkicks.com</strong></p>
+              <p className="text-foreground/80 mb-2">Email: <strong>authenticity@bmkicks.shop</strong></p>
               <p className="text-foreground/80 mb-4">Include your order number, photos, and a description of your concerns.</p>
 
               <h3 className="text-xl font-semibold mb-3 text-foreground">Step 3: We Will Respond Within 24 Hours</h3>

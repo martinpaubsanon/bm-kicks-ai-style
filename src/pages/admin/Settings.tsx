@@ -25,7 +25,7 @@ export default function Settings() {
             </div>
             <div>
               <Label htmlFor="store-email">Contact Email</Label>
-              <Input id="store-email" type="email" defaultValue="support@bmkicks.com" />
+              <Input id="store-email" type="email" defaultValue="support@bmkicks.shop" />
             </div>
             <div>
               <Label htmlFor="store-phone">Phone Number</Label>
