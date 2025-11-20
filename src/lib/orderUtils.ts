@@ -39,15 +39,20 @@ export async function createOrder({
     throw new Error("Invalid payment method. Only 'cod' or 'bank_transfer' are allowed.");
   }
 
-  // Validate stock availability
+  // Validate stock availability and prices
   for (const item of items) {
     const { data: product, error } = await supabase
       .from("products")
-      .select("sizes")
+      .select("sizes, price")
       .eq("id", item.product_id)
       .single();
 
-    if (error) throw new Error("Failed to validate product stock");
+    if (error || !product) throw new Error("Invalid product");
+
+    // Verify price matches database to prevent manipulation
+    if (item.product_price !== Number(product.price)) {
+      throw new Error(`Price mismatch detected for ${item.product_name}`);
+    }
 
     const sizes = product.sizes as Record<string, number>;
     const availableStock = sizes[item.size] || 0;
