@@ -28,6 +28,7 @@ interface ProductFiltersProps {
   onFeaturedToggle: () => void;
   showLimitedOnly: boolean;
   onLimitedToggle: () => void;
+  availableBrands?: string[]; // Optional: defaults to predefined list
 }
 
 const brands = [
@@ -43,6 +44,13 @@ const brands = [
   "Vans",
   "Converse",
   "On",
+  "Li Ning",
+  "Hoka",
+  "Salomon",
+  "Mizuno",
+  "Saucony",
+  "Fila",
+  "Sketchers",
 ];
 
 export const ProductFilters = ({
@@ -61,7 +69,11 @@ export const ProductFilters = ({
   onFeaturedToggle,
   showLimitedOnly,
   onLimitedToggle,
+  availableBrands,
 }: ProductFiltersProps) => {
+  // Use passed brands or fall back to default list
+  const brandsToShow = availableBrands && availableBrands.length > 0 ? availableBrands : brands;
+  
   const hasActiveFilters =
     searchQuery.length > 0 ||
     priceRange[0] > 0 ||
@@ -150,7 +162,7 @@ export const ProductFilters = ({
       <div className="space-y-3">
         <Label>Brands</Label>
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {brands.map((brand) => (
+          {brandsToShow.map((brand) => (
             <div key={brand} className="flex items-center space-x-2">
               <Checkbox
                 id={`brand-${brand}`}

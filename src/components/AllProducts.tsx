@@ -28,6 +28,7 @@ export const AllProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [availableBrands, setAvailableBrands] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -57,6 +58,10 @@ export const AllProducts = () => {
 
       if (error) throw error;
       setProducts(data || []);
+      
+      // Extract unique brands from products
+      const uniqueBrands = [...new Set(data?.map(p => p.brand) || [])].sort();
+      setAvailableBrands(uniqueBrands);
     } catch (error) {
       console.error("Error fetching products:", error);
       toast({
@@ -229,6 +234,7 @@ export const AllProducts = () => {
               onFeaturedToggle={() => setShowFeaturedOnly(!showFeaturedOnly)}
               showLimitedOnly={showLimitedOnly}
               onLimitedToggle={() => setShowLimitedOnly(!showLimitedOnly)}
+              availableBrands={availableBrands}
             />
           </aside>
 

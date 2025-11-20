@@ -211,13 +211,51 @@ export default function ProductForm() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="brand">Brand *</Label>
-                <Input
-                  id="brand"
+                <Select
                   value={formData.brand}
-                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                  required
-                  placeholder="Nike"
-                />
+                  onValueChange={(value) => {
+                    if (value === "custom") {
+                      // Allow user to type custom brand
+                      setFormData({ ...formData, brand: "" });
+                    } else {
+                      setFormData({ ...formData, brand: value });
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select brand" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Nike">Nike</SelectItem>
+                    <SelectItem value="Adidas">Adidas</SelectItem>
+                    <SelectItem value="Jordan">Jordan</SelectItem>
+                    <SelectItem value="New Balance">New Balance</SelectItem>
+                    <SelectItem value="Puma">Puma</SelectItem>
+                    <SelectItem value="Under Armour">Under Armour</SelectItem>
+                    <SelectItem value="Brooks">Brooks</SelectItem>
+                    <SelectItem value="ASICS">ASICS</SelectItem>
+                    <SelectItem value="Reebok">Reebok</SelectItem>
+                    <SelectItem value="Vans">Vans</SelectItem>
+                    <SelectItem value="Converse">Converse</SelectItem>
+                    <SelectItem value="On">On</SelectItem>
+                    <SelectItem value="Li Ning">Li Ning</SelectItem>
+                    <SelectItem value="Hoka">Hoka</SelectItem>
+                    <SelectItem value="Salomon">Salomon</SelectItem>
+                    <SelectItem value="Mizuno">Mizuno</SelectItem>
+                    <SelectItem value="Saucony">Saucony</SelectItem>
+                    <SelectItem value="Fila">Fila</SelectItem>
+                    <SelectItem value="Sketchers">Sketchers</SelectItem>
+                    <SelectItem value="custom">Other (Custom)</SelectItem>
+                  </SelectContent>
+                </Select>
+                {(!formData.brand || formData.brand === "") && (
+                  <Input
+                    className="mt-2"
+                    placeholder="Enter custom brand name"
+                    value={formData.brand}
+                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                  />
+                )}
               </div>
               <div>
                 <Label htmlFor="category">Category *</Label>
