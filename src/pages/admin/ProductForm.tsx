@@ -252,7 +252,7 @@ export default function ProductForm() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="price">Price (USD) *</Label>
+                <Label htmlFor="price">Price (QAR) *</Label>
                 <Input
                   id="price"
                   type="number"
