@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatCard } from "@/components/admin/StatCard";
 import { DollarSign, TrendingUp, ShoppingCart, Package } from "lucide-react";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import {
   BarChart,
   Bar,
@@ -22,6 +23,7 @@ import {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export default function Analytics() {
+  const { formatPrice } = useCurrency();
   const [stats, setStats] = useState({
     totalRevenue: 0,
     orderCount: 0,
@@ -145,7 +147,7 @@ export default function Analytics() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Revenue (30d)"
-          value={`QAR ${stats.totalRevenue.toFixed(2)}`}
+          value={formatPrice(stats.totalRevenue)}
           icon={DollarSign}
           change={12}
         />
@@ -157,7 +159,7 @@ export default function Analytics() {
         />
         <StatCard
           title="Avg Order Value"
-          value={`$${stats.avgOrderValue.toFixed(2)}`}
+          value={formatPrice(stats.avgOrderValue)}
           icon={TrendingUp}
           change={5}
         />
