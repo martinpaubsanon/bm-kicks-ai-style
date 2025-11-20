@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface Product {
   id: string;
@@ -25,6 +26,7 @@ export const InlineSearch = ({ isOpen, onClose }: InlineSearchProps) => {
   const [loading, setLoading] = useState(false);
   const debouncedQuery = useDebounce(query, 300);
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -128,7 +130,7 @@ export const InlineSearch = ({ isOpen, onClose }: InlineSearchProps) => {
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm truncate">{product.name}</div>
                       <div className="text-xs text-muted-foreground">{product.brand}</div>
-                      <div className="text-sm font-semibold text-primary">QAR {product.price.toFixed(2)}</div>
+                      <div className="text-sm font-semibold text-primary">{formatPrice(product.price)}</div>
                     </div>
                   </button>
                 ))}

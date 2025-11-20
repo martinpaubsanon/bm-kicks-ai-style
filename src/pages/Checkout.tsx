@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const { items, cartTotal, clearCart } = useCart();
   const { user, customerProfile } = useAuth();
+  const { formatPrice } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [proceedAsGuest, setProceedAsGuest] = useState(false);
@@ -303,13 +305,13 @@ export default function Checkout() {
                     <span>
                       {item.product_name} (Size {item.size}) x{item.quantity}
                     </span>
-                    <span>QAR {(item.product_price * item.quantity).toFixed(2)}</span>
+                    <span>{formatPrice(item.product_price * item.quantity)}</span>
                   </div>
                 ))}
                 <div className="border-t pt-2 mt-2">
                   <div className="flex justify-between font-bold">
                     <span>Total</span>
-                    <span>QAR {cartTotal.toFixed(2)}</span>
+                    <span>{formatPrice(cartTotal)}</span>
                   </div>
                 </div>
               </div>

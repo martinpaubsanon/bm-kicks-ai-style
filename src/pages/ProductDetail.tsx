@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { resolveProductImage } from "@/lib/productImageOverrides";
@@ -35,6 +36,7 @@ const ProductDetail = () => {
   const { toast } = useToast();
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
@@ -211,7 +213,7 @@ const ProductDetail = () => {
                 {product.is_featured && <Badge>⭐ Featured</Badge>}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{product.name}</h1>
-              <div className="text-3xl font-bold text-primary">QAR {product.price.toFixed(2)}</div>
+              <div className="text-3xl font-bold text-primary">{formatPrice(product.price)}</div>
             </div>
 
             {product.description && (

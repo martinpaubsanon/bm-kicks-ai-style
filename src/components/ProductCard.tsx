@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { resolveProductImage } from "@/lib/productImageOverrides";
+import { useCurrency } from "@/contexts/CurrencyContext";
 interface Product {
   id: string;
   name: string;
@@ -18,6 +19,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, onClick }: ProductCardProps) => {
+  const { formatPrice } = useCurrency();
   const imageSrc = resolveProductImage(product.id, product.images?.[0]);
   const isLowStock = (product.stock_total || 0) < 10 && (product.stock_total || 0) > 0;
 
@@ -53,7 +55,7 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
         <div className="text-[10px] md:text-sm text-muted-foreground font-medium">{product.brand}</div>
         <h3 className="font-semibold text-xs md:text-base text-foreground line-clamp-1 mt-0.5 md:mt-1">{product.name}</h3>
         <div className="mt-1 md:mt-2 flex items-center justify-between">
-          <span className="text-sm md:text-xl font-bold text-primary">QAR {product.price.toFixed(2)}</span>
+          <span className="text-sm md:text-xl font-bold text-primary">{formatPrice(product.price)}</span>
           <span className="text-[10px] md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
             Details →
           </span>

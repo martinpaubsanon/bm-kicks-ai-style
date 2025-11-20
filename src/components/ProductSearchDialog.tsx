@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface Product {
   id: string;
@@ -31,6 +32,7 @@ export const ProductSearchDialog = ({ open, onOpenChange }: ProductSearchDialogP
   const [products, setProducts] = useState<Product[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   useEffect(() => {
@@ -106,7 +108,7 @@ export const ProductSearchDialog = ({ open, onOpenChange }: ProductSearchDialogP
                     <div className="text-sm text-muted-foreground flex items-center gap-2">
                       <span>{product.brand}</span>
                       <span className="text-xs">•</span>
-                      <span className="font-semibold text-foreground">QAR {product.price.toFixed(2)}</span>
+                      <span className="font-semibold text-foreground">{formatPrice(product.price)}</span>
                     </div>
                   </div>
                 </CommandItem>
