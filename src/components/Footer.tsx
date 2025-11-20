@@ -54,6 +54,22 @@ export const Footer = () => {
           </div>
         </div>
 
+        {/* Brand Disclaimer - Prominent Section */}
+        <div className="border-t border-primary-foreground/20 pt-8 pb-6">
+          <a 
+            href="/brand-disclaimer" 
+            className="block p-4 bg-primary-foreground/5 border border-primary-foreground/20 rounded-lg hover:bg-primary-foreground/10 hover:border-accent/50 transition-all group"
+          >
+            <p className="text-sm md:text-base text-primary-foreground/90 text-center leading-relaxed">
+              <span className="font-semibold">Important:</span> BM Kicks is an independent seller and is not associated, endorsed, or authorized by any brand. 
+              All items are original and sourced from legitimate retailers.{" "}
+              <span className="text-accent group-hover:underline font-medium inline-flex items-center gap-1">
+                Learn more →
+              </span>
+            </p>
+          </a>
+        </div>
+
         <div className="border-t border-primary-foreground/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-primary-foreground/60">
             © 2025 BM Kicks. All rights reserved. [Powered by StrategAIz - Tech Arm of Address Gateway]
