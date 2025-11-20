@@ -87,22 +87,22 @@ export const InlineSearch = ({ isOpen, onClose }: InlineSearchProps) => {
     <div ref={containerRef} className="absolute top-full right-0 mt-2 w-80 bg-card border border-border rounded-lg shadow-xl z-50 animate-in fade-in slide-in-from-top-2">
       <div className="p-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
           <Input
             ref={inputRef}
             type="text"
             placeholder="Search products..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-9 pr-9"
+            className="pl-8 md:pl-10 pr-8 md:pr-9"
           />
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+            className="absolute right-0.5 md:right-1 top-1/2 -translate-y-1/2 h-6 w-6 md:h-7 md:w-7"
             onClick={onClose}
           >
-            <X className="h-4 w-4" />
+            <X className="h-3 w-3 md:h-4 md:w-4" />
           </Button>
         </div>
 

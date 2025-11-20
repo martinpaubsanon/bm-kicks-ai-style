@@ -104,20 +104,20 @@ export const ProductFilters = ({
       <div className="space-y-2">
         <Label htmlFor="search">Search Products</Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
           <Input
             id="search"
             type="text"
             placeholder="Search by name or description..."
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
-            className="pl-9"
+            className="pl-8 md:pl-10"
           />
           {searchQuery && (
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+              className="absolute right-0.5 md:right-1 top-1/2 -translate-y-1/2 h-6 w-6 md:h-7 md:w-7"
               onClick={() => onSearchQueryChange("")}
             >
               <X className="h-3 w-3" />
