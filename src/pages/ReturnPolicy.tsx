@@ -57,7 +57,11 @@ export default function ReturnPolicy() {
               <li>Worn, damaged, or altered products</li>
               <li>Items without original packaging, tags, or labels</li>
               <li>Custom or personalized orders</li>
+              <li>Returns requested due to changes in secondary market prices</li>
             </ul>
+            <p className="text-foreground/80 leading-relaxed mt-4">
+              <strong>Price Volatility:</strong> We do not accept returns or cancellations due to changes in the secondary market price of any product.
+            </p>
           </section>
 
           <section>
@@ -173,8 +177,8 @@ export default function ReturnPolicy() {
               If you have any questions about our Return & Refund Policy, please contact us:
             </p>
             <div className="mt-4 p-4 bg-muted rounded-lg">
-              <p className="text-foreground/80"><strong>Email:</strong> returns@bmkicks.com</p>
-              <p className="text-foreground/80"><strong>Support:</strong> support@bmkicks.com</p>
+              <p className="text-foreground/80"><strong>Email:</strong> returns@bmkicks.shop</p>
+              <p className="text-foreground/80"><strong>Support:</strong> support@bmkicks.shop</p>
               <p className="text-foreground/80"><strong>Phone:</strong> Available through WhatsApp support</p>
             </div>
           </section>

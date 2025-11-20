@@ -16,7 +16,13 @@ export default function AuthenticityGuarantee() {
           <Shield className="h-10 w-10 text-primary" />
           <h1 className="text-4xl font-bold text-foreground">Authenticity Guarantee</h1>
         </div>
-        <p className="text-sm text-muted-foreground mb-8">Last Updated: January 15, 2025</p>
+        <p className="text-sm text-muted-foreground mb-4">Last Updated: January 15, 2025</p>
+
+        <div className="bg-accent/10 border border-accent/30 rounded-lg p-6 mb-6">
+          <p className="text-foreground/80 text-sm leading-relaxed">
+            <strong>Important Notice:</strong> BM Kicks is not an authorized retailer or official distributor of any of the brands we resell. Brand names and logos are used solely to identify the products available for resale.
+          </p>
+        </div>
 
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-3">100% Authentic Guarantee</h2>
@@ -44,9 +50,9 @@ export default function AuthenticityGuarantee() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2 text-foreground">Authorized Sources Only</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">Reputable Sources</h3>
                   <p className="text-foreground/80 leading-relaxed">
-                    We source all our products directly from authorized retailers, official brand distributors, and verified suppliers. We maintain strict partnerships and documented relationships with all our suppliers to ensure a clear chain of custody.
+                    We source all our products from reputable retailers, authorized distributors, and trusted commercial suppliers. We maintain documented relationships with all our suppliers to ensure a clear chain of custody and product authenticity.
                   </p>
                 </div>
               </div>
@@ -206,9 +212,9 @@ export default function AuthenticityGuarantee() {
             <div className="flex gap-3 items-start bg-amber-50 dark:bg-amber-950/20 p-6 rounded-lg">
               <AlertCircle className="h-6 w-6 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">Beware of Counterfeit Websites</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Official Website Only</h3>
                 <p className="text-foreground/80 leading-relaxed">
-                  Only purchase from our official website (www.bmkicks.com) or authorized retail partners. We are not responsible for products purchased from unauthorized sellers, social media marketplaces, or third-party websites claiming to represent BM Kicks.
+                  Only purchase from our official website (www.bmkicks.shop) or authorized retail partners. We are not responsible for products purchased from unauthorized sellers, social media marketplaces, or third-party websites claiming to represent BM Kicks.
                 </p>
               </div>
             </div>
@@ -224,14 +230,24 @@ export default function AuthenticityGuarantee() {
             </p>
           </section>
 
+          <section className="bg-muted/50 p-6 rounded-lg border border-border">
+            <h2 className="text-2xl font-semibold mb-4 text-foreground">9. Manufacturer Warranty Disclaimer</h2>
+            <p className="text-foreground/80 leading-relaxed mb-4">
+              Our authenticity guarantee is provided solely by BM Kicks and does not constitute a manufacturer guarantee or warranty. Manufacturer support for warranty, service, or repairs may not be available for products purchased from us because we are not an authorized dealer.
+            </p>
+            <p className="text-foreground/80 leading-relaxed">
+              See our <a href="/terms-of-service" className="text-accent hover:underline">Terms of Service</a> and <a href="/return-policy" className="text-accent hover:underline">Return Policy</a> for full details on our obligations and your rights.
+            </p>
+          </section>
+
           <section>
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">9. Contact Our Authentication Team</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-foreground">10. Contact Our Authentication Team</h2>
             <p className="text-foreground/80 leading-relaxed">
               For any questions about authenticity, verification, or our authentication process:
             </p>
             <div className="mt-4 p-4 bg-muted rounded-lg">
-              <p className="text-foreground/80"><strong>Email:</strong> authenticity@bmkicks.com</p>
-              <p className="text-foreground/80"><strong>General Support:</strong> support@bmkicks.com</p>
+              <p className="text-foreground/80"><strong>Email:</strong> authenticity@bmkicks.shop</p>
+              <p className="text-foreground/80"><strong>General Support:</strong> support@bmkicks.shop</p>
               <p className="text-foreground/80"><strong>Response Time:</strong> Within 24 hours</p>
             </div>
           </section>

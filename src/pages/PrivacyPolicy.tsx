@@ -17,8 +17,11 @@ export default function PrivacyPolicy() {
         <div className="prose prose-slate max-w-none space-y-8">
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-foreground">1. Introduction</h2>
-            <p className="text-foreground/80 leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed mb-4">
               Welcome to BM Kicks ("we," "our," or "us"). We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
+            </p>
+            <p className="text-foreground/80 leading-relaxed">
+              We comply with Qatar Law No. 13 of 2016 on the Protection of Personal Data Privacy (PDPPL) and the Philippines Data Privacy Act of 2012 (RA 10173), ensuring your data rights are protected according to applicable laws.
             </p>
           </section>
 
@@ -52,11 +55,14 @@ export default function PrivacyPolicy() {
               <li>Process and fulfill your orders, including shipping and delivery</li>
               <li>Communicate with you about your orders, products, and services</li>
               <li>Provide customer support and respond to your inquiries</li>
-              <li>Send you marketing and promotional communications (with your consent)</li>
+              <li>Send you marketing and promotional communications (only where you have opted-in and provided consent; you can withdraw consent at any time)</li>
               <li>Improve our website, products, and services</li>
               <li>Detect, prevent, and address fraud and security issues</li>
               <li>Comply with legal obligations and enforce our terms and policies</li>
             </ul>
+            <p className="text-foreground/80 leading-relaxed mt-4">
+              <strong>Marketing Communications:</strong> We only send marketing messages where you have explicitly opted in. You can unsubscribe from marketing emails at any time using the unsubscribe link in our emails or by contacting us at privacy@bmkicks.shop.
+            </p>
           </section>
 
           <section>
@@ -82,18 +88,19 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-foreground">6. Your Privacy Rights</h2>
             <p className="text-foreground/80 leading-relaxed mb-4">
-              Depending on your location, you may have the following rights regarding your personal information:
+              Under Qatar Law No. 13 of 2016 (PDPPL) and the Philippines Data Privacy Act of 2012 (RA 10173), you have the following rights regarding your personal information:
             </p>
             <ul className="list-disc pl-6 space-y-2 text-foreground/80">
               <li><strong>Access:</strong> Request access to the personal information we hold about you</li>
               <li><strong>Correction:</strong> Request correction of inaccurate or incomplete information</li>
               <li><strong>Deletion:</strong> Request deletion of your personal information</li>
               <li><strong>Data Portability:</strong> Request a copy of your data in a portable format</li>
-              <li><strong>Withdraw Consent:</strong> Withdraw consent for processing your information</li>
+              <li><strong>Object to Processing:</strong> Object to certain types of processing of your data</li>
+              <li><strong>Withdraw Consent:</strong> Withdraw consent for processing your information at any time</li>
               <li><strong>Opt-Out:</strong> Opt-out of marketing communications at any time</li>
             </ul>
             <p className="text-foreground/80 leading-relaxed mt-4">
-              To exercise these rights, please contact us at privacy@bmkicks.com
+              To exercise these rights, please contact us at privacy@bmkicks.shop. We will respond to your request within the timeframes required by applicable law (typically within 30 days).
             </p>
           </section>
 
@@ -138,8 +145,8 @@ export default function PrivacyPolicy() {
               If you have any questions about this Privacy Policy or our privacy practices, please contact us at:
             </p>
             <div className="mt-4 p-4 bg-muted rounded-lg">
-              <p className="text-foreground/80"><strong>Email:</strong> privacy@bmkicks.com</p>
-              <p className="text-foreground/80"><strong>Website:</strong> www.bmkicks.com</p>
+              <p className="text-foreground/80"><strong>Email:</strong> privacy@bmkicks.shop</p>
+              <p className="text-foreground/80"><strong>Website:</strong> www.bmkicks.shop</p>
             </div>
           </section>
         </div>
