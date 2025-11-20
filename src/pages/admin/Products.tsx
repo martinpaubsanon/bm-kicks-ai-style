@@ -172,7 +172,7 @@ export default function Products() {
                       size="xs"
                       className="h-6 w-6 md:h-8 md:w-8 p-0"
                     >
-                      <Link to={`/admin/products/${product.id}`}>
+                      <Link to={`/admin/products/${product.id}/edit`}>
                         <Pencil className="h-2.5 w-2.5 md:h-3 md:w-3" />
                       </Link>
                     </Button>
