@@ -84,7 +84,9 @@ export default function ImageUploader({
         description: `${uploadedUrls.length} image(s) uploaded successfully`,
       });
     } catch (error: any) {
-      console.error("Upload error:", error);
+      if (import.meta.env.DEV) {
+        console.error("Upload error:", error);
+      }
       toast({
         title: "Upload failed",
         description: error.message || "Failed to upload images",

@@ -33,7 +33,7 @@ serve(async (req) => {
       .gt("stock_total", 0);
 
     if (productsError) {
-      console.error("Error fetching products:", productsError);
+      console.error("Error fetching products - Status:", productsError.code);
       throw productsError;
     }
 
@@ -101,7 +101,7 @@ Use the recommend_shoes tool to return your recommendations with a friendly expl
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error("AI API error:", aiResponse.status, errorText);
+      console.error("AI API error - Status:", aiResponse.status);
       
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ 
@@ -151,7 +151,6 @@ Use the recommend_shoes tool to return your recommendations with a friendly expl
     const explanation = recommendation.explanation || "Here are some great options for you!";
 
     console.log("✅ AI recommended:", productIds.length, "products");
-    console.log("💬 AI explanation:", explanation);
 
     // Fetch the recommended products
     const { data: recommendedProducts, error: fetchError } = await supabase
@@ -160,7 +159,7 @@ Use the recommend_shoes tool to return your recommendations with a friendly expl
       .in("id", productIds);
 
     if (fetchError) {
-      console.error("Error fetching recommended products:", fetchError);
+      console.error("Error fetching recommended products - Status:", fetchError.code);
       throw fetchError;
     }
 
@@ -175,7 +174,7 @@ Use the recommend_shoes tool to return your recommendations with a friendly expl
       }
     );
   } catch (error) {
-    console.error("AI consultant error:", error);
+    console.error("AI consultant error - Type:", error instanceof Error ? error.message : "Unknown");
     
     // Fallback to featured products on any error
     try {
@@ -199,7 +198,7 @@ Use the recommend_shoes tool to return your recommendations with a friendly expl
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     } catch (fallbackError) {
-      console.error("Fallback error:", fallbackError);
+      console.error("Fallback error occurred");
       return new Response(
         JSON.stringify({ 
           error: error instanceof Error ? error.message : "Unknown error",

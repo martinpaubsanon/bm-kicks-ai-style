@@ -53,7 +53,9 @@ export default function Products() {
       setProducts(data || []);
       setFilteredProducts(data || []);
     } catch (error) {
-      console.error("Error loading products:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error loading products:", error);
+      }
       toast({
         title: "Error",
         description: "Failed to load products",
@@ -78,7 +80,9 @@ export default function Products() {
       });
       loadProducts();
     } catch (error) {
-      console.error("Error deleting product:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error deleting product:", error);
+      }
       toast({
         title: "Error",
         description: "Failed to delete product",
