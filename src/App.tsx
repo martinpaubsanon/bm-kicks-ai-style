@@ -19,6 +19,7 @@ import ReturnPolicy from "./pages/ReturnPolicy";
 import ShippingPolicy from "./pages/ShippingPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import AuthenticityGuarantee from "./pages/AuthenticityGuarantee";
+import BrandDisclaimer from "./pages/BrandDisclaimer";
 import AdminLogin from "./pages/admin/Login";
 import AdminLayout from "./components/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="/shipping-policy" element={<ShippingPolicy />} />
               <Route path="/cookie-policy" element={<CookiePolicy />} />
               <Route path="/authenticity-guarantee" element={<AuthenticityGuarantee />} />
+              <Route path="/brand-disclaimer" element={<BrandDisclaimer />} />
               
               {/* Customer portal routes */}
               <Route
