@@ -7,7 +7,7 @@ export default function BrandDisclaimer() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 bg-background">
+      <main className="flex-1 bg-background pt-20">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-4">Brand Disclaimer</h1>
