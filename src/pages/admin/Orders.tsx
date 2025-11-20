@@ -42,6 +42,37 @@ export default function Orders() {
 
   useEffect(() => {
     loadOrders();
+
+    // Set up real-time subscription for orders
+    const channel = supabase
+      .channel('orders-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        (payload) => {
+          if (payload.eventType === 'DELETE') {
+            // Remove deleted order from state
+            setOrders((current) => current.filter((order) => order.id !== payload.old.id));
+          } else if (payload.eventType === 'INSERT') {
+            // Add new order to state
+            setOrders((current) => [payload.new as any, ...current]);
+          } else if (payload.eventType === 'UPDATE') {
+            // Update existing order in state
+            setOrders((current) =>
+              current.map((order) => order.id === payload.new.id ? payload.new as any : order)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
