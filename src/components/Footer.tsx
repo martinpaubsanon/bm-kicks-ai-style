@@ -46,10 +46,10 @@ export const Footer = () => {
           <div>
             <h3 className="font-bold text-lg mb-4">Support</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-primary-foreground/80 hover:text-accent transition-colors">Contact Us</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-accent transition-colors">Shipping Info</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-accent transition-colors">Returns</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-accent transition-colors">Size Guide</a></li>
+              <li><a href="/shipping-policy" className="text-primary-foreground/80 hover:text-accent transition-colors">Shipping Info</a></li>
+              <li><a href="/return-policy" className="text-primary-foreground/80 hover:text-accent transition-colors">Returns</a></li>
+              <li><a href="/authenticity-guarantee" className="text-primary-foreground/80 hover:text-accent transition-colors">Authenticity</a></li>
+              <li><a href="/cookie-policy" className="text-primary-foreground/80 hover:text-accent transition-colors">Cookies</a></li>
             </ul>
           </div>
         </div>
@@ -59,8 +59,8 @@ export const Footer = () => {
             © 2025 BM Kicks. All rights reserved. [Powered by StrategAIz - Tech Arm of Address Gateway]
           </p>
           <div className="flex gap-6 text-sm">
-            <a href="#" className="text-primary-foreground/60 hover:text-accent transition-colors">Privacy Policy</a>
-            <a href="#" className="text-primary-foreground/60 hover:text-accent transition-colors">Terms of Service</a>
+            <a href="/privacy-policy" className="text-primary-foreground/60 hover:text-accent transition-colors">Privacy Policy</a>
+            <a href="/terms-of-service" className="text-primary-foreground/60 hover:text-accent transition-colors">Terms of Service</a>
           </div>
         </div>
       </div>

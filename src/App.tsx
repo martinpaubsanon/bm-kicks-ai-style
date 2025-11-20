@@ -13,6 +13,12 @@ import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
 import CustomerAuth from "./pages/CustomerAuth";
 import Checkout from "./pages/Checkout";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import ReturnPolicy from "./pages/ReturnPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import CookiePolicy from "./pages/CookiePolicy";
+import AuthenticityGuarantee from "./pages/AuthenticityGuarantee";
 import AdminLogin from "./pages/admin/Login";
 import AdminLayout from "./components/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
@@ -49,6 +55,14 @@ const App = () => (
               <Route path="/auth" element={<CustomerAuth />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/customer/order-success" element={<OrderSuccess />} />
+              
+              {/* Legal Pages */}
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/return-policy" element={<ReturnPolicy />} />
+              <Route path="/shipping-policy" element={<ShippingPolicy />} />
+              <Route path="/cookie-policy" element={<CookiePolicy />} />
+              <Route path="/authenticity-guarantee" element={<AuthenticityGuarantee />} />
               
               {/* Customer portal routes */}
               <Route
