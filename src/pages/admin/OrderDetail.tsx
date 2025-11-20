@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import {
   Table,
   TableBody,
@@ -25,6 +26,7 @@ import { toast } from "@/hooks/use-toast";
 export default function OrderDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const [order, setOrder] = useState<any>(null);
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const [paymentConfirmations, setPaymentConfirmations] = useState<any[]>([]);
@@ -213,8 +215,8 @@ export default function OrderDetail() {
                   </TableCell>
                   <TableCell>{item.size}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
-                  <TableCell>QAR {Number(item.price).toFixed(2)}</TableCell>
-                  <TableCell>QAR {Number(item.subtotal).toFixed(2)}</TableCell>
+                  <TableCell>{formatPrice(Number(item.price))}</TableCell>
+                  <TableCell>{formatPrice(Number(item.subtotal))}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -222,11 +224,11 @@ export default function OrderDetail() {
           <div className="mt-4 space-y-2 text-right">
             <div className="flex justify-end gap-4">
               <span className="text-muted-foreground">Subtotal:</span>
-              <span className="font-medium">QAR {Number(order.subtotal).toFixed(2)}</span>
+              <span className="font-medium">{formatPrice(Number(order.subtotal))}</span>
             </div>
             <div className="flex justify-end gap-4 text-lg font-bold">
               <span>Total:</span>
-              <span>QAR {Number(order.total).toFixed(2)}</span>
+              <span>{formatPrice(Number(order.total))}</span>
             </div>
           </div>
         </CardContent>

@@ -14,9 +14,11 @@ import {
 } from "@/components/ui/table";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const [stats, setStats] = useState({
     totalRevenue: 0,
     totalOrders: 0,
@@ -147,7 +149,7 @@ export default function Dashboard() {
       <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Revenue (30d)"
-          value={`QAR ${stats.totalRevenue.toFixed(2)}`}
+          value={formatPrice(stats.totalRevenue)}
           icon={DollarSign}
           change={12}
           onClick={() => navigate("/admin/orders")}
@@ -161,7 +163,7 @@ export default function Dashboard() {
         />
         <StatCard
           title="Avg Order Value"
-          value={`$${stats.avgOrderValue.toFixed(2)}`}
+          value={formatPrice(stats.avgOrderValue)}
           icon={TrendingUp}
           change={5}
           onClick={() => navigate("/admin/orders")}
@@ -182,28 +184,28 @@ export default function Dashboard() {
             title="0-7 Days"
             value={agingStats.week1.count}
             icon={Clock}
-            description={`QAR ${agingStats.week1.amount.toFixed(2)} outstanding`}
+            description={`${formatPrice(agingStats.week1.amount)} outstanding`}
             onClick={() => navigate("/admin/orders?ageFilter=0-7&status=pending")}
           />
           <StatCard
             title="8-30 Days"
             value={agingStats.week2to4.count}
             icon={Clock}
-            description={`QAR ${agingStats.week2to4.amount.toFixed(2)} outstanding`}
+            description={`${formatPrice(agingStats.week2to4.amount)} outstanding`}
             onClick={() => navigate("/admin/orders?ageFilter=8-30&status=pending")}
           />
           <StatCard
             title="31-60 Days"
             value={agingStats.month2.count}
             icon={Clock}
-            description={`QAR ${agingStats.month2.amount.toFixed(2)} outstanding`}
+            description={`${formatPrice(agingStats.month2.amount)} outstanding`}
             onClick={() => navigate("/admin/orders?ageFilter=31-60&status=pending")}
           />
           <StatCard
             title="60+ Days"
             value={agingStats.older.count}
             icon={Clock}
-            description={`QAR ${agingStats.older.amount.toFixed(2)} outstanding`}
+            description={`${formatPrice(agingStats.older.amount)} outstanding`}
             onClick={() => navigate("/admin/orders?ageFilter=60plus&status=pending")}
           />
         </div>
@@ -230,7 +232,7 @@ export default function Dashboard() {
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">{order.order_number}</TableCell>
                     <TableCell>{order.customer_name}</TableCell>
-                    <TableCell>QAR {Number(order.total).toFixed(2)}</TableCell>
+                    <TableCell>{formatPrice(Number(order.total))}</TableCell>
                     <TableCell>
                       <StatusBadge status={order.order_status} type="order" />
                     </TableCell>

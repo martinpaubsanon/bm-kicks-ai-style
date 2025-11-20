@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resolveProductImage } from "@/lib/productImageOverrides";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import {
   Carousel,
   CarouselContent,
@@ -30,6 +31,7 @@ export const FeaturedProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     fetchFeaturedProducts();
@@ -129,7 +131,7 @@ export const FeaturedProducts = () => {
                       {product.name}
                     </h3>
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold">QAR {product.price.toFixed(2)}</span>
+                      <span className="text-2xl font-bold">{formatPrice(product.price)}</span>
                       <span className="text-sm text-muted-foreground">{product.category}</span>
                     </div>
                   </div>
