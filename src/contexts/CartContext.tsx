@@ -32,36 +32,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const getSessionId = () => {
-    let sessionId = localStorage.getItem("cart_session_id");
-    if (!sessionId) {
-      sessionId = crypto.randomUUID();
-      localStorage.setItem("cart_session_id", sessionId);
-    }
-    return sessionId;
-  };
-
   useEffect(() => {
     loadCart();
   }, [user]);
 
   const loadCart = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      let query = supabase
+      const { data, error } = await supabase
         .from("cart_items")
         .select(`
           *,
           product:products(*)
-        `);
-
-      if (user) {
-        query = query.eq("user_id", user.id);
-      } else {
-        query = query.eq("session_id", getSessionId());
-      }
-
-      const { data, error } = await query;
+        `)
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
@@ -84,26 +73,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const mergeGuestCart = async (userId: string) => {
-    const sessionId = getSessionId();
-    try {
-      // Update guest cart items to user cart
-      await supabase
-        .from("cart_items")
-        .update({ user_id: userId, session_id: null })
-        .eq("session_id", sessionId);
-    } catch (error) {
-      console.error("Error merging cart:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      mergeGuestCart(user.id).then(() => loadCart());
-    }
-  }, [user]);
 
   const addToCart = async (productId: string, size: string, quantity: number) => {
+    if (!user) {
+      throw new Error("Please sign in to add items to cart");
+    }
+
     try {
       // Get product details
       const { data: product, error: productError } = await supabase
@@ -133,8 +108,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           product_id: productId,
           size,
           quantity,
-          user_id: user?.id || null,
-          session_id: user ? null : getSessionId(),
+          user_id: user.id,
         });
 
         if (error) throw error;
@@ -187,16 +161,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const clearCart = async () => {
+    if (!user) return;
+
     try {
-      let query = supabase.from("cart_items").delete();
+      const { error } = await supabase
+        .from("cart_items")
+        .delete()
+        .eq("user_id", user.id);
 
-      if (user) {
-        query = query.eq("user_id", user.id);
-      } else {
-        query = query.eq("session_id", getSessionId());
-      }
-
-      const { error } = await query;
       if (error) throw error;
       
       setItems([]);
