@@ -20,7 +20,6 @@ export type Database = {
           id: string
           product_id: string
           quantity: number
-          session_id: string | null
           size: string
           user_id: string | null
         }
@@ -29,7 +28,6 @@ export type Database = {
           id?: string
           product_id: string
           quantity?: number
-          session_id?: string | null
           size: string
           user_id?: string | null
         }
@@ -38,7 +36,6 @@ export type Database = {
           id?: string
           product_id?: string
           quantity?: number
-          session_id?: string | null
           size?: string
           user_id?: string | null
         }
