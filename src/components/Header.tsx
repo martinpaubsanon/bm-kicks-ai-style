@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import { InlineSearch } from "@/components/InlineSearch";
+import { CurrencySelector } from "@/components/CurrencySelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +37,7 @@ export const Header = () => {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 md:gap-3 relative">
+          <CurrencySelector />
           <Button 
             variant="ghost" 
             size="icon" 

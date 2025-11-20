@@ -1,6 +1,7 @@
 import { Product } from "@/components/AIShoeConsultant";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Flame } from "lucide-react";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface CompactProductCardProps {
   product: Product;
@@ -8,6 +9,7 @@ interface CompactProductCardProps {
 }
 
 export const CompactProductCard = ({ product, onClick }: CompactProductCardProps) => {
+  const { formatPrice } = useCurrency();
   const imageUrl = product.images?.[0] || "/placeholder.svg";
   
   return (
@@ -52,7 +54,7 @@ export const CompactProductCard = ({ product, onClick }: CompactProductCardProps
           {product.brand}
         </p>
         <p className="font-bold text-xs md:text-sm mt-0.5 md:mt-1 text-primary">
-          QAR {product.price.toFixed(2)}
+          {formatPrice(product.price)}
         </p>
       </div>
       

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import {
   Sheet,
   SheetContent,
@@ -17,6 +18,7 @@ interface CartDrawerProps {
 export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
   const navigate = useNavigate();
   const { items, cartTotal, updateQuantity, removeFromCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   const handleCheckout = () => {
     onOpenChange(false);
@@ -50,7 +52,7 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                       <p className="font-semibold text-sm">{item.product_name}</p>
                       <p className="text-xs text-muted-foreground">Size: {item.size}</p>
                       <p className="text-sm font-bold mt-1">
-                        QAR {(item.product_price * item.quantity).toFixed(2)}
+                        {formatPrice(item.product_price * item.quantity)}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <Button
@@ -88,7 +90,7 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             <div className="border-t pt-4 space-y-4">
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
-                <span>QAR {cartTotal.toFixed(2)}</span>
+                <span>{formatPrice(cartTotal)}</span>
               </div>
               <div className="space-y-2">
                 <Button className="w-full" onClick={handleCheckout}>

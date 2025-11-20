@@ -5,6 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatPrice(price: number): string {
-  return `QAR ${price.toFixed(2)}`;
+export function formatPrice(price: number, currencySymbol: string = 'QAR'): string {
+  return `${currencySymbol} ${price.toFixed(2)}`;
 }
