@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ export default function CustomerOrderDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
   const [order, setOrder] = useState<Order | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -184,9 +186,9 @@ export default function CustomerOrderDetail() {
                   <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold">QAR {item.subtotal.toFixed(2)}</p>
+                  <p className="font-semibold">{formatPrice(item.subtotal)}</p>
                   <p className="text-sm text-muted-foreground">
-                    QAR {item.price.toFixed(2)} each
+                    {formatPrice(item.price)} each
                   </p>
                 </div>
               </div>
@@ -195,11 +197,11 @@ export default function CustomerOrderDetail() {
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal:</span>
-                <span>QAR {order.subtotal.toFixed(2)}</span>
+                <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
-                <span>QAR {order.total.toFixed(2)}</span>
+                <span>{formatPrice(order.total)}</span>
               </div>
             </div>
           </div>

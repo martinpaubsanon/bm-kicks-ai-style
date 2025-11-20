@@ -12,16 +12,30 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Search, Eye, Plus, X } from "lucide-react";
+import { Search, Eye, Plus, X, Pencil, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Orders() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { formatPrice } = useCurrency();
   const [orders, setOrders] = useState<any[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<any>(null);
   
   const ageFilter = searchParams.get("ageFilter");
   const statusFilter = searchParams.get("status");
@@ -90,6 +104,57 @@ export default function Orders() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (order: any) => {
+    setOrderToDelete(order);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!orderToDelete) return;
+
+    try {
+      // First delete order items (due to foreign key constraint)
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .delete()
+        .eq("order_id", orderToDelete.id);
+
+      if (itemsError) throw itemsError;
+
+      // Delete payment confirmations if any
+      await supabase
+        .from("payment_confirmations")
+        .delete()
+        .eq("order_id", orderToDelete.id);
+
+      // Then delete the order
+      const { error: orderError } = await supabase
+        .from("orders")
+        .delete()
+        .eq("id", orderToDelete.id);
+
+      if (orderError) throw orderError;
+
+      toast({
+        title: "Success",
+        description: "Order deleted successfully",
+      });
+
+      // Reload orders
+      loadOrders();
+    } catch (error: any) {
+      console.error("Error deleting order:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete order",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setOrderToDelete(null);
     }
   };
 
@@ -188,7 +253,7 @@ export default function Orders() {
                 <TableCell className="font-medium">{order.order_number}</TableCell>
                 <TableCell>{order.customer_name}</TableCell>
                 <TableCell>{order.customer_email}</TableCell>
-                <TableCell>QAR {Number(order.total).toFixed(2)}</TableCell>
+                <TableCell>{formatPrice(Number(order.total))}</TableCell>
                 <TableCell>
                   <StatusBadge status={order.payment_status} type="payment" />
                 </TableCell>
@@ -199,11 +264,26 @@ export default function Orders() {
                   {new Date(order.created_at).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={`/admin/orders/${order.id}`}>
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={`/admin/orders/${order.id}`}>
+                        <Eye className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={`/admin/orders/${order.id}`}>
+                        <Pencil className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleDeleteClick(order)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -216,6 +296,27 @@ export default function Orders() {
           <p className="text-muted-foreground">No orders found</p>
         </div>
       )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Order</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete order <strong>{orderToDelete?.order_number}</strong>? 
+              This action cannot be undone and will also delete all associated order items and payment confirmations.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

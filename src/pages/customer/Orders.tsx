@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ interface Order {
 
 export default function CustomerOrders() {
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -89,7 +91,7 @@ export default function CustomerOrders() {
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-bold text-sm md:text-base">QAR {order.total.toFixed(2)}</p>
+                    <p className="font-bold text-sm md:text-base">{formatPrice(order.total)}</p>
                     <Button asChild size="xs" className="mt-1.5 md:mt-2">
                       <Link to={`/customer/orders/${order.id}`}>
                         <span className="text-[10px] md:text-xs">View</span>
