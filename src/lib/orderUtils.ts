@@ -33,6 +33,20 @@ export async function createOrder({
   paymentMethod,
   userId,
 }: CreateOrderParams): Promise<string> {
+  // Check rate limit - use user_id if authenticated, otherwise use email as identifier
+  const identifier = userId || shippingInfo.email;
+  
+  const { data: rateLimitOk, error: rateLimitError } = await supabase
+    .rpc('check_order_rate_limit', { user_identifier: identifier });
+
+  if (rateLimitError) {
+    throw new Error("Failed to verify rate limit. Please try again.");
+  }
+
+  if (!rateLimitOk) {
+    throw new Error("Too many orders. Please wait before placing another order (max 5 orders per hour).");
+  }
+
   // Validate payment method
   const allowedMethods = ["cod", "bank_transfer"] as const;
   if (!allowedMethods.includes(paymentMethod)) {

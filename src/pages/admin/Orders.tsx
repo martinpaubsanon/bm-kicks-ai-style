@@ -127,7 +127,9 @@ export default function Orders() {
       setOrders(data || []);
       setFilteredOrders(data || []);
     } catch (error) {
-      console.error("Error loading orders:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error loading orders:", error);
+      }
       toast({
         title: "Error",
         description: "Failed to load orders",
@@ -147,27 +149,13 @@ export default function Orders() {
     if (!orderToDelete) return;
 
     try {
-      // First delete order items (due to foreign key constraint)
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .delete()
-        .eq("order_id", orderToDelete.id);
-
-      if (itemsError) throw itemsError;
-
-      // Delete payment confirmations if any
-      await supabase
-        .from("payment_confirmations")
-        .delete()
-        .eq("order_id", orderToDelete.id);
-
-      // Then delete the order
-      const { error: orderError } = await supabase
+      // Delete order - CASCADE will handle order_items and payment_confirmations
+      const { error } = await supabase
         .from("orders")
         .delete()
         .eq("id", orderToDelete.id);
 
-      if (orderError) throw orderError;
+      if (error) throw error;
 
       toast({
         title: "Success",
@@ -177,7 +165,9 @@ export default function Orders() {
       // Reload orders
       loadOrders();
     } catch (error: any) {
-      console.error("Error deleting order:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error deleting order:", error);
+      }
       toast({
         title: "Error",
         description: error.message || "Failed to delete order",

@@ -133,6 +133,30 @@ export type Database = {
           },
         ]
       }
+      order_rate_limits: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          id: string
+          identifier: string
+          window_start: string
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          id?: string
+          identifier: string
+          window_start?: string
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          id?: string
+          identifier?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string | null
@@ -302,6 +326,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_order_rate_limit: {
+        Args: { user_identifier: string }
+        Returns: boolean
+      }
       generate_order_number: { Args: never; Returns: string }
       has_role: {
         Args: {
