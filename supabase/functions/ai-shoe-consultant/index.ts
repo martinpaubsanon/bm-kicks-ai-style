@@ -1,10 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const messageSchema = z.object({
+  messages: z.array(
+    z.object({
+      role: z.enum(['user', 'assistant', 'system']),
+      content: z.string().trim().min(1).max(500)
+    })
+  ).min(1).max(20)
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -12,7 +23,23 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    // Validate input
+    const body = await req.json();
+    const validationResult = messageSchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      console.error("Input validation failed:", validationResult.error);
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input format",
+          text: "Sorry, your message format is invalid. Please try again with a shorter message.",
+          products: []
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    const { messages } = validationResult.data;
     console.log("🔍 Processing AI shoe consultation with", messages.length, "messages");
 
     // Initialize Supabase client
