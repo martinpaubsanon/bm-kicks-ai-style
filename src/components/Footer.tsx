@@ -56,9 +56,7 @@ export const Footer = () => {
 
         <div className="border-t border-primary-foreground/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-primary-foreground/60">
-            <span onClick={() => window.location.href = '/admin/login'} className="cursor-pointer hover:text-accent transition-colors" title="Admin Access">
-              ©
-            </span> 2025 BM Kicks. All rights reserved. [Powered by StrategAIz - Tech Arm of Address Gateway]
+            © 2025 BM Kicks. All rights reserved. [Powered by StrategAIz - Tech Arm of Address Gateway]
           </p>
           <div className="flex gap-6 text-sm">
             <a href="#" className="text-primary-foreground/60 hover:text-accent transition-colors">Privacy Policy</a>
