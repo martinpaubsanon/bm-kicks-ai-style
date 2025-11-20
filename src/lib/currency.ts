@@ -46,7 +46,13 @@ export function formatCurrency(amount: number, currency: Currency = 'QAR'): stri
   const config = CURRENCIES[currency];
   const convertedAmount = convertPrice(amount, 'QAR', currency);
   
-  return `${config.symbol} ${convertedAmount.toFixed(2)}`;
+  // Format with thousand separators and 2 decimal places
+  const formattedAmount = convertedAmount.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  
+  return `${config.symbol} ${formattedAmount}`;
 }
 
 export function getCurrencySymbol(currency: Currency): string {
