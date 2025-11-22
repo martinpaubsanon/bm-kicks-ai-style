@@ -35,6 +35,27 @@ export const FeaturedProducts = () => {
 
   useEffect(() => {
     fetchFeaturedProducts();
+
+    // Subscribe to real-time updates for featured products
+    const channel = supabase
+      .channel('products-featured-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'products'
+        },
+        (payload) => {
+          console.log('Featured product change detected:', payload);
+          fetchFeaturedProducts(); // Refresh when any product changes
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchFeaturedProducts = async () => {
