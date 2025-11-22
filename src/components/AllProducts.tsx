@@ -37,7 +37,8 @@ export const AllProducts = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 300]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 3000]);
+  const [maxPrice, setMaxPrice] = useState(3000);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("featured");
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -79,6 +80,15 @@ export const AllProducts = () => {
 
       if (error) throw error;
       setProducts(data || []);
+      
+      // Calculate dynamic max price from products
+      if (data && data.length > 0) {
+        const calculatedMaxPrice = Math.ceil(Math.max(...data.map(p => p.price)) / 1000) * 1000;
+        setMaxPrice(calculatedMaxPrice);
+        
+        // Update price range if still at default
+        setPriceRange(prev => prev[1] === 3000 ? [0, calculatedMaxPrice] : prev);
+      }
       
       // Extract unique brands from products
       const uniqueBrands = [...new Set(data?.map(p => p.brand) || [])].sort();
@@ -173,7 +183,7 @@ export const AllProducts = () => {
 
   const handleClearFilters = () => {
     setSearchQuery("");
-    setPriceRange([0, 300]);
+    setPriceRange([0, maxPrice]);
     setSelectedBrands([]);
     setInStockOnly(false);
     setShowFeaturedOnly(false);
@@ -256,6 +266,7 @@ export const AllProducts = () => {
               showLimitedOnly={showLimitedOnly}
               onLimitedToggle={() => setShowLimitedOnly(!showLimitedOnly)}
               availableBrands={availableBrands}
+              maxPrice={maxPrice}
             />
           </aside>
 

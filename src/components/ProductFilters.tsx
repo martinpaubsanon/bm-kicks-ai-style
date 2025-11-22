@@ -29,6 +29,7 @@ interface ProductFiltersProps {
   showLimitedOnly: boolean;
   onLimitedToggle: () => void;
   availableBrands?: string[]; // Optional: defaults to predefined list
+  maxPrice?: number; // Dynamic max price
 }
 
 const brands = [
@@ -70,6 +71,7 @@ export const ProductFilters = ({
   showLimitedOnly,
   onLimitedToggle,
   availableBrands,
+  maxPrice = 3000,
 }: ProductFiltersProps) => {
   // Use passed brands or fall back to default list
   const brandsToShow = availableBrands && availableBrands.length > 0 ? availableBrands : brands;
@@ -77,7 +79,7 @@ export const ProductFilters = ({
   const hasActiveFilters =
     searchQuery.length > 0 ||
     priceRange[0] > 0 ||
-    priceRange[1] < 300 ||
+    priceRange[1] < maxPrice ||
     selectedBrands.length > 0 ||
     inStockOnly ||
     showFeaturedOnly ||
@@ -150,7 +152,7 @@ export const ProductFilters = ({
         </Label>
         <Slider
           min={0}
-          max={300}
+          max={maxPrice}
           step={10}
           value={priceRange}
           onValueChange={(value) => onPriceRangeChange(value as [number, number])}
