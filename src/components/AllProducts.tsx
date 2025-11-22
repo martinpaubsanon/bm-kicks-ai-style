@@ -107,9 +107,11 @@ export const AllProducts = () => {
 
   useEffect(() => {
     let filtered = [...products];
+    console.log('Starting filter - Total products:', products.length);
     
     if (selectedCategory !== "all") {
       filtered = filtered.filter(p => p.category === selectedCategory);
+      console.log('After category filter:', filtered.length);
     }
 
     // Search filter - checks name, description, and brand
@@ -119,12 +121,23 @@ export const AllProducts = () => {
         p.name.toLowerCase().includes(query) ||
         p.brand.toLowerCase().includes(query)
       );
+      console.log('After search filter:', filtered.length);
     }
 
     filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    console.log('After price filter:', filtered.length, 'Price range:', priceRange);
 
     if (selectedBrands.length > 0) {
-      filtered = filtered.filter(p => selectedBrands.includes(p.brand));
+      console.log('Filtering by brands:', selectedBrands);
+      console.log('Available product brands:', [...new Set(products.map(p => p.brand))]);
+      filtered = filtered.filter(p => {
+        const matches = selectedBrands.includes(p.brand);
+        if (!matches) {
+          console.log('Product brand mismatch:', p.brand, 'not in', selectedBrands);
+        }
+        return matches;
+      });
+      console.log('After brand filter:', filtered.length);
     }
 
     if (inStockOnly) {
@@ -176,9 +189,11 @@ export const AllProducts = () => {
   };
 
   const handleBrandToggle = (brand: string) => {
-    setSelectedBrands(prev =>
-      prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
-    );
+    setSelectedBrands(prev => {
+      const newBrands = prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand];
+      console.log('Selected brands:', newBrands);
+      return newBrands;
+    });
   };
 
   const handleClearFilters = () => {
