@@ -15,7 +15,7 @@ export const Footer = () => {
             </p>
             <div className="flex flex-col gap-4">
               <div className="flex gap-4">
-                <a href="#" className="hover:text-accent transition-colors" aria-label="Facebook">
+                <a href="https://www.facebook.com/BMKicks" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" aria-label="Facebook">
                   <Facebook className="h-5 w-5" />
                 </a>
                 <a href="#" className="hover:text-accent transition-colors" aria-label="Instagram">
