@@ -79,9 +79,12 @@ export type Database = {
       order_items: {
         Row: {
           actual_price: number
+          balance_due: number | null
           created_at: string | null
           discount_amount: number | null
+          downpayment_amount: number | null
           id: string
+          is_preorder: boolean | null
           order_id: string
           original_price: number
           price: number
@@ -94,9 +97,12 @@ export type Database = {
         }
         Insert: {
           actual_price?: number
+          balance_due?: number | null
           created_at?: string | null
           discount_amount?: number | null
+          downpayment_amount?: number | null
           id?: string
+          is_preorder?: boolean | null
           order_id: string
           original_price?: number
           price: number
@@ -109,9 +115,12 @@ export type Database = {
         }
         Update: {
           actual_price?: number
+          balance_due?: number | null
           created_at?: string | null
           discount_amount?: number | null
+          downpayment_amount?: number | null
           id?: string
+          is_preorder?: boolean | null
           order_id?: string
           original_price?: number
           price?: number
@@ -165,17 +174,21 @@ export type Database = {
       }
       orders: {
         Row: {
+          balance_total: number | null
           created_at: string | null
           customer_email: string
           customer_name: string
           customer_phone: string
           discount_total: number
+          downpayment_total: number | null
+          has_preorder_items: boolean | null
           id: string
           notes: string | null
           order_number: string
           order_status: string | null
           payment_method: string
           payment_status: string | null
+          preorder_status: string | null
           shipping_address: Json
           subtotal: number
           total: number
@@ -183,17 +196,21 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          balance_total?: number | null
           created_at?: string | null
           customer_email: string
           customer_name: string
           customer_phone: string
           discount_total?: number
+          downpayment_total?: number | null
+          has_preorder_items?: boolean | null
           id?: string
           notes?: string | null
           order_number: string
           order_status?: string | null
           payment_method: string
           payment_status?: string | null
+          preorder_status?: string | null
           shipping_address: Json
           subtotal: number
           total: number
@@ -201,17 +218,21 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          balance_total?: number | null
           created_at?: string | null
           customer_email?: string
           customer_name?: string
           customer_phone?: string
           discount_total?: number
+          downpayment_total?: number | null
+          has_preorder_items?: boolean | null
           id?: string
           notes?: string | null
           order_number?: string
           order_status?: string | null
           payment_method?: string
           payment_status?: string | null
+          preorder_status?: string | null
           shipping_address?: Json
           subtotal?: number
           total?: number
@@ -266,6 +287,7 @@ export type Database = {
           images: string[] | null
           is_featured: boolean | null
           is_limited_edition: boolean | null
+          is_preorder: boolean | null
           name: string
           price: number
           sizes: Json | null
@@ -283,6 +305,7 @@ export type Database = {
           images?: string[] | null
           is_featured?: boolean | null
           is_limited_edition?: boolean | null
+          is_preorder?: boolean | null
           name: string
           price: number
           sizes?: Json | null
@@ -300,6 +323,7 @@ export type Database = {
           images?: string[] | null
           is_featured?: boolean | null
           is_limited_edition?: boolean | null
+          is_preorder?: boolean | null
           name?: string
           price?: number
           sizes?: Json | null

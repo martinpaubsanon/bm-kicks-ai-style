@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Input } from "@/components/ui/input";
@@ -346,6 +347,80 @@ export default function OrderDetail() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Pre-Order Management */}
+      {order?.has_preorder_items && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <span className="text-lg">🔔</span>
+              Pre-Order Status
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Downpayment</p>
+                <p className="text-lg font-bold text-primary">
+                  {formatPrice(Number(order.downpayment_total || 0))}
+                  <Badge variant="outline" className="ml-2 text-xs">PAID</Badge>
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Balance Due</p>
+                <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                  {formatPrice(Number(order.balance_total || 0))}
+                  <Badge variant="outline" className="ml-2 text-xs border-orange-500 text-orange-600">PENDING</Badge>
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Pre-Order Status</label>
+              <Select
+                value={order.preorder_status || "awaiting_downpayment"}
+                onValueChange={async (value) => {
+                  const { error } = await supabase
+                    .from("orders")
+                    .update({ preorder_status: value })
+                    .eq("id", id);
+
+                  if (error) {
+                    toast({
+                      title: "Error",
+                      description: "Failed to update pre-order status",
+                      variant: "destructive",
+                    });
+                  } else {
+                    toast({
+                      title: "Success",
+                      description: "Pre-order status updated",
+                    });
+                    loadOrderDetails();
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="awaiting_downpayment">⏳ Awaiting Downpayment</SelectItem>
+                  <SelectItem value="processing">🔄 Processing (Sourcing Item)</SelectItem>
+                  <SelectItem value="ready_for_delivery">📦 Ready for Delivery</SelectItem>
+                  <SelectItem value="completed">✓ Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg p-3">
+              <p className="text-xs font-semibold text-orange-700 dark:text-orange-300 mb-1">Delivery Timeline:</p>
+              <p className="text-xs text-orange-600 dark:text-orange-400">
+                Estimated delivery: 10-14 days from order date. Balance payment will be collected upon delivery.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>

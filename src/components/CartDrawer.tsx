@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -8,6 +10,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Minus, Plus, X } from "lucide-react";
 
 interface CartDrawerProps {
@@ -19,11 +22,56 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
   const navigate = useNavigate();
   const { items, cartTotal, updateQuantity, removeFromCart } = useCart();
   const { formatPrice } = useCurrency();
+  const [productDetails, setProductDetails] = useState<Record<string, { is_preorder: boolean; price: number }>>({});
+
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      const productIds = items.map(item => item.product_id);
+      if (productIds.length === 0) return;
+
+      const { data } = await supabase
+        .from("products")
+        .select("id, is_preorder, price")
+        .in("id", productIds);
+
+      if (data) {
+        const details: Record<string, { is_preorder: boolean; price: number }> = {};
+        data.forEach(product => {
+          details[product.id] = {
+            is_preorder: product.is_preorder || false,
+            price: Number(product.price),
+          };
+        });
+        setProductDetails(details);
+      }
+    };
+
+    if (open) {
+      fetchProductDetails();
+    }
+  }, [items, open]);
 
   const handleCheckout = () => {
     onOpenChange(false);
     navigate("/checkout");
   };
+
+  const downpaymentTotal = items.reduce((sum, item) => {
+    const isPreorder = productDetails[item.product_id]?.is_preorder;
+    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+  }, 0);
+
+  const balanceTotal = items.reduce((sum, item) => {
+    const isPreorder = productDetails[item.product_id]?.is_preorder;
+    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+  }, 0);
+
+  const regularTotal = items.reduce((sum, item) => {
+    const isPreorder = productDetails[item.product_id]?.is_preorder;
+    return sum + (!isPreorder ? item.product_price * item.quantity : 0);
+  }, 0);
+
+  const hasPreorderItems = items.some(item => productDetails[item.product_id]?.is_preorder);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -41,7 +89,9 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
           <>
             <div className="flex-1 overflow-auto py-4">
               <div className="space-y-4">
-                {items.map((item) => (
+                {items.map((item) => {
+                  const isPreorder = productDetails[item.product_id]?.is_preorder;
+                  return (
                   <div key={item.id} className="flex gap-4 border-b pb-4">
                     <img
                       src={item.product_image}
@@ -49,11 +99,30 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                       className="w-20 h-20 object-cover rounded"
                     />
                     <div className="flex-1">
-                      <p className="font-semibold text-sm">{item.product_name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-sm">{item.product_name}</p>
+                        {isPreorder && (
+                          <Badge className="bg-orange-500 text-white text-[9px] px-1 py-0 h-4">PRE-ORDER</Badge>
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground">Size: {item.size}</p>
-                      <p className="text-sm font-bold mt-1">
-                        {formatPrice(item.product_price * item.quantity)}
-                      </p>
+                      {isPreorder ? (
+                        <div className="text-xs mt-1 space-y-0.5">
+                          <p className="text-muted-foreground">
+                            Price: {formatPrice(item.product_price * item.quantity)}
+                          </p>
+                          <p className="font-semibold text-primary">
+                            Pay Now: {formatPrice(item.product_price * item.quantity * 0.5)} (50%)
+                          </p>
+                          <p className="text-muted-foreground">
+                            On Delivery: {formatPrice(item.product_price * item.quantity * 0.5)}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-sm font-bold mt-1">
+                          {formatPrice(item.product_price * item.quantity)}
+                        </p>
+                      )}
                       <div className="flex items-center gap-2 mt-2">
                         <Button
                           size="icon"
@@ -83,15 +152,43 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
             <div className="border-t pt-4 space-y-4">
-              <div className="flex justify-between font-bold text-lg">
-                <span>Total:</span>
-                <span>{formatPrice(cartTotal)}</span>
-              </div>
+              {hasPreorderItems ? (
+                <div className="space-y-2 text-sm">
+                  {regularTotal > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Regular Items:</span>
+                      <span className="font-medium">{formatPrice(regularTotal)}</span>
+                    </div>
+                  )}
+                  {downpaymentTotal > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Pre-Order (50% Down):</span>
+                      <span className="font-medium">{formatPrice(downpaymentTotal)}</span>
+                    </div>
+                  )}
+                  <div className="border-t pt-2 flex justify-between font-bold text-lg">
+                    <span>Amount Due Now:</span>
+                    <span className="text-primary">{formatPrice(regularTotal + downpaymentTotal)}</span>
+                  </div>
+                  {balanceTotal > 0 && (
+                    <div className="flex justify-between text-orange-600 dark:text-orange-400">
+                      <span>Balance on Delivery:</span>
+                      <span className="font-semibold">{formatPrice(balanceTotal)}</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total:</span>
+                  <span>{formatPrice(cartTotal)}</span>
+                </div>
+              )}
               <div className="space-y-2">
                 <Button className="w-full" onClick={handleCheckout}>
                   Proceed to Checkout
