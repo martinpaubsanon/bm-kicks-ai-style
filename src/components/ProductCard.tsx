@@ -11,6 +11,7 @@ interface Product {
   is_featured?: boolean;
   is_limited_edition?: boolean;
   stock_total?: number;
+  is_preorder?: boolean;
 }
 
 interface ProductCardProps {
@@ -38,6 +39,11 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
           }}
         />
         <div className="absolute top-1 md:top-2 right-1 md:right-2 flex flex-col gap-0.5 md:gap-1">
+          {product.is_preorder && (
+            <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-[9px] md:text-xs px-1 md:px-2 py-0 h-4 md:h-5">
+              🔔 PRE-ORDER
+            </Badge>
+          )}
           {product.is_limited_edition && (
             <Badge variant="destructive" className="animate-pulse text-[9px] md:text-xs px-1 md:px-2 py-0 h-4 md:h-5">
               🔥 LIMITED
@@ -55,7 +61,12 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
         <div className="text-[10px] md:text-sm text-muted-foreground font-medium">{product.brand}</div>
         <h3 className="font-semibold text-xs md:text-base text-foreground line-clamp-1 mt-0.5 md:mt-1">{product.name}</h3>
         <div className="mt-1 md:mt-2 flex items-center justify-between">
-          <span className="text-sm md:text-xl font-bold text-primary">{formatPrice(product.price)}</span>
+          <div>
+            <span className="text-sm md:text-xl font-bold text-primary">{formatPrice(product.price)}</span>
+            {product.is_preorder && (
+              <p className="text-[9px] md:text-xs text-muted-foreground">50% downpayment</p>
+            )}
+          </div>
           <span className="text-[10px] md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
             Details →
           </span>

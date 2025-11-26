@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Package, ShoppingBag } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Package, ShoppingBag, Clock } from "lucide-react";
 import { Header } from "@/components/Header";
 
 interface OrderItem {
@@ -88,7 +89,9 @@ export default function OrderSuccess() {
 
               {/* Success Message */}
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-foreground">Order Placed Successfully!</h1>
+                <h1 className="text-3xl font-bold text-foreground">
+                  {order?.has_preorder_items ? "Pre-Order" : "Order"} Placed Successfully!
+                </h1>
                 <p className="text-lg text-muted-foreground">
                   Thank you for your order, {order?.customer_name}!
                 </p>
@@ -100,19 +103,57 @@ export default function OrderSuccess() {
                   <span className="text-sm font-medium text-muted-foreground">Order Number</span>
                   <span className="text-sm font-bold">#{order?.order_number}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-muted-foreground">Total Amount</span>
-                  <span className="text-sm font-bold">QAR {order?.total.toFixed(2)}</span>
-                </div>
+                
+                {order?.has_preorder_items ? (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-muted-foreground">Downpayment Paid</span>
+                      <span className="text-sm font-bold text-primary">QAR {order?.downpayment_total?.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-muted-foreground">Balance on Delivery</span>
+                      <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">QAR {order?.balance_total?.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-muted-foreground">Total Amount</span>
+                      <span className="text-sm font-bold">QAR {order?.total.toFixed(2)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-muted-foreground">Total Amount</span>
+                    <span className="text-sm font-bold">QAR {order?.total.toFixed(2)}</span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-muted-foreground">Payment Method</span>
                   <span className="text-sm capitalize">{order?.payment_method.replace("_", " ")}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-muted-foreground">Estimated Delivery</span>
-                  <span className="text-sm">3-5 business days</span>
+                  <span className="text-sm flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    {order?.has_preorder_items ? "10-14 business days" : "3-5 business days"}
+                  </span>
                 </div>
               </div>
+
+              {/* Pre-Order Info Box */}
+              {order?.has_preorder_items && (
+                <div className="bg-orange-50 dark:bg-orange-950 border-2 border-orange-200 dark:border-orange-800 rounded-lg p-4 text-left">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">🔔</span>
+                    <span className="font-semibold text-orange-700 dark:text-orange-300">Pre-Order Details</span>
+                  </div>
+                  <p className="text-sm text-orange-600 dark:text-orange-400 mb-2">
+                    Your pre-order items will be sourced and delivered within 10-14 business days.
+                  </p>
+                  <p className="text-sm text-orange-700 dark:text-orange-300 font-medium">
+                    We'll contact you when your items arrive and schedule delivery for final payment collection.
+                  </p>
+                </div>
+              )}
 
               {/* Order Items */}
               {orderItems.length > 0 && (

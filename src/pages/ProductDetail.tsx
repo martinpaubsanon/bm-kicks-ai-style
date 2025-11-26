@@ -28,6 +28,7 @@ interface Product {
   is_featured?: boolean;
   is_limited_edition?: boolean;
   stock_total?: number;
+  is_preorder?: boolean;
 }
 
 const ProductDetail = () => {
@@ -216,6 +217,24 @@ const ProductDetail = () => {
               <div className="text-3xl font-bold text-primary">{formatPrice(product.price)}</div>
             </div>
 
+            {/* Pre-Order Info Box */}
+            {product.is_preorder && (
+              <div className="bg-orange-50 dark:bg-orange-950 border-2 border-orange-200 dark:border-orange-800 rounded-lg p-4 space-y-2">
+                <div className="flex items-center gap-2 text-orange-700 dark:text-orange-300 font-semibold">
+                  <span className="text-xl">🔔</span>
+                  <span>PRE-ORDER ITEM</span>
+                </div>
+                <ul className="text-sm space-y-1 ml-7 text-orange-800 dark:text-orange-200">
+                  <li>• 50% Downpayment: <strong>{formatPrice(product.price * 0.5)}</strong></li>
+                  <li>• Balance on Delivery: <strong>{formatPrice(product.price * 0.5)}</strong></li>
+                  <li>• Estimated Delivery: <strong>10-14 days</strong></li>
+                </ul>
+                <p className="text-xs text-orange-700 dark:text-orange-300 ml-7 pt-1">
+                  ✓ Full payment collected upon delivery
+                </p>
+              </div>
+            )}
+
             {product.description && (
               <div>
                 <h3 className="font-semibold mb-2">Description</h3>
@@ -286,7 +305,7 @@ const ProductDetail = () => {
               disabled={availableSizes.length === 0}
             >
               <ShoppingCart className="mr-2 h-5 w-5" />
-              Add to Cart
+              {product.is_preorder ? "Pre-Order Now (50% Down)" : "Add to Cart"}
             </Button>
 
             {/* WhatsApp Help Section */}

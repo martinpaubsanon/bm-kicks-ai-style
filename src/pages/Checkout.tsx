@@ -4,6 +4,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +41,33 @@ export default function Checkout() {
 
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "bank_transfer">("bank_transfer");
   const [showAddressForm, setShowAddressForm] = useState(true);
+  const [productDetails, setProductDetails] = useState<Record<string, { is_preorder: boolean; price: number }>>({});
+
+  // Fetch product details to check for pre-order items
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      const productIds = items.map(item => item.product_id);
+      if (productIds.length === 0) return;
+
+      const { data } = await supabase
+        .from("products")
+        .select("id, is_preorder, price")
+        .in("id", productIds);
+
+      if (data) {
+        const details: Record<string, { is_preorder: boolean; price: number }> = {};
+        data.forEach(product => {
+          details[product.id] = {
+            is_preorder: product.is_preorder || false,
+            price: Number(product.price),
+          };
+        });
+        setProductDetails(details);
+      }
+    };
+
+    fetchProductDetails();
+  }, [items]);
 
   // Load saved address when customerProfile is available
   useEffect(() => {
@@ -74,6 +102,23 @@ export default function Checkout() {
       </div>
     );
   }
+
+  const downpaymentTotal = items.reduce((sum, item) => {
+    const isPreorder = productDetails[item.product_id]?.is_preorder;
+    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+  }, 0);
+
+  const balanceTotal = items.reduce((sum, item) => {
+    const isPreorder = productDetails[item.product_id]?.is_preorder;
+    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+  }, 0);
+
+  const regularTotal = items.reduce((sum, item) => {
+    const isPreorder = productDetails[item.product_id]?.is_preorder;
+    return sum + (!isPreorder ? item.product_price * item.quantity : 0);
+  }, 0);
+
+  const hasPreorderItems = items.some(item => productDetails[item.product_id]?.is_preorder);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,20 +344,71 @@ export default function Checkout() {
               <CardTitle>Order Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                {items.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span>
-                      {item.product_name} (Size {item.size}) x{item.quantity}
-                    </span>
-                    <span>{formatPrice(item.product_price * item.quantity)}</span>
-                  </div>
-                ))}
-                <div className="border-t pt-2 mt-2">
-                  <div className="flex justify-between font-bold">
-                    <span>Total</span>
-                    <span>{formatPrice(cartTotal)}</span>
-                  </div>
+              <div className="space-y-3">
+                {regularTotal > 0 && (
+                  <>
+                    <h4 className="font-semibold text-sm">Regular Items:</h4>
+                    {items.filter(item => !productDetails[item.product_id]?.is_preorder).map((item) => (
+                      <div key={item.id} className="flex justify-between text-sm pl-4">
+                        <span>
+                          {item.product_name} (Size {item.size}) x{item.quantity}
+                        </span>
+                        <span>{formatPrice(item.product_price * item.quantity)}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
+                
+                {hasPreorderItems && (
+                  <>
+                    <h4 className="font-semibold text-sm flex items-center gap-2">
+                      Pre-Order Items:
+                      <Badge className="bg-orange-500 text-white">50% Downpayment</Badge>
+                    </h4>
+                    {items.filter(item => productDetails[item.product_id]?.is_preorder).map((item) => (
+                      <div key={item.id} className="text-sm pl-4">
+                        <div className="flex justify-between">
+                          <span>
+                            {item.product_name} (Size {item.size}) x{item.quantity}
+                          </span>
+                          <span className="text-muted-foreground">{formatPrice(item.product_price * item.quantity)}</span>
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground ml-4">
+                          <span>└─ 50% Downpayment</span>
+                          <span className="font-semibold text-primary">{formatPrice(item.product_price * item.quantity * 0.5)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                <div className="border-t pt-3 mt-3 space-y-2">
+                  {hasPreorderItems ? (
+                    <>
+                      <div className="flex justify-between font-bold text-lg">
+                        <span>Amount Due Now:</span>
+                        <span className="text-primary">{formatPrice(regularTotal + downpaymentTotal)}</span>
+                      </div>
+                      <div className="flex justify-between text-orange-600 dark:text-orange-400 font-semibold">
+                        <span>Balance on Delivery:</span>
+                        <span>{formatPrice(balanceTotal)}</span>
+                      </div>
+                      
+                      <div className="bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg p-3 mt-3">
+                        <p className="text-xs font-semibold text-orange-700 dark:text-orange-300 mb-1">⚠️ PRE-ORDER TERMS:</p>
+                        <ul className="text-xs text-orange-600 dark:text-orange-400 space-y-0.5 ml-4">
+                          <li>• 50% downpayment secures your order</li>
+                          <li>• Delivery within 10-14 days</li>
+                          <li>• Remaining 50% collected on delivery</li>
+                        </ul>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between font-bold text-lg">
+                      <span>Total</span>
+                      <span>{formatPrice(cartTotal)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

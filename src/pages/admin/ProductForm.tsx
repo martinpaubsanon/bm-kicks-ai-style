@@ -38,6 +38,7 @@ export default function ProductForm() {
     style: "",
     is_featured: false,
     is_limited_edition: false,
+    is_preorder: false,
   });
 
   useEffect(() => {
@@ -76,6 +77,7 @@ export default function ProductForm() {
         style: data.style || "",
         is_featured: data.is_featured || false,
         is_limited_edition: data.is_limited_edition || false,
+        is_preorder: data.is_preorder || false,
       });
     } catch (error) {
       toast({
@@ -144,6 +146,7 @@ export default function ProductForm() {
         style: formData.style,
         is_featured: formData.is_featured,
         is_limited_edition: formData.is_limited_edition,
+        is_preorder: formData.is_preorder,
       };
 
       if (id) {
@@ -405,6 +408,22 @@ export default function ProductForm() {
                 checked={formData.is_limited_edition}
                 onCheckedChange={(checked) =>
                   setFormData({ ...formData, is_limited_edition: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="preorder">Pre-Order Item</Label>
+                <p className="text-sm text-muted-foreground">
+                  Requires 50% downpayment. Delivery: 10-14 days
+                </p>
+              </div>
+              <Switch
+                id="preorder"
+                checked={formData.is_preorder}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, is_preorder: checked })
                 }
               />
             </div>
