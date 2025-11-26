@@ -26,11 +26,16 @@ export default function Analytics() {
   const { formatPrice } = useCurrency();
   const [stats, setStats] = useState({
     totalRevenue: 0,
+    actualRevenue: 0,
+    totalDiscounts: 0,
+    discountRate: 0,
     orderCount: 0,
     avgOrderValue: 0,
     topProducts: [] as any[],
     revenueByCategory: [] as any[],
     dailyRevenue: [] as any[],
+    discountTrend: [] as any[],
+    topDiscountedProducts: [] as any[],
   });
   const [loading, setLoading] = useState(true);
 
@@ -46,20 +51,23 @@ export default function Analytics() {
 
       const { data: orders } = await supabase
         .from("orders")
-        .select("total, created_at")
+        .select("total, discount_total, created_at")
         .gte("created_at", thirtyDaysAgo.toISOString());
 
-      const totalRevenue = orders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
+      const actualRevenue = orders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
+      const totalDiscounts = orders?.reduce((sum, order) => sum + Number(order.discount_total || 0), 0) || 0;
+      const totalRevenue = actualRevenue + totalDiscounts;
+      const discountRate = totalRevenue > 0 ? (totalDiscounts / totalRevenue) * 100 : 0;
       const orderCount = orders?.length || 0;
-      const avgOrderValue = orderCount > 0 ? totalRevenue / orderCount : 0;
+      const avgOrderValue = orderCount > 0 ? actualRevenue / orderCount : 0;
 
-      // Get order items with product info
+      // Get order items with product info including discount data
       const { data: orderItems } = await supabase
         .from("order_items")
-        .select("product_name, quantity, subtotal, product_id");
+        .select("product_name, quantity, subtotal, product_id, actual_price, original_price, discount_amount");
 
-      // Calculate top products
-      const productSales: { [key: string]: { name: string; revenue: number; quantity: number } } = {};
+      // Calculate top products and discount data
+      const productSales: { [key: string]: { name: string; revenue: number; quantity: number; discount: number } } = {};
       
       orderItems?.forEach((item) => {
         if (!productSales[item.product_name]) {
@@ -67,10 +75,12 @@ export default function Analytics() {
             name: item.product_name,
             revenue: 0,
             quantity: 0,
+            discount: 0,
           };
         }
-        productSales[item.product_name].revenue += Number(item.subtotal);
+        productSales[item.product_name].revenue += Number(item.actual_price) * item.quantity;
         productSales[item.product_name].quantity += item.quantity;
+        productSales[item.product_name].discount += Number(item.discount_amount || 0);
       });
 
       const topProducts = Object.values(productSales)
@@ -79,6 +89,15 @@ export default function Analytics() {
         .map((p) => ({
           name: p.name.length > 20 ? p.name.substring(0, 20) + "..." : p.name,
           revenue: p.revenue,
+        }));
+
+      const topDiscountedProducts = Object.values(productSales)
+        .filter((p) => p.discount > 0)
+        .sort((a, b) => b.discount - a.discount)
+        .slice(0, 10)
+        .map((p) => ({
+          name: p.name.length > 20 ? p.name.substring(0, 20) + "..." : p.name,
+          discount: p.discount,
         }));
 
       // Get products for category breakdown
@@ -94,8 +113,10 @@ export default function Analytics() {
         value,
       }));
 
-      // Generate daily revenue for last 7 days
+      // Generate daily revenue and discount trends for last 7 days
       const dailyRevenue = [];
+      const discountTrend = [];
+      
       for (let i = 6; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
@@ -107,20 +128,33 @@ export default function Analytics() {
         );
 
         const dayRevenue = dayOrders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
+        const dayDiscount = dayOrders?.reduce((sum, order) => sum + Number(order.discount_total || 0), 0) || 0;
 
+        const dateLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        
         dailyRevenue.push({
-          date: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          date: dateLabel,
           revenue: dayRevenue,
+        });
+
+        discountTrend.push({
+          date: dateLabel,
+          discount: dayDiscount,
         });
       }
 
       setStats({
         totalRevenue,
+        actualRevenue,
+        totalDiscounts,
+        discountRate,
         orderCount,
         avgOrderValue,
         topProducts,
         revenueByCategory,
         dailyRevenue,
+        discountTrend,
+        topDiscountedProducts,
       });
     } catch (error) {
       console.error("Error loading analytics:", error);
@@ -146,24 +180,28 @@ export default function Analytics() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Revenue (30d)"
-          value={formatPrice(stats.totalRevenue)}
+          title="Actual Revenue (30d)"
+          value={formatPrice(stats.actualRevenue)}
           icon={DollarSign}
-          change={12}
+          description="Revenue after discounts"
+        />
+        <StatCard
+          title="Total Discounts (30d)"
+          value={formatPrice(stats.totalDiscounts)}
+          icon={TrendingUp}
+          description={`${stats.discountRate.toFixed(1)}% discount rate`}
         />
         <StatCard
           title="Total Orders (30d)"
           value={stats.orderCount}
           icon={ShoppingCart}
-          change={8}
         />
         <StatCard
           title="Avg Order Value"
           value={formatPrice(stats.avgOrderValue)}
-          icon={TrendingUp}
-          change={5}
+          icon={Package}
+          description="After discounts"
         />
-        <StatCard title="Active Products" value={48} icon={Package} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -179,12 +217,32 @@ export default function Analytics() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="revenue" stroke="#8884d8" />
+                <Line type="monotone" dataKey="revenue" stroke="#8884d8" name="Actual Revenue" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle>Discount Trend (Last 7 Days)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={stats.discountTrend}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="discount" stroke="#ef4444" name="Discounts Given" />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Revenue by Category</CardTitle>
@@ -210,6 +268,24 @@ export default function Analytics() {
                 </Pie>
                 <Tooltip />
               </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Most Discounted Products</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={stats.topDiscountedProducts}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="discount" fill="#ef4444" name="Total Discount" />
+              </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
