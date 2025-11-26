@@ -115,6 +115,8 @@ export async function createOrder({
       size: item.size,
       quantity: item.quantity,
       price: item.product_price,
+      original_price: item.product_price,
+      actual_price: item.product_price,
       subtotal: item.product_price * item.quantity,
     });
 

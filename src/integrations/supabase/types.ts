@@ -78,9 +78,12 @@ export type Database = {
       }
       order_items: {
         Row: {
+          actual_price: number
           created_at: string | null
+          discount_amount: number | null
           id: string
           order_id: string
+          original_price: number
           price: number
           product_id: string | null
           product_image: string | null
@@ -90,9 +93,12 @@ export type Database = {
           subtotal: number
         }
         Insert: {
+          actual_price?: number
           created_at?: string | null
+          discount_amount?: number | null
           id?: string
           order_id: string
+          original_price?: number
           price: number
           product_id?: string | null
           product_image?: string | null
@@ -102,9 +108,12 @@ export type Database = {
           subtotal: number
         }
         Update: {
+          actual_price?: number
           created_at?: string | null
+          discount_amount?: number | null
           id?: string
           order_id?: string
+          original_price?: number
           price?: number
           product_id?: string | null
           product_image?: string | null
@@ -160,6 +169,7 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone: string
+          discount_total: number
           id: string
           notes: string | null
           order_number: string
@@ -177,6 +187,7 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone: string
+          discount_total?: number
           id?: string
           notes?: string | null
           order_number: string
@@ -194,6 +205,7 @@ export type Database = {
           customer_email?: string
           customer_name?: string
           customer_phone?: string
+          discount_total?: number
           id?: string
           notes?: string | null
           order_number?: string

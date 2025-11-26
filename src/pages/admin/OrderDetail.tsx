@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -20,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil, Check, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 export default function OrderDetail() {
@@ -31,6 +32,8 @@ export default function OrderDetail() {
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const [paymentConfirmations, setPaymentConfirmations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editedPrice, setEditedPrice] = useState<string>("");
 
   useEffect(() => {
     loadOrderDetails();
@@ -120,6 +123,52 @@ export default function OrderDetail() {
     }
   };
 
+  const startEditingPrice = (itemId: string, currentPrice: number) => {
+    setEditingItemId(itemId);
+    setEditedPrice(currentPrice.toString());
+  };
+
+  const cancelEditingPrice = () => {
+    setEditingItemId(null);
+    setEditedPrice("");
+  };
+
+  const saveActualPrice = async (itemId: string) => {
+    try {
+      const newPrice = parseFloat(editedPrice);
+      if (isNaN(newPrice) || newPrice < 0) {
+        toast({
+          title: "Error",
+          description: "Please enter a valid price",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from("order_items")
+        .update({ actual_price: newPrice })
+        .eq("id", itemId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Actual price updated successfully",
+      });
+      
+      setEditingItemId(null);
+      setEditedPrice("");
+      loadOrderDetails();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update actual price",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-96">
@@ -193,8 +242,10 @@ export default function OrderDetail() {
               <TableRow>
                 <TableHead>Product</TableHead>
                 <TableHead>Size</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Price</TableHead>
+                <TableHead>Qty</TableHead>
+                <TableHead>Original Price</TableHead>
+                <TableHead>Actual Price</TableHead>
+                <TableHead>Discount</TableHead>
                 <TableHead>Subtotal</TableHead>
               </TableRow>
             </TableHeader>
@@ -215,19 +266,81 @@ export default function OrderDetail() {
                   </TableCell>
                   <TableCell>{item.size}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
-                  <TableCell>{formatPrice(Number(item.price))}</TableCell>
-                  <TableCell>{formatPrice(Number(item.subtotal))}</TableCell>
+                  <TableCell>{formatPrice(Number(item.original_price))}</TableCell>
+                  <TableCell>
+                    {editingItemId === item.id ? (
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          value={editedPrice}
+                          onChange={(e) => setEditedPrice(e.target.value)}
+                          className="w-24"
+                          step="0.01"
+                        />
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          onClick={() => saveActualPrice(item.id)}
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          onClick={cancelEditingPrice}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span>{formatPrice(Number(item.actual_price))}</span>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          onClick={() => startEditingPrice(item.id, Number(item.actual_price))}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {Number(item.discount_amount) > 0 ? (
+                      <span className="text-red-500">
+                        -{formatPrice(Number(item.discount_amount))}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>{formatPrice(Number(item.actual_price) * item.quantity)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-          <div className="mt-4 space-y-2 text-right">
+          <div className="mt-4 space-y-2 text-right border-t pt-4">
             <div className="flex justify-end gap-4">
-              <span className="text-muted-foreground">Subtotal:</span>
-              <span className="font-medium">{formatPrice(Number(order.subtotal))}</span>
+              <span className="text-muted-foreground">Original Total:</span>
+              <span className="font-medium">
+                {formatPrice(
+                  orderItems.reduce((sum, item) => sum + Number(item.original_price) * item.quantity, 0)
+                )}
+              </span>
             </div>
-            <div className="flex justify-end gap-4 text-lg font-bold">
-              <span>Total:</span>
+            {Number(order.discount_total) > 0 && (
+              <div className="flex justify-end gap-4">
+                <span className="text-red-500">Discount Given:</span>
+                <span className="font-medium text-red-500">
+                  -{formatPrice(Number(order.discount_total))}
+                </span>
+              </div>
+            )}
+            <div className="flex justify-end gap-4 text-lg font-bold text-green-600">
+              <span>Actual Revenue:</span>
               <span>{formatPrice(Number(order.total))}</span>
             </div>
           </div>
