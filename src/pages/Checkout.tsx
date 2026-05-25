@@ -103,22 +103,22 @@ export default function Checkout() {
     );
   }
 
+  const isItemPreorder = (item: any) =>
+    item.product?._colorway_is_preorder ?? productDetails[item.product_id]?.is_preorder ?? false;
+
   const downpaymentTotal = items.reduce((sum, item) => {
-    const isPreorder = productDetails[item.product_id]?.is_preorder;
-    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+    return sum + (isItemPreorder(item) ? item.product_price * item.quantity * 0.5 : 0);
   }, 0);
 
   const balanceTotal = items.reduce((sum, item) => {
-    const isPreorder = productDetails[item.product_id]?.is_preorder;
-    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+    return sum + (isItemPreorder(item) ? item.product_price * item.quantity * 0.5 : 0);
   }, 0);
 
   const regularTotal = items.reduce((sum, item) => {
-    const isPreorder = productDetails[item.product_id]?.is_preorder;
-    return sum + (!isPreorder ? item.product_price * item.quantity : 0);
+    return sum + (!isItemPreorder(item) ? item.product_price * item.quantity : 0);
   }, 0);
 
-  const hasPreorderItems = items.some(item => productDetails[item.product_id]?.is_preorder);
+  const hasPreorderItems = items.some(isItemPreorder);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
