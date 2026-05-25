@@ -391,15 +391,35 @@ export default function ProductForm() {
           </CardContent>
         </Card>
 
-        {/* Product Variants */}
+        {/* Colorways */}
         <Card>
           <CardHeader>
-            <CardTitle>Product Variants</CardTitle>
-            <CardDescription>Colors, sizes, and stock management</CardDescription>
+            <CardTitle>Colorways</CardTitle>
+            <CardDescription>
+              Add color variants — each with its own images, sizes, stock, and SKU.
+              Leave empty to use the default product images and sizes below.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ColorwayManager
+              colorways={colorways}
+              onChange={setColorways}
+              productId={id || "new"}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Default / Fallback Variants */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Default Sizes & Colors</CardTitle>
+            <CardDescription>
+              Used when no colorways are defined, or as a tag-only color list.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <Label>Available Colors</Label>
+              <Label>Available Colors (tags)</Label>
               <div className="mt-2">
                 <ColorManager
                   colors={formData.colors}
@@ -409,12 +429,11 @@ export default function ProductForm() {
             </div>
 
             <div>
-              <Label>Sizes & Stock</Label>
+              <Label>Sizes & Stock (fallback)</Label>
               <div className="mt-2">
                 <SizeStockManager
                   sizes={formData.sizes}
                   onChange={(sizes) => {
-                    // Auto-calculate total stock
                     const total = Object.values(sizes).reduce((sum, stock) => sum + stock, 0);
                     setFormData({
                       ...formData,
@@ -430,6 +449,7 @@ export default function ProductForm() {
             </div>
           </CardContent>
         </Card>
+
 
         {/* Product Settings */}
         <Card>
