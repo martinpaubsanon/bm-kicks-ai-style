@@ -6,6 +6,9 @@ import { toast } from "@/hooks/use-toast";
 interface CartItem {
   id: string;
   product_id: string;
+  colorway_id: string | null;
+  colorway_name?: string | null;
+  colorway_swatch?: string | null;
   product_name: string;
   product_image: string;
   product_price: number;
@@ -17,7 +20,7 @@ interface CartItem {
 interface CartContextType {
   items: CartItem[];
   loading: boolean;
-  addToCart: (productId: string, size: string, quantity: number) => Promise<void>;
+  addToCart: (productId: string, size: string, quantity: number, colorwayId?: string | null) => Promise<void>;
   removeFromCart: (itemId: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -46,24 +49,46 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await supabase
         .from("cart_items")
-        .select(`
-          *,
-          product:products(*)
-        `)
+        .select(`*, product:products(*)`)
         .eq("user_id", user.id);
 
       if (error) throw error;
 
-      const cartItems = (data || []).map((item: any) => ({
-        id: item.id,
-        product_id: item.product_id,
-        product_name: item.product ? `${item.product.brand} ${item.product.name}` : "",
-        product_image: item.product?.images?.[0] || "",
-        product_price: item.product?.price || 0,
-        size: item.size,
-        quantity: item.quantity,
-        product: item.product,
-      }));
+      // Hydrate colorway info if any
+      const colorwayIds = Array.from(
+        new Set((data || []).map((d: any) => d.colorway_id).filter(Boolean))
+      ) as string[];
+      let colorwayMap: Record<string, any> = {};
+      if (colorwayIds.length > 0) {
+        const { data: cws } = await supabase
+          .from("product_colorways")
+          .select("id, name, swatch_hex, swatch_image, images, price_override, is_preorder")
+          .in("id", colorwayIds);
+        (cws || []).forEach((c: any) => { colorwayMap[c.id] = c; });
+      }
+
+      const cartItems: CartItem[] = (data || []).map((item: any) => {
+        const cw = item.colorway_id ? colorwayMap[item.colorway_id] : null;
+        const image =
+          cw?.images?.[0] ||
+          item.product?.images?.[0] ||
+          "";
+        const price =
+          cw?.price_override != null ? Number(cw.price_override) : Number(item.product?.price || 0);
+        return {
+          id: item.id,
+          product_id: item.product_id,
+          colorway_id: item.colorway_id || null,
+          colorway_name: cw?.name || null,
+          colorway_swatch: cw?.swatch_image || cw?.swatch_hex || null,
+          product_name: item.product ? `${item.product.brand} ${item.product.name}` : "",
+          product_image: image,
+          product_price: price,
+          size: item.size,
+          quantity: item.quantity,
+          product: { ...item.product, _colorway_is_preorder: cw?.is_preorder },
+        };
+      });
 
       setItems(cartItems);
     } catch (error) {
@@ -74,31 +99,46 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
 
-  const addToCart = async (productId: string, size: string, quantity: number) => {
+  const addToCart = async (
+    productId: string,
+    size: string,
+    quantity: number,
+    colorwayId: string | null = null
+  ) => {
     if (!user) {
       throw new Error("Please sign in to add items to cart");
     }
 
     try {
-      // Get product details
-      const { data: product, error: productError } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", productId)
-        .single();
-
-      if (productError) throw productError;
-
-      const sizes = product.sizes as Record<string, number>;
-      const availableStock = sizes[size] || 0;
+      let availableStock = 0;
+      if (colorwayId) {
+        const { data: cw, error: cwErr } = await supabase
+          .from("product_colorways")
+          .select("sizes")
+          .eq("id", colorwayId)
+          .single();
+        if (cwErr) throw cwErr;
+        availableStock = ((cw.sizes as Record<string, number>) || {})[size] || 0;
+      } else {
+        const { data: product, error: productError } = await supabase
+          .from("products")
+          .select("sizes")
+          .eq("id", productId)
+          .single();
+        if (productError) throw productError;
+        availableStock = ((product.sizes as Record<string, number>) || {})[size] || 0;
+      }
 
       if (availableStock < quantity) {
         throw new Error("Insufficient stock");
       }
 
-      // Check if item already exists
+      // Same product+colorway+size = merge quantity
       const existingItem = items.find(
-        (item) => item.product_id === productId && item.size === size
+        (item) =>
+          item.product_id === productId &&
+          (item.colorway_id || null) === (colorwayId || null) &&
+          item.size === size
       );
 
       if (existingItem) {
@@ -106,6 +146,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       } else {
         const { error } = await supabase.from("cart_items").insert({
           product_id: productId,
+          colorway_id: colorwayId,
           size,
           quantity,
           user_id: user.id,
@@ -170,7 +211,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         .eq("user_id", user.id);
 
       if (error) throw error;
-      
+
       setItems([]);
     } catch (error) {
       console.error("Error clearing cart:", error);
