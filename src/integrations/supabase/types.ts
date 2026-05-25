@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       cart_items: {
         Row: {
+          colorway_id: string | null
           created_at: string | null
           id: string
           product_id: string
@@ -24,6 +25,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          colorway_id?: string | null
           created_at?: string | null
           id?: string
           product_id: string
@@ -32,6 +34,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          colorway_id?: string | null
           created_at?: string | null
           id?: string
           product_id?: string
@@ -40,6 +43,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "cart_items_colorway_id_fkey"
+            columns: ["colorway_id"]
+            isOneToOne: false
+            referencedRelation: "product_colorways"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "cart_items_product_id_fkey"
             columns: ["product_id"]
@@ -80,6 +90,8 @@ export type Database = {
         Row: {
           actual_price: number
           balance_due: number | null
+          colorway_id: string | null
+          colorway_name: string | null
           created_at: string | null
           discount_amount: number | null
           downpayment_amount: number | null
@@ -98,6 +110,8 @@ export type Database = {
         Insert: {
           actual_price?: number
           balance_due?: number | null
+          colorway_id?: string | null
+          colorway_name?: string | null
           created_at?: string | null
           discount_amount?: number | null
           downpayment_amount?: number | null
@@ -116,6 +130,8 @@ export type Database = {
         Update: {
           actual_price?: number
           balance_due?: number | null
+          colorway_id?: string | null
+          colorway_name?: string | null
           created_at?: string | null
           discount_amount?: number | null
           downpayment_amount?: number | null
@@ -272,6 +288,74 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_colorways: {
+        Row: {
+          created_at: string
+          id: string
+          images: string[]
+          is_default: boolean
+          is_limited_edition: boolean
+          is_preorder: boolean
+          name: string
+          price_override: number | null
+          product_id: string
+          sizes: Json
+          sku: string | null
+          slug: string
+          sort_order: number
+          stock_total: number
+          swatch_hex: string | null
+          swatch_image: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          images?: string[]
+          is_default?: boolean
+          is_limited_edition?: boolean
+          is_preorder?: boolean
+          name: string
+          price_override?: number | null
+          product_id: string
+          sizes?: Json
+          sku?: string | null
+          slug: string
+          sort_order?: number
+          stock_total?: number
+          swatch_hex?: string | null
+          swatch_image?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          images?: string[]
+          is_default?: boolean
+          is_limited_edition?: boolean
+          is_preorder?: boolean
+          name?: string
+          price_override?: number | null
+          product_id?: string
+          sizes?: Json
+          sku?: string | null
+          slug?: string
+          sort_order?: number
+          stock_total?: number
+          swatch_hex?: string | null
+          swatch_image?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_colorways_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
