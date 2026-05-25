@@ -140,23 +140,31 @@ export default function ProductForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Image and size validation
-    if (formData.images.length === 0) {
+    const activeColorways = colorways.filter((c) => !c._deleted);
+    const hasColorways = activeColorways.length > 0;
+
+    // Image and size validation — only required when no colorways are defined
+    if (!hasColorways && formData.images.length === 0) {
       toast({
         title: "Images required",
-        description: "Please upload at least one product image",
+        description: "Add at least one product image or create a colorway",
         variant: "destructive",
       });
       return;
     }
 
-    if (Object.keys(formData.sizes).length === 0) {
+    if (!hasColorways && Object.keys(formData.sizes).length === 0) {
       toast({
         title: "Sizes required",
-        description: "Please add at least one size with stock",
+        description: "Add at least one size with stock or create a colorway",
         variant: "destructive",
       });
       return;
+    }
+
+    if (hasColorways && !activeColorways.some((c) => c.is_default)) {
+      // Auto-mark first as default if none set
+      activeColorways[0].is_default = true;
     }
 
     // Validate product data with zod schema
