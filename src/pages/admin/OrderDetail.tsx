@@ -262,7 +262,12 @@ export default function OrderDetail() {
                           className="w-12 h-12 object-cover rounded"
                         />
                       )}
-                      <span className="font-medium">{item.product_name}</span>
+                      <div>
+                        <span className="font-medium">{item.product_name}</span>
+                        {item.colorway_name && (
+                          <div className="text-xs text-muted-foreground">Color: {item.colorway_name}</div>
+                        )}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>{item.size}</TableCell>
