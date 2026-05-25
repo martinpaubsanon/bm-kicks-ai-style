@@ -90,7 +90,9 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             <div className="flex-1 overflow-auto py-4">
               <div className="space-y-4">
                 {items.map((item) => {
-                  const isPreorder = productDetails[item.product_id]?.is_preorder;
+                  const isPreorder =
+                    (item.product as any)?._colorway_is_preorder ??
+                    productDetails[item.product_id]?.is_preorder;
                   return (
                   <div key={item.id} className="flex gap-4 border-b pb-4">
                     <img
@@ -99,12 +101,27 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                       className="w-20 h-20 object-cover rounded"
                     />
                     <div className="flex-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-semibold text-sm">{item.product_name}</p>
                         {isPreorder && (
                           <Badge className="bg-orange-500 text-white text-[9px] px-1 py-0 h-4">PRE-ORDER</Badge>
                         )}
                       </div>
+                      {item.colorway_name && (
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {item.colorway_swatch && (
+                            <span
+                              className="inline-block w-3 h-3 rounded-full border border-border"
+                              style={{
+                                background: item.colorway_swatch.startsWith("#")
+                                  ? item.colorway_swatch
+                                  : `url(${item.colorway_swatch}) center/cover`,
+                              }}
+                            />
+                          )}
+                          <p className="text-xs text-muted-foreground">{item.colorway_name}</p>
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground">Size: {item.size}</p>
                       {isPreorder ? (
                         <div className="text-xs mt-1 space-y-0.5">

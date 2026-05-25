@@ -1,7 +1,10 @@
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { resolveProductImage } from "@/lib/productImageOverrides";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { supabase } from "@/integrations/supabase/client";
+
 interface Product {
   id: string;
   name: string;
@@ -19,10 +22,36 @@ interface ProductCardProps {
   onClick: () => void;
 }
 
+interface CardColorway {
+  id: string;
+  swatch_hex: string | null;
+  swatch_image: string | null;
+  images: string[] | null;
+}
+
 export const ProductCard = ({ product, onClick }: ProductCardProps) => {
   const { formatPrice } = useCurrency();
-  const imageSrc = resolveProductImage(product.id, product.images?.[0]);
+  const [colorways, setColorways] = useState<CardColorway[]>([]);
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from("product_colorways")
+      .select("id, swatch_hex, swatch_image, images")
+      .eq("product_id", product.id)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        if (!cancelled && data) setColorways(data as CardColorway[]);
+      });
+    return () => { cancelled = true; };
+  }, [product.id]);
+
+  const imageSrc = hoveredImage || resolveProductImage(product.id, product.images?.[0]);
   const isLowStock = (product.stock_total || 0) < 10 && (product.stock_total || 0) > 0;
+  const maxDots = 4;
+  const visibleDots = colorways.slice(0, maxDots);
+  const overflow = colorways.length - visibleDots.length;
 
   return (
     <Card
@@ -34,9 +63,7 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
           src={imageSrc}
           alt={`${product.brand} ${product.name}`}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-          onError={(e) => {
-            e.currentTarget.src = "/placeholder.svg";
-          }}
+          onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
         />
         <div className="absolute top-1 md:top-2 right-1 md:right-2 flex flex-col gap-0.5 md:gap-1">
           {product.is_preorder && (
@@ -60,6 +87,36 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
       <div className="p-1.5 md:p-4">
         <div className="text-[10px] md:text-sm text-muted-foreground font-medium">{product.brand}</div>
         <h3 className="font-semibold text-xs md:text-base text-foreground line-clamp-1 mt-0.5 md:mt-1">{product.name}</h3>
+
+        {colorways.length > 0 && (
+          <div
+            className="mt-1 flex items-center gap-1"
+            onMouseLeave={() => setHoveredImage(null)}
+          >
+            {visibleDots.map((cw) => (
+              <button
+                key={cw.id}
+                type="button"
+                onMouseEnter={() => {
+                  const next = cw.images?.[0];
+                  if (next) setHoveredImage(next);
+                }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-3 h-3 md:w-4 md:h-4 rounded-full border border-border/70 hover:border-primary transition"
+                style={{
+                  background: cw.swatch_image
+                    ? `url(${cw.swatch_image}) center/cover`
+                    : cw.swatch_hex || "#999",
+                }}
+                aria-label="Colorway"
+              />
+            ))}
+            {overflow > 0 && (
+              <span className="text-[9px] md:text-xs text-muted-foreground ml-0.5">+{overflow}</span>
+            )}
+          </div>
+        )}
+
         <div className="mt-1 md:mt-2 flex items-center justify-between">
           <div>
             <span className="text-sm md:text-xl font-bold text-primary">{formatPrice(product.price)}</span>

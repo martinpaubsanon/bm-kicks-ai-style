@@ -19,12 +19,15 @@ import { ArrowLeft } from "lucide-react";
 import ImageUploader from "@/components/admin/ImageUploader";
 import SizeStockManager from "@/components/admin/SizeStockManager";
 import ColorManager from "@/components/admin/ColorManager";
+import ColorwayManager, { type DraftColorway } from "@/components/admin/ColorwayManager";
+import { fetchColorways, slugify, totalStockFromSizes } from "@/lib/colorwayUtils";
 import { productSchema } from "@/lib/validationSchemas";
 
 export default function ProductForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [colorways, setColorways] = useState<DraftColorway[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     brand: "",
@@ -79,6 +82,15 @@ export default function ProductForm() {
         is_limited_edition: data.is_limited_edition || false,
         is_preorder: data.is_preorder || false,
       });
+
+      // Load colorways for this product
+      const cws = await fetchColorways(id!);
+      setColorways(
+        cws.map((c) => ({
+          ...c,
+          _localId: c.id,
+        }))
+      );
     } catch (error) {
       toast({
         title: "Error",
@@ -88,26 +100,71 @@ export default function ProductForm() {
     }
   };
 
+  const syncColorways = async (productId: string) => {
+    // Delete removed
+    const toDelete = colorways.filter((c) => c._deleted && c.id).map((c) => c.id!);
+    if (toDelete.length > 0) {
+      await supabase.from("product_colorways").delete().in("id", toDelete);
+    }
+
+    // Upsert kept
+    const kept = colorways.filter((c) => !c._deleted);
+    for (let i = 0; i < kept.length; i++) {
+      const c = kept[i];
+      const payload = {
+        product_id: productId,
+        name: c.name,
+        slug: c.slug || slugify(c.name),
+        sku: c.sku,
+        swatch_hex: c.swatch_hex,
+        swatch_image: c.swatch_image,
+        images: c.images,
+        sizes: c.sizes,
+        stock_total: totalStockFromSizes(c.sizes),
+        price_override: c.price_override,
+        is_default: c.is_default,
+        is_preorder: c.is_preorder,
+        is_limited_edition: c.is_limited_edition,
+        sort_order: i,
+      };
+      if (c.id) {
+        await supabase.from("product_colorways").update(payload).eq("id", c.id);
+      } else {
+        await supabase.from("product_colorways").insert(payload);
+      }
+    }
+  };
+
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Image and size validation
-    if (formData.images.length === 0) {
+    const activeColorways = colorways.filter((c) => !c._deleted);
+    const hasColorways = activeColorways.length > 0;
+
+    // Image and size validation — only required when no colorways are defined
+    if (!hasColorways && formData.images.length === 0) {
       toast({
         title: "Images required",
-        description: "Please upload at least one product image",
+        description: "Add at least one product image or create a colorway",
         variant: "destructive",
       });
       return;
     }
 
-    if (Object.keys(formData.sizes).length === 0) {
+    if (!hasColorways && Object.keys(formData.sizes).length === 0) {
       toast({
         title: "Sizes required",
-        description: "Please add at least one size with stock",
+        description: "Add at least one size with stock or create a colorway",
         variant: "destructive",
       });
       return;
+    }
+
+    if (hasColorways && !activeColorways.some((c) => c.is_default)) {
+      // Auto-mark first as default if none set
+      activeColorways[0].is_default = true;
     }
 
     // Validate product data with zod schema
@@ -149,6 +206,7 @@ export default function ProductForm() {
         is_preorder: formData.is_preorder,
       };
 
+      let savedProductId = id;
       if (id) {
         const { error } = await supabase
           .from("products")
@@ -156,13 +214,21 @@ export default function ProductForm() {
           .eq("id", id);
 
         if (error) throw error;
-        toast({ title: "Success", description: "Product updated successfully" });
       } else {
-        const { error } = await supabase.from("products").insert(productData);
+        const { data: inserted, error } = await supabase
+          .from("products")
+          .insert(productData)
+          .select("id")
+          .single();
 
         if (error) throw error;
-        toast({ title: "Success", description: "Product created successfully" });
+        savedProductId = inserted.id;
       }
+
+      // Sync colorways
+      await syncColorways(savedProductId!);
+
+      toast({ title: "Success", description: id ? "Product updated successfully" : "Product created successfully" });
 
       navigate("/admin/products");
     } catch (error: any) {
@@ -333,15 +399,35 @@ export default function ProductForm() {
           </CardContent>
         </Card>
 
-        {/* Product Variants */}
+        {/* Colorways */}
         <Card>
           <CardHeader>
-            <CardTitle>Product Variants</CardTitle>
-            <CardDescription>Colors, sizes, and stock management</CardDescription>
+            <CardTitle>Colorways</CardTitle>
+            <CardDescription>
+              Add color variants — each with its own images, sizes, stock, and SKU.
+              Leave empty to use the default product images and sizes below.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ColorwayManager
+              colorways={colorways}
+              onChange={setColorways}
+              productId={id || "new"}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Default / Fallback Variants */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Default Sizes & Colors</CardTitle>
+            <CardDescription>
+              Used when no colorways are defined, or as a tag-only color list.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <Label>Available Colors</Label>
+              <Label>Available Colors (tags)</Label>
               <div className="mt-2">
                 <ColorManager
                   colors={formData.colors}
@@ -351,12 +437,11 @@ export default function ProductForm() {
             </div>
 
             <div>
-              <Label>Sizes & Stock</Label>
+              <Label>Sizes & Stock (fallback)</Label>
               <div className="mt-2">
                 <SizeStockManager
                   sizes={formData.sizes}
                   onChange={(sizes) => {
-                    // Auto-calculate total stock
                     const total = Object.values(sizes).reduce((sum, stock) => sum + stock, 0);
                     setFormData({
                       ...formData,
@@ -372,6 +457,7 @@ export default function ProductForm() {
             </div>
           </CardContent>
         </Card>
+
 
         {/* Product Settings */}
         <Card>

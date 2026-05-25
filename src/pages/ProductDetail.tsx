@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -13,6 +13,7 @@ import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { resolveProductImage } from "@/lib/productImageOverrides";
 import { AuthRequiredModal } from "@/components/AuthRequiredModal";
+import { fetchColorways, type Colorway, pickDefaultColorway } from "@/lib/colorwayUtils";
 
 interface Product {
   id: string;
@@ -34,106 +35,124 @@ interface Product {
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const { addToCart } = useCart();
   const { user } = useAuth();
   const { formatPrice } = useCurrency();
   const [product, setProduct] = useState<Product | null>(null);
+  const [colorways, setColorways] = useState<Colorway[]>([]);
+  const [activeColorwayId, setActiveColorwayId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [pendingCartAction, setPendingCartAction] = useState<{ productId: string; size: string } | null>(null);
+  const [pendingCartAction, setPendingCartAction] = useState<{
+    productId: string;
+    colorwayId: string | null;
+    size: string;
+  } | null>(null);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const load = async () => {
       if (!id) return;
-      
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", id)
-        .single();
+      setLoading(true);
+      const [{ data, error }, cws] = await Promise.all([
+        supabase.from("products").select("*").eq("id", id).single(),
+        fetchColorways(id),
+      ]);
 
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load product details",
-          variant: "destructive",
-        });
+      if (error || !data) {
+        toast({ title: "Error", description: "Failed to load product details", variant: "destructive" });
         navigate("/");
         return;
       }
 
       setProduct(data);
+      setColorways(cws);
+
+      const urlCw = searchParams.get("cw");
+      let initial: Colorway | null = null;
+      if (urlCw) initial = cws.find((c) => c.slug === urlCw) || null;
+      if (!initial) initial = pickDefaultColorway(cws);
+      setActiveColorwayId(initial?.id || null);
       setLoading(false);
     };
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
-    fetchProduct();
-  }, [id, navigate, toast]);
+  const activeColorway = useMemo(
+    () => colorways.find((c) => c.id === activeColorwayId) || null,
+    [colorways, activeColorwayId]
+  );
+
+  // Effective images/sizes/price/flags (colorway overrides product)
+  const effectiveImages =
+    activeColorway?.images.length
+      ? activeColorway.images
+      : product?.images && product.images.length > 0
+        ? product.images
+        : [];
+  const effectiveSizes: Record<string, number> =
+    activeColorway?.sizes && Object.keys(activeColorway.sizes).length > 0
+      ? activeColorway.sizes
+      : ((product?.sizes as Record<string, number>) || {});
+  const effectivePrice =
+    activeColorway?.price_override != null ? activeColorway.price_override : product?.price || 0;
+  const effectiveIsPreorder = activeColorway?.is_preorder ?? product?.is_preorder ?? false;
+  const effectiveIsLimited = activeColorway?.is_limited_edition ?? product?.is_limited_edition ?? false;
+
+  const handleSelectColorway = (cw: Colorway) => {
+    setActiveColorwayId(cw.id);
+    setSelectedSize("");
+    setCurrentImageIndex(0);
+    const next = new URLSearchParams(searchParams);
+    next.set("cw", cw.slug);
+    setSearchParams(next, { replace: true });
+  };
 
   const handleAddToCart = async () => {
     if (!selectedSize) {
-      toast({
-        title: "Select a size",
-        description: "Please select a size before adding to cart",
-        variant: "destructive",
-      });
+      toast({ title: "Select a size", description: "Please select a size before adding to cart", variant: "destructive" });
       return;
     }
-
     if (!product) return;
-
-    const sizes = product.sizes as Record<string, number> || {};
-    const availableStock = sizes[selectedSize] || 0;
-
+    const availableStock = effectiveSizes[selectedSize] || 0;
     if (availableStock === 0) {
-      toast({
-        title: "Out of stock",
-        description: `Size ${selectedSize} is currently out of stock`,
-        variant: "destructive",
-      });
+      toast({ title: "Out of stock", description: `Size ${selectedSize} is currently out of stock`, variant: "destructive" });
       return;
     }
-
-    // Check if user is authenticated
     if (!user) {
-      setPendingCartAction({ productId: product.id, size: selectedSize });
+      setPendingCartAction({ productId: product.id, colorwayId: activeColorwayId, size: selectedSize });
       setShowAuthModal(true);
       return;
     }
-
-    // User is authenticated, proceed with adding to cart
-    await performAddToCart(product.id, selectedSize);
+    await performAddToCart(product.id, activeColorwayId, selectedSize);
   };
 
-  const performAddToCart = async (productId: string, size: string) => {
+  const performAddToCart = async (productId: string, colorwayId: string | null, size: string) => {
     setAddingToCart(true);
     try {
-      await addToCart(productId, size, 1);
-      const currentProduct = product;
+      await addToCart(productId, size, 1, colorwayId);
       toast({
         title: "Added to cart!",
-        description: `${currentProduct?.brand} ${currentProduct?.name} - Size ${size}`,
+        description: `${product?.brand} ${product?.name}${activeColorway ? ` - ${activeColorway.name}` : ""} - Size ${size}`,
       });
       setPendingCartAction(null);
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to add to cart",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: error.message || "Failed to add to cart", variant: "destructive" });
     } finally {
       setAddingToCart(false);
     }
   };
 
-  // Complete pending cart action after successful authentication
   useEffect(() => {
     if (user && pendingCartAction) {
-      performAddToCart(pendingCartAction.productId, pendingCartAction.size);
+      performAddToCart(pendingCartAction.productId, pendingCartAction.colorwayId, pendingCartAction.size);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, pendingCartAction]);
 
   if (loading) {
@@ -149,22 +168,17 @@ const ProductDetail = () => {
 
   if (!product) return null;
 
-  const images = product.images && product.images.length > 0
-    ? [resolveProductImage(product.id, product.images[0]), ...product.images.slice(1)]
+  const images = effectiveImages.length > 0
+    ? [resolveProductImage(product.id, effectiveImages[0]), ...effectiveImages.slice(1)]
     : [resolveProductImage(product.id)];
-  const sizes = product.sizes as Record<string, number> || {};
-  const availableSizes = Object.entries(sizes).filter(([_, stock]) => stock > 0);
+  const availableSizes = Object.entries(effectiveSizes).filter(([_, stock]) => stock > 0);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-8 flex-1">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/")}
-          className="mb-6"
-        >
+        <Button variant="ghost" onClick={() => navigate("/")} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Home
         </Button>
@@ -177,11 +191,9 @@ const ProductDetail = () => {
                 src={images[currentImageIndex]}
                 alt={`${product.brand} ${product.name}`}
                 className="h-full w-full object-cover transition-transform hover:scale-110 duration-500"
-                onError={(e) => {
-                  e.currentTarget.src = "/placeholder.svg";
-                }}
+                onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
               />
-              {product.is_limited_edition && (
+              {effectiveIsLimited && (
                 <Badge variant="destructive" className="absolute top-4 right-4 animate-pulse">
                   🔥 LIMITED EDITION
                 </Badge>
@@ -194,9 +206,7 @@ const ProductDetail = () => {
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
                     className={`aspect-square overflow-hidden rounded border-2 transition-all ${
-                      idx === currentImageIndex
-                        ? "border-primary"
-                        : "border-border hover:border-primary/50"
+                      idx === currentImageIndex ? "border-primary" : "border-border hover:border-primary/50"
                     }`}
                   >
                     <img src={img} alt={`View ${idx + 1}`} className="h-full w-full object-cover" />
@@ -214,19 +224,69 @@ const ProductDetail = () => {
                 {product.is_featured && <Badge>⭐ Featured</Badge>}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{product.name}</h1>
-              <div className="text-3xl font-bold text-primary">{formatPrice(product.price)}</div>
+              <div className="text-3xl font-bold text-primary">{formatPrice(effectivePrice)}</div>
             </div>
 
+            {/* Colorway selector */}
+            {colorways.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-xs uppercase text-muted-foreground tracking-wide">Color</p>
+                    <p className="font-medium">
+                      {activeColorway?.name || "Select a colorway"}
+                      {activeColorway?.sku && (
+                        <span className="text-muted-foreground text-sm ml-2">{activeColorway.sku}</span>
+                      )}
+                    </p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {colorways.length} Color{colorways.length > 1 ? "s" : ""}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {colorways.map((cw) => {
+                    const soldOut = cw.stock_total === 0;
+                    const isActive = cw.id === activeColorwayId;
+                    return (
+                      <button
+                        key={cw.id}
+                        type="button"
+                        onClick={() => handleSelectColorway(cw)}
+                        title={cw.name}
+                        className={`relative h-12 w-12 rounded-full border-2 transition-all overflow-hidden ${
+                          isActive
+                            ? "border-primary ring-2 ring-primary/30 ring-offset-2 ring-offset-background"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                        style={{
+                          background: cw.swatch_image
+                            ? `url(${cw.swatch_image}) center/cover`
+                            : cw.swatch_hex || "#999",
+                        }}
+                      >
+                        {soldOut && (
+                          <span className="absolute inset-0 flex items-center justify-center bg-background/50">
+                            <span className="block w-full h-0.5 bg-destructive rotate-45" />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Pre-Order Info Box */}
-            {product.is_preorder && (
+            {effectiveIsPreorder && (
               <div className="bg-orange-50 dark:bg-orange-950 border-2 border-orange-200 dark:border-orange-800 rounded-lg p-4 space-y-2">
                 <div className="flex items-center gap-2 text-orange-700 dark:text-orange-300 font-semibold">
                   <span className="text-xl">🔔</span>
                   <span>PRE-ORDER ITEM</span>
                 </div>
                 <ul className="text-sm space-y-1 ml-7 text-orange-800 dark:text-orange-200">
-                  <li>• 50% Downpayment: <strong>{formatPrice(product.price * 0.5)}</strong></li>
-                  <li>• Balance on Delivery: <strong>{formatPrice(product.price * 0.5)}</strong></li>
+                  <li>• 50% Downpayment: <strong>{formatPrice(effectivePrice * 0.5)}</strong></li>
+                  <li>• Balance on Delivery: <strong>{formatPrice(effectivePrice * 0.5)}</strong></li>
                   <li>• Estimated Delivery: <strong>10-14 days</strong></li>
                 </ul>
                 <p className="text-xs text-orange-700 dark:text-orange-300 ml-7 pt-1">
@@ -255,7 +315,7 @@ const ProductDetail = () => {
                     <span className="capitalize">{product.style}</span>
                   </div>
                 )}
-                {product.colors && product.colors.length > 0 && (
+                {product.colors && product.colors.length > 0 && colorways.length === 0 && (
                   <div className="flex gap-2">
                     <span className="text-muted-foreground">Colors:</span>
                     <span>{product.colors.join(", ")}</span>
@@ -268,11 +328,6 @@ const ProductDetail = () => {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Select Size (US)</h3>
-                {product.stock_total && product.stock_total < 20 && (
-                  <span className="text-sm text-destructive font-medium">
-                    Only {product.stock_total} left in stock!
-                  </span>
-                )}
               </div>
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                 {availableSizes.map(([size, stock]) => (
@@ -302,21 +357,21 @@ const ProductDetail = () => {
               size="lg"
               className="w-full"
               onClick={handleAddToCart}
-              disabled={availableSizes.length === 0}
+              disabled={availableSizes.length === 0 || addingToCart}
             >
               <ShoppingCart className="mr-2 h-5 w-5" />
-              {product.is_preorder ? "Pre-Order Now (50% Down)" : "Add to Cart"}
+              {effectiveIsPreorder ? "Pre-Order Now (50% Down)" : "Add to Cart"}
             </Button>
 
-            {/* WhatsApp Help Section */}
+            {/* WhatsApp Help */}
             <div className="pt-6 border-t border-border">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="font-medium text-sm">Questions about this product?</p>
                   <p className="text-xs text-muted-foreground">Chat with us on WhatsApp</p>
                 </div>
-                <WhatsAppButton 
-                  message={`Hi! I'm interested in the ${product.brand} ${product.name}. Can you help me?`}
+                <WhatsAppButton
+                  message={`Hi! I'm interested in the ${product.brand} ${product.name}${activeColorway ? ` (${activeColorway.name})` : ""}. Can you help me?`}
                   size="sm"
                 />
               </div>
@@ -326,7 +381,7 @@ const ProductDetail = () => {
       </div>
 
       <Footer />
-      
+
       <AuthRequiredModal
         open={showAuthModal}
         onOpenChange={setShowAuthModal}

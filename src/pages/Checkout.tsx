@@ -103,22 +103,22 @@ export default function Checkout() {
     );
   }
 
+  const isItemPreorder = (item: any) =>
+    item.product?._colorway_is_preorder ?? productDetails[item.product_id]?.is_preorder ?? false;
+
   const downpaymentTotal = items.reduce((sum, item) => {
-    const isPreorder = productDetails[item.product_id]?.is_preorder;
-    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+    return sum + (isItemPreorder(item) ? item.product_price * item.quantity * 0.5 : 0);
   }, 0);
 
   const balanceTotal = items.reduce((sum, item) => {
-    const isPreorder = productDetails[item.product_id]?.is_preorder;
-    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+    return sum + (isItemPreorder(item) ? item.product_price * item.quantity * 0.5 : 0);
   }, 0);
 
   const regularTotal = items.reduce((sum, item) => {
-    const isPreorder = productDetails[item.product_id]?.is_preorder;
-    return sum + (!isPreorder ? item.product_price * item.quantity : 0);
+    return sum + (!isItemPreorder(item) ? item.product_price * item.quantity : 0);
   }, 0);
 
-  const hasPreorderItems = items.some(item => productDetails[item.product_id]?.is_preorder);
+  const hasPreorderItems = items.some(isItemPreorder);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -348,7 +348,7 @@ export default function Checkout() {
                 {regularTotal > 0 && (
                   <>
                     <h4 className="font-semibold text-sm">Regular Items:</h4>
-                    {items.filter(item => !productDetails[item.product_id]?.is_preorder).map((item) => (
+                    {items.filter(item => !isItemPreorder(item)).map((item) => (
                       <div key={item.id} className="flex justify-between text-sm pl-4">
                         <span>
                           {item.product_name} (Size {item.size}) x{item.quantity}
@@ -365,7 +365,7 @@ export default function Checkout() {
                       Pre-Order Items:
                       <Badge className="bg-orange-500 text-white">50% Downpayment</Badge>
                     </h4>
-                    {items.filter(item => productDetails[item.product_id]?.is_preorder).map((item) => (
+                    {items.filter(item => isItemPreorder(item)).map((item) => (
                       <div key={item.id} className="text-sm pl-4">
                         <div className="flex justify-between">
                           <span>
