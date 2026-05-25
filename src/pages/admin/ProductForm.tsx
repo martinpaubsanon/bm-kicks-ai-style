@@ -82,6 +82,15 @@ export default function ProductForm() {
         is_limited_edition: data.is_limited_edition || false,
         is_preorder: data.is_preorder || false,
       });
+
+      // Load colorways for this product
+      const cws = await fetchColorways(id!);
+      setColorways(
+        cws.map((c) => ({
+          ...c,
+          _localId: c.id,
+        }))
+      );
     } catch (error) {
       toast({
         title: "Error",
