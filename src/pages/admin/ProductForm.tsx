@@ -100,6 +100,43 @@ export default function ProductForm() {
     }
   };
 
+  const syncColorways = async (productId: string) => {
+    // Delete removed
+    const toDelete = colorways.filter((c) => c._deleted && c.id).map((c) => c.id!);
+    if (toDelete.length > 0) {
+      await supabase.from("product_colorways").delete().in("id", toDelete);
+    }
+
+    // Upsert kept
+    const kept = colorways.filter((c) => !c._deleted);
+    for (let i = 0; i < kept.length; i++) {
+      const c = kept[i];
+      const payload = {
+        product_id: productId,
+        name: c.name,
+        slug: c.slug || slugify(c.name),
+        sku: c.sku,
+        swatch_hex: c.swatch_hex,
+        swatch_image: c.swatch_image,
+        images: c.images,
+        sizes: c.sizes,
+        stock_total: totalStockFromSizes(c.sizes),
+        price_override: c.price_override,
+        is_default: c.is_default,
+        is_preorder: c.is_preorder,
+        is_limited_edition: c.is_limited_edition,
+        sort_order: i,
+      };
+      if (c.id) {
+        await supabase.from("product_colorways").update(payload).eq("id", c.id);
+      } else {
+        await supabase.from("product_colorways").insert(payload);
+      }
+    }
+  };
+
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
