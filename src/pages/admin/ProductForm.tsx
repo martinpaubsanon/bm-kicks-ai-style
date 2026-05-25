@@ -19,6 +19,8 @@ import { ArrowLeft } from "lucide-react";
 import ImageUploader from "@/components/admin/ImageUploader";
 import SizeStockManager from "@/components/admin/SizeStockManager";
 import ColorManager from "@/components/admin/ColorManager";
+import ColorwayManager, { type DraftColorway } from "@/components/admin/ColorwayManager";
+import { fetchColorways, slugify, totalStockFromSizes } from "@/lib/colorwayUtils";
 import { productSchema } from "@/lib/validationSchemas";
 
 export default function ProductForm() {
