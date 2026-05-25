@@ -348,7 +348,7 @@ export default function Checkout() {
                 {regularTotal > 0 && (
                   <>
                     <h4 className="font-semibold text-sm">Regular Items:</h4>
-                    {items.filter(item => !productDetails[item.product_id]?.is_preorder).map((item) => (
+                    {items.filter(item => !isItemPreorder(item)).map((item) => (
                       <div key={item.id} className="flex justify-between text-sm pl-4">
                         <span>
                           {item.product_name} (Size {item.size}) x{item.quantity}
@@ -365,7 +365,7 @@ export default function Checkout() {
                       Pre-Order Items:
                       <Badge className="bg-orange-500 text-white">50% Downpayment</Badge>
                     </h4>
-                    {items.filter(item => productDetails[item.product_id]?.is_preorder).map((item) => (
+                    {items.filter(item => isItemPreorder(item)).map((item) => (
                       <div key={item.id} className="text-sm pl-4">
                         <div className="flex justify-between">
                           <span>
