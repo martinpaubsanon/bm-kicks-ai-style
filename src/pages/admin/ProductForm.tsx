@@ -161,6 +161,7 @@ export default function ProductForm() {
         is_preorder: formData.is_preorder,
       };
 
+      let savedProductId = id;
       if (id) {
         const { error } = await supabase
           .from("products")
@@ -168,13 +169,21 @@ export default function ProductForm() {
           .eq("id", id);
 
         if (error) throw error;
-        toast({ title: "Success", description: "Product updated successfully" });
       } else {
-        const { error } = await supabase.from("products").insert(productData);
+        const { data: inserted, error } = await supabase
+          .from("products")
+          .insert(productData)
+          .select("id")
+          .single();
 
         if (error) throw error;
-        toast({ title: "Success", description: "Product created successfully" });
+        savedProductId = inserted.id;
       }
+
+      // Sync colorways
+      await syncColorways(savedProductId!);
+
+      toast({ title: "Success", description: id ? "Product updated successfully" : "Product created successfully" });
 
       navigate("/admin/products");
     } catch (error: any) {
