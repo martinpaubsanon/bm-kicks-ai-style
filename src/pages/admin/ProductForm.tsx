@@ -27,6 +27,7 @@ export default function ProductForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [colorways, setColorways] = useState<DraftColorway[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     brand: "",
