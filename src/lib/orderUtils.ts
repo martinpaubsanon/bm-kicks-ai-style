@@ -2,6 +2,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface OrderItem {
   product_id: string;
+  colorway_id?: string | null;
+  colorway_name?: string | null;
   product_name: string;
   product_image: string;
   product_price: number;
@@ -33,71 +35,87 @@ export async function createOrder({
   paymentMethod,
   userId,
 }: CreateOrderParams): Promise<string> {
-  // Check rate limit - use user_id if authenticated, otherwise use email as identifier
   const identifier = userId || shippingInfo.email;
-  
+
   const { data: rateLimitOk, error: rateLimitError } = await supabase
     .rpc('check_order_rate_limit', { user_identifier: identifier });
 
   if (rateLimitError) {
     throw new Error("Failed to verify rate limit. Please try again.");
   }
-
   if (!rateLimitOk) {
     throw new Error("Too many orders. Please wait before placing another order (max 5 orders per hour).");
   }
 
-  // Validate payment method
   const allowedMethods = ["cod", "bank_transfer"] as const;
   if (!allowedMethods.includes(paymentMethod)) {
     throw new Error("Invalid payment method. Only 'cod' or 'bank_transfer' are allowed.");
   }
 
-  // Validate stock availability and prices
-  const productsData: Record<string, { price: number; sizes: Record<string, number>; is_preorder: boolean }> = {};
-  
+  // Validate stock + prices. Use colorway if present, else product.
+  const itemMeta: Record<string, { price: number; sizes: Record<string, number>; is_preorder: boolean; colorway_name: string | null }> = {};
+
   for (const item of items) {
-    const { data: product, error } = await supabase
-      .from("products")
-      .select("sizes, price, is_preorder")
-      .eq("id", item.product_id)
-      .single();
+    const key = `${item.product_id}:${item.colorway_id || "default"}:${item.size}`;
+    let price = 0;
+    let sizes: Record<string, number> = {};
+    let isPreorder = false;
+    let colorwayName: string | null = item.colorway_name || null;
 
-    if (error || !product) throw new Error("Invalid product");
+    if (item.colorway_id) {
+      const { data: cw, error } = await supabase
+        .from("product_colorways")
+        .select("name, sizes, price_override, is_preorder, product_id")
+        .eq("id", item.colorway_id)
+        .single();
+      if (error || !cw) throw new Error("Invalid colorway");
 
-    // Verify price matches database to prevent manipulation
-    if (item.product_price !== Number(product.price)) {
-      throw new Error(`Price mismatch detected for ${item.product_name}`);
+      const { data: product, error: pErr } = await supabase
+        .from("products")
+        .select("price, is_preorder")
+        .eq("id", item.product_id)
+        .single();
+      if (pErr || !product) throw new Error("Invalid product");
+
+      price = cw.price_override != null ? Number(cw.price_override) : Number(product.price);
+      sizes = (cw.sizes as Record<string, number>) || {};
+      isPreorder = cw.is_preorder ?? product.is_preorder ?? false;
+      colorwayName = cw.name;
+    } else {
+      const { data: product, error } = await supabase
+        .from("products")
+        .select("sizes, price, is_preorder")
+        .eq("id", item.product_id)
+        .single();
+      if (error || !product) throw new Error("Invalid product");
+      price = Number(product.price);
+      sizes = (product.sizes as Record<string, number>) || {};
+      isPreorder = product.is_preorder || false;
     }
 
-    const sizes = product.sizes as Record<string, number>;
+    if (item.product_price !== price) {
+      throw new Error(`Price mismatch detected for ${item.product_name}`);
+    }
     const availableStock = sizes[item.size] || 0;
-
     if (availableStock < item.quantity) {
       throw new Error(`Insufficient stock for ${item.product_name} (Size ${item.size})`);
     }
 
-    productsData[item.product_id] = {
-      price: Number(product.price),
-      sizes,
-      is_preorder: product.is_preorder || false,
-    };
+    itemMeta[key] = { price, sizes, is_preorder: isPreorder, colorway_name: colorwayName };
   }
 
+  const metaFor = (item: OrderItem) =>
+    itemMeta[`${item.product_id}:${item.colorway_id || "default"}:${item.size}`];
+
   const subtotal = items.reduce((sum, item) => sum + item.product_price * item.quantity, 0);
-  
-  // Calculate pre-order amounts
-  const hasPreorderItems = items.some(item => productsData[item.product_id]?.is_preorder);
+  const hasPreorderItems = items.some(item => metaFor(item).is_preorder);
   const downpaymentTotal = items.reduce((sum, item) => {
-    const isPreorder = productsData[item.product_id]?.is_preorder;
-    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+    return sum + (metaFor(item).is_preorder ? item.product_price * item.quantity * 0.5 : 0);
   }, 0);
   const balanceTotal = items.reduce((sum, item) => {
-    const isPreorder = productsData[item.product_id]?.is_preorder;
-    return sum + (isPreorder ? item.product_price * item.quantity * 0.5 : 0);
+    return sum + (metaFor(item).is_preorder ? item.product_price * item.quantity * 0.5 : 0);
   }, 0);
 
-  // Create order
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
@@ -117,7 +135,7 @@ export async function createOrder({
       total: subtotal,
       order_status: "pending",
       payment_status: "pending",
-      order_number: "", // Will be generated by trigger
+      order_number: "",
       has_preorder_items: hasPreorderItems,
       downpayment_total: downpaymentTotal,
       balance_total: balanceTotal,
@@ -128,16 +146,18 @@ export async function createOrder({
 
   if (orderError) throw orderError;
 
-  // Create order items and update stock
   for (const item of items) {
-    const isPreorder = productsData[item.product_id]?.is_preorder;
+    const meta = metaFor(item);
+    const isPreorder = meta.is_preorder;
     const itemSubtotal = item.product_price * item.quantity;
-    
+
     const { error: itemError } = await supabase.from("order_items").insert({
       order_id: order.id,
       product_id: item.product_id,
       product_name: item.product_name,
       product_image: item.product_image,
+      colorway_id: item.colorway_id || null,
+      colorway_name: meta.colorway_name,
       size: item.size,
       quantity: item.quantity,
       price: item.product_price,
@@ -151,21 +171,36 @@ export async function createOrder({
 
     if (itemError) throw itemError;
 
-    // Update product stock
-    const { data: product } = await supabase
-      .from("products")
-      .select("sizes")
-      .eq("id", item.product_id)
-      .single();
-
-    if (product) {
-      const sizes = product.sizes as Record<string, number>;
-      sizes[item.size] = (sizes[item.size] || 0) - item.quantity;
-
-      await supabase
+    // Decrement stock from the right source
+    if (item.colorway_id) {
+      const { data: cw } = await supabase
+        .from("product_colorways")
+        .select("sizes, stock_total")
+        .eq("id", item.colorway_id)
+        .single();
+      if (cw) {
+        const sizes = (cw.sizes as Record<string, number>) || {};
+        sizes[item.size] = (sizes[item.size] || 0) - item.quantity;
+        const stock_total = Object.values(sizes).reduce((s, n) => s + (typeof n === "number" ? n : 0), 0);
+        await supabase
+          .from("product_colorways")
+          .update({ sizes, stock_total })
+          .eq("id", item.colorway_id);
+      }
+    } else {
+      const { data: product } = await supabase
         .from("products")
-        .update({ sizes })
-        .eq("id", item.product_id);
+        .select("sizes")
+        .eq("id", item.product_id)
+        .single();
+      if (product) {
+        const sizes = (product.sizes as Record<string, number>) || {};
+        sizes[item.size] = (sizes[item.size] || 0) - item.quantity;
+        await supabase
+          .from("products")
+          .update({ sizes })
+          .eq("id", item.product_id);
+      }
     }
   }
 
