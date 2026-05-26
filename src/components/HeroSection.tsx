@@ -157,6 +157,9 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
                   alt="Premium sneakers from BM Kicks"
                   width={1024}
                   height={1024}
+                  fetchPriority="high"
+                  loading="eager"
+                  decoding="async"
                   className="relative rounded-3xl shadow-card w-full max-w-2xl aspect-square object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                 />
                 {/* Logo overlay */}
