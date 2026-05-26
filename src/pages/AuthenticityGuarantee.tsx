@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { PageSEO } from "@/components/seo/PageSEO";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Shield, CheckCircle, Search, Package, Award, AlertCircle } from "lucide-react";
@@ -10,6 +11,7 @@ export default function AuthenticityGuarantee() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <PageSEO title="Authenticity Guarantee | BM Kicks" description="Every sneaker is verified authentic. Learn how BM Kicks guarantees genuine kicks." path="/authenticity-guarantee" />
       <Header />
       <main className="flex-1 container mx-auto px-4 py-12 max-w-4xl">
         <div className="flex items-center gap-3 mb-4">

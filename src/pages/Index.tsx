@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PageSEO } from "@/components/seo/PageSEO";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
@@ -14,6 +15,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <PageSEO title="BM Kicks | Premium Sneakers in Qatar" description="Shop authentic Nike, Adidas & Jordan sneakers in Qatar with AI styling and loyalty rewards." path="/" />
       <Header />
       <HeroSection onAIClick={() => setIsAIOpen(true)} />
       <CustomRequestCTA />
