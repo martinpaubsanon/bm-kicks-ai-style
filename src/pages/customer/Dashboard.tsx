@@ -14,7 +14,8 @@ import { useLoyalty } from "@/hooks/useLoyalty";
 
 export default function Dashboard() {
   const { user, customerProfile } = useAuth();
-  const { account } = useLoyalty();
+  const { account, combinedScore, bonusPoints } = useLoyalty();
+  const game = loadGameState();
   const [orders, setOrders] = useState<any[]>([]);
   const [stats, setStats] = useState({
     total: 0,
