@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Package, User, LogOut, ShoppingBag, LayoutDashboard } from "lucide-react";
+import { Package, User, LogOut, ShoppingBag, LayoutDashboard, Gift } from "lucide-react";
 import { Header } from "@/components/Header";
 
 export default function CustomerLayout() {
@@ -10,6 +10,7 @@ export default function CustomerLayout() {
 
   const navigation = [
     { name: "Dashboard", href: "/customer", icon: LayoutDashboard },
+    { name: "Rewards", href: "/customer/rewards", icon: Gift },
     { name: "My Orders", href: "/customer/orders", icon: Package },
     { name: "Profile", href: "/customer/profile", icon: User },
   ];

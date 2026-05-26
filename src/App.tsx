@@ -36,6 +36,7 @@ import CustomerDashboard from "./pages/customer/Dashboard";
 import CustomerOrders from "./pages/customer/Orders";
 import CustomerOrderDetail from "./pages/customer/OrderDetail";
 import CustomerProfile from "./pages/customer/Profile";
+import CustomerRewards from "./pages/customer/Rewards";
 import OrderSuccess from "./pages/customer/OrderSuccess";
 
 const queryClient = new QueryClient();
@@ -79,6 +80,7 @@ const App = () => (
                 <Route path="orders" element={<CustomerOrders />} />
                 <Route path="orders/:id" element={<CustomerOrderDetail />} />
                 <Route path="profile" element={<CustomerProfile />} />
+                <Route path="rewards" element={<CustomerRewards />} />
               </Route>
               
               {/* Admin login */}

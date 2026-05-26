@@ -8,106 +8,91 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* BM Kicks Brand - Jet Black, Hot Red, Crisp White */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 8%;
+    /* BM Kicks "Glass & Glow" — dark by default */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
 
-    /* Primary - Jet black for bold streetwear feel */
-    --primary: 0 0% 6%;
+    /* Primary = signature BM Kicks crimson */
+    --primary: 0 85% 52%;
     --primary-foreground: 0 0% 100%;
+    --primary-glow: 0 90% 60%;
 
-    /* Secondary - Soft off-white */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 8%;
+    /* Secondary = subtle glass surface */
+    --secondary: 0 0% 11%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
 
-    /* Accent - Signature BM Kicks red */
+    /* Accent kept as crimson for consistency */
     --accent: 0 85% 52%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 85% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 0 0% 16%;
+    --input: 0 0% 14%;
     --ring: 0 85% 52%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Hip gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 4%) 0%, hsl(0 0% 10%) 60%, hsl(0 70% 25%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(0 85% 52%), hsl(0 75% 45%));
+    /* Loyalty gold */
+    --gold: 43 96% 56%;
+    --gold-foreground: 0 0% 8%;
+
+    /* Gradients */
+    --gradient-hero: radial-gradient(120% 90% at 80% 20%, hsl(0 85% 52% / 0.18), transparent 60%), linear-gradient(160deg, hsl(0 0% 5%) 0%, hsl(0 0% 3%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(0 85% 52%), hsl(0 75% 42%));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0.02));
+    --gradient-gold: linear-gradient(135deg, hsl(43 96% 56%), hsl(38 96% 45%));
 
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.08);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.12);
-    --shadow-lg: 0 10px 25px -3px hsl(0 0% 0% / 0.2);
-    --shadow-accent: 0 10px 30px -8px hsl(0 85% 52% / 0.45);
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.4);
+    --shadow-md: 0 4px 12px -2px hsl(0 0% 0% / 0.45);
+    --shadow-lg: 0 18px 40px -10px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 8px 30px hsl(var(--primary) / 0.35);
+    --shadow-card: 0 30px 80px -20px hsl(0 0% 0% / 0.7);
+    --shadow-accent: 0 10px 30px -8px hsl(var(--primary) / 0.5);
 
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 0 85% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 0 85% 52%;
   }
 
+  /* .dark mirrors :root since the site is dark-first */
   .dark {
-    /* Dark mode with navy and red accents */
-    --background: 215 42% 8%;
+    --background: 0 0% 4%;
     --foreground: 0 0% 98%;
-
-    --card: 215 42% 12%;
+    --card: 0 0% 7%;
     --card-foreground: 0 0% 98%;
-
-    --popover: 215 42% 12%;
+    --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
-
-    --primary: 0 0% 98%;
-    --primary-foreground: 215 42% 20%;
-
-    --secondary: 215 35% 15%;
+    --primary: 0 85% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 11%;
     --secondary-foreground: 0 0% 98%;
-
-    --muted: 215 35% 15%;
-    --muted-foreground: 214 15% 65%;
-
-    --accent: 0 84% 60%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 215 35% 20%;
-    --input: 215 35% 20%;
-    --ring: 0 84% 60%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 85% 52%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 85% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 16%;
+    --input: 0 0% 14%;
+    --ring: 0 85% 52%;
   }
 }
 
@@ -128,55 +113,61 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  /* Hero gradient backgrounds */
-  .bg-gradient-hero {
-    background: var(--gradient-hero);
-  }
-  
-  .bg-gradient-accent {
-    background: var(--gradient-accent);
+  .bg-gradient-hero { background: var(--gradient-hero); }
+  .bg-gradient-accent { background: var(--gradient-accent); }
+  .bg-gradient-glass { background: var(--gradient-glass); }
+  .bg-gradient-gold { background: var(--gradient-gold); }
+
+  .text-gold { color: hsl(var(--gold)); }
+  .bg-gold { background-color: hsl(var(--gold)); }
+
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-accent { box-shadow: var(--shadow-accent); }
+
+  /* Glass surface utility */
+  .glass-surface {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid hsl(0 0% 100% / 0.06);
   }
 
-  /* Smooth hover effects for products */
+  .glass-strong {
+    background: hsl(var(--card) / 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsl(0 0% 100% / 0.08);
+  }
+
   .product-card-hover {
     transition: var(--transition-smooth);
   }
-
   .product-card-hover:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-6px);
+    box-shadow: 0 24px 50px -20px hsl(var(--primary) / 0.35), var(--shadow-lg);
   }
 
-  /* Accent shadows */
-  .shadow-accent {
-    box-shadow: var(--shadow-accent);
-  }
-
-  /* Smooth link underline animation */
   .link-underline {
-    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-accent after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
   }
 
-  /* AI Hero Button - Dynamic gradient animation */
+  .font-display { font-family: 'Oswald', 'Inter', system-ui, sans-serif; letter-spacing: -0.01em; }
+
+  /* AI Hero Button - keeps the glow effect on the CTA */
   .ai-hero-button {
-    background: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 74% 55%), hsl(0 84% 60%));
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)), hsl(var(--primary)));
     background-size: 200% 200%;
     position: relative;
     overflow: hidden;
   }
-
   .ai-hero-button::before {
     content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    position: absolute; inset: -50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
     opacity: 0;
     transition: opacity 0.4s ease;
   }
-
   .ai-hero-button:hover::before {
     opacity: 1;
     animation: sparkle 1.5s ease-in-out infinite;

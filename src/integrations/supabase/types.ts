@@ -86,6 +86,207 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_accounts: {
+        Row: {
+          created_at: string
+          current_tier: string
+          lifetime_points: number
+          points_balance: number
+          referral_code: string
+          referred_by: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_tier?: string
+          lifetime_points?: number
+          points_balance?: number
+          referral_code: string
+          referred_by?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_tier?: string
+          lifetime_points?: number
+          points_balance?: number
+          referral_code?: string
+          referred_by?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      loyalty_partners: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          location_text: string | null
+          logo_url: string | null
+          name: string
+          sort_order: number
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location_text?: string | null
+          logo_url?: string | null
+          name: string
+          sort_order?: number
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location_text?: string | null
+          logo_url?: string | null
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      loyalty_referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referred_user_id: string
+          referrer_user_id: string
+          rewarded_at: string | null
+          status: Database["public"]["Enums"]["referral_status"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referred_user_id: string
+          referrer_user_id: string
+          rewarded_at?: string | null
+          status?: Database["public"]["Enums"]["referral_status"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referred_user_id?: string
+          referrer_user_id?: string
+          rewarded_at?: string | null
+          status?: Database["public"]["Enums"]["referral_status"]
+        }
+        Relationships: []
+      }
+      loyalty_settings: {
+        Row: {
+          created_at: string
+          id: string
+          points_per_order: number
+          points_per_qar: number
+          redemption_enabled: boolean
+          referral_bonus: number
+          signup_bonus: number
+          singleton: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points_per_order?: number
+          points_per_qar?: number
+          redemption_enabled?: boolean
+          referral_bonus?: number
+          signup_bonus?: number
+          singleton?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points_per_order?: number
+          points_per_qar?: number
+          redemption_enabled?: boolean
+          referral_bonus?: number
+          signup_bonus?: number
+          singleton?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      loyalty_tiers: {
+        Row: {
+          color_hex: string | null
+          created_at: string
+          id: string
+          min_points: number
+          multiplier: number
+          name: string
+          perks: Json
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color_hex?: string | null
+          created_at?: string
+          id?: string
+          min_points: number
+          multiplier?: number
+          name: string
+          perks?: Json
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color_hex?: string | null
+          created_at?: string
+          id?: string
+          min_points?: number
+          multiplier?: number
+          name?: string
+          perks?: Json
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      loyalty_transactions: {
+        Row: {
+          created_at: string
+          delta: number
+          description: string | null
+          id: string
+          reference_id: string | null
+          type: Database["public"]["Enums"]["loyalty_txn_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delta: number
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type: Database["public"]["Enums"]["loyalty_txn_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delta?: number
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type?: Database["public"]["Enums"]["loyalty_txn_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           actual_price: number
@@ -417,6 +618,115 @@ export type Database = {
         }
         Relationships: []
       }
+      reward_redemptions: {
+        Row: {
+          code: string | null
+          code_expires_at: string | null
+          created_at: string
+          fulfilled_at: string | null
+          id: string
+          notes: string | null
+          points_spent: number
+          reward_id: string
+          status: Database["public"]["Enums"]["redemption_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code?: string | null
+          code_expires_at?: string | null
+          created_at?: string
+          fulfilled_at?: string | null
+          id?: string
+          notes?: string | null
+          points_spent: number
+          reward_id: string
+          status?: Database["public"]["Enums"]["redemption_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string | null
+          code_expires_at?: string | null
+          created_at?: string
+          fulfilled_at?: string | null
+          id?: string
+          notes?: string | null
+          points_spent?: number
+          reward_id?: string
+          status?: Database["public"]["Enums"]["redemption_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_redemptions_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rewards_catalog: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          kind: Database["public"]["Enums"]["reward_kind"]
+          partner_id: string | null
+          points_cost: number
+          qar_value: number | null
+          sort_order: number
+          stock: number | null
+          terms: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          kind: Database["public"]["Enums"]["reward_kind"]
+          partner_id?: string | null
+          points_cost: number
+          qar_value?: number | null
+          sort_order?: number
+          stock?: number | null
+          terms?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["reward_kind"]
+          partner_id?: string | null
+          points_cost?: number
+          qar_value?: number | null
+          sort_order?: number
+          stock?: number | null
+          terms?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rewards_catalog_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "loyalty_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -443,11 +753,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_loyalty_delta: {
+        Args: {
+          p_delta: number
+          p_description?: string
+          p_reference?: string
+          p_type: Database["public"]["Enums"]["loyalty_txn_type"]
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       check_order_rate_limit: {
         Args: { user_identifier: string }
         Returns: boolean
       }
       generate_order_number: { Args: never; Returns: string }
+      generate_referral_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -456,9 +777,46 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      recalculate_tier: { Args: { p_user_id: string }; Returns: undefined }
+      redeem_reward: {
+        Args: { p_reward_id: string }
+        Returns: {
+          code: string | null
+          code_expires_at: string | null
+          created_at: string
+          fulfilled_at: string | null
+          id: string
+          notes: string | null
+          points_spent: number
+          reward_id: string
+          status: Database["public"]["Enums"]["redemption_status"]
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reward_redemptions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      loyalty_txn_type:
+        | "earn_signup"
+        | "earn_order"
+        | "earn_referral"
+        | "earn_bonus"
+        | "redeem_store"
+        | "redeem_gift"
+        | "redeem_partner"
+        | "admin_adjustment"
+        | "expiry"
+        | "refund"
+      redemption_status: "pending" | "fulfilled" | "expired" | "cancelled"
+      referral_status: "pending" | "completed" | "cancelled"
+      reward_kind: "store_discount" | "physical_gift" | "partner_voucher"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -587,6 +945,21 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      loyalty_txn_type: [
+        "earn_signup",
+        "earn_order",
+        "earn_referral",
+        "earn_bonus",
+        "redeem_store",
+        "redeem_gift",
+        "redeem_partner",
+        "admin_adjustment",
+        "expiry",
+        "refund",
+      ],
+      redemption_status: ["pending", "fulfilled", "expired", "cancelled"],
+      referral_status: ["pending", "completed", "cancelled"],
+      reward_kind: ["store_discount", "physical_gift", "partner_voucher"],
     },
   },
 } as const
