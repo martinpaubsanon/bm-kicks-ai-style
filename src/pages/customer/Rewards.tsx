@@ -17,9 +17,25 @@ import {
   Trophy,
   Flame,
   Lock,
+  Star,
+  Medal,
+  Award,
+  Crown,
+  Gem,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
+
+// Spend-based tiers — MUST match src/components/customer/LoyaltyProgress.tsx
+const SPEND_TIERS = [
+  { name: "Rookie",   min: 0,     icon: Star,   color: "#cbd5e1" },
+  { name: "Bronze",   min: 500,   icon: Medal,  color: "#d97706" },
+  { name: "Silver",   min: 2000,  icon: Award,  color: "#d4d4d8" },
+  { name: "Gold",     min: 5000,  icon: Trophy, color: "#facc15" },
+  { name: "Platinum", min: 10000, icon: Crown,  color: "#67e8f9" },
+  { name: "Diamond",  min: 25000, icon: Gem,    color: "#e879f9" },
+];
 
 // ---------- Gamified config ----------
 const BADGES = [
