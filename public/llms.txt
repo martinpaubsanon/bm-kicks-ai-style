@@ -1,0 +1,20 @@
+# BM Kicks
+
+> Premium sneaker store in Qatar. Authentic Nike, Adidas, and Jordan kicks with AI-powered shoe recommendations, loyalty rewards, and flexible payment options.
+
+## Pages
+
+- [Home](/): Browse featured sneakers, categories, and all products with AI-assisted search.
+- [Product](/product): Detailed product pages with sizes, stock info, images, and add-to-cart.
+- [Checkout](/checkout): Secure checkout with support for standard and pre-order split payments.
+- [Authenticity Guarantee](/authenticity-guarantee): Our commitment to 100% authentic products.
+- [Brand Disclaimer](/brand-disclaimer): Independent reseller business model and warranty policy.
+- [Privacy Policy](/privacy-policy): How we collect, use, and protect your data.
+- [Terms of Service](/terms-of-service): Rules and conditions for using our store.
+- [Return Policy](/return-policy): Guidelines for returns, exchanges, and refunds.
+- [Shipping Policy](/shipping-policy): Delivery times, fees, and coverage areas.
+- [Cookie Policy](/cookie-policy): How we use cookies and tracking technologies.
+
+## Optional
+
+- [AI Shoe Consultant](/): AI-powered chat that recommends the perfect sneakers based on your style, budget, and preferences — accessible site-wide via the floating assistant.
