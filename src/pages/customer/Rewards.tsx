@@ -535,6 +535,67 @@ export default function Rewards() {
         </CardContent>
       </Card>
 
+      {/* === Featured reward === */}
+      {(() => {
+        const featured = rewards.find((r) => r.is_featured);
+        if (!featured) return null;
+        const pct = Math.min(
+          100,
+          Math.round(((account.points_balance ?? 0) / featured.points_cost) * 100),
+        );
+        const canAfford = (account.points_balance ?? 0) >= featured.points_cost;
+        return (
+          <div className="rounded-2xl p-[2px] bg-[linear-gradient(135deg,#facc15,#ec4899)] shadow-[0_0_40px_-10px_rgba(250,204,21,0.6)]">
+            <Card className="rounded-2xl border-0">
+              <CardContent className="p-6 flex flex-col md:flex-row gap-6 items-center">
+                {featured.image_url && (
+                  <img
+                    src={featured.image_url}
+                    alt={featured.title}
+                    className="w-full md:w-48 h-40 object-cover rounded-xl"
+                  />
+                )}
+                <div className="flex-1 w-full">
+                  <p className="text-xs uppercase tracking-widest font-bold text-[#facc15] mb-1">
+                    ⭐ Featured reward
+                  </p>
+                  <h3 className="text-2xl font-black">{featured.title}</h3>
+                  {featured.description && (
+                    <p className="text-sm text-muted-foreground mt-1">{featured.description}</p>
+                  )}
+                  <div className="mt-4">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">
+                        {(account.points_balance ?? 0).toLocaleString()} / {featured.points_cost.toLocaleString()} pts
+                      </span>
+                      <span className="font-bold">{pct}%</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                      <div
+                        className="h-full bg-[linear-gradient(90deg,#facc15,#ec4899)] transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  size="lg"
+                  className="font-bold"
+                  disabled={!canAfford || !settings?.redemption_enabled || redeeming === featured.id}
+                  onClick={() => handleRedeem(featured.id)}
+                >
+                  {redeeming === featured.id
+                    ? "..."
+                    : canAfford
+                      ? "Redeem now"
+                      : `${(featured.points_cost - (account.points_balance ?? 0)).toLocaleString()} pts to go`}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        );
+      })()}
+
       {/* === Reward catalog === */}
       <Card className="border-border/60">
         <CardHeader>
@@ -574,7 +635,10 @@ export default function Rewards() {
                 ) : (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filtered(kind).map((r) => {
-                      const canAfford = account.points_balance >= r.points_cost;
+                      const balance = account.points_balance ?? 0;
+                      const canAfford = balance >= r.points_cost;
+                      const pct = Math.min(100, Math.round((balance / r.points_cost) * 100));
+                      const remaining = Math.max(0, r.points_cost - balance);
                       return (
                         <div
                           key={r.id}
@@ -600,6 +664,28 @@ export default function Rewards() {
                               </p>
                             )}
                           </div>
+
+                          {/* Progress to this reward */}
+                          <div>
+                            <div className="flex justify-between text-[10px] mb-1">
+                              <span className="text-muted-foreground">
+                                {canAfford ? "Ready to redeem" : `${remaining.toLocaleString()} pts to go`}
+                              </span>
+                              <span className="font-bold">{pct}%</span>
+                            </div>
+                            <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                              <div
+                                className={cn(
+                                  "h-full transition-all",
+                                  canAfford
+                                    ? "bg-[#4ade80]"
+                                    : "bg-[linear-gradient(90deg,#ec4899,#4ade80)]",
+                                )}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                          </div>
+
                           <div className="mt-auto flex items-center justify-between">
                             <span className="font-display text-lg text-[#4ade80]">
                               {r.points_cost.toLocaleString()} pts
