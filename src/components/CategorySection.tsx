@@ -19,8 +19,27 @@ const categories = [
     description: "Street style meets everyday comfort",
     image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800",
     category: "Lifestyle"
+  },
+  {
+    title: "Bags",
+    description: "Statement carry for every drop",
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800",
+    category: "Bags"
+  },
+  {
+    title: "Watches",
+    description: "Wrist game on lock",
+    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800",
+    category: "Watches"
+  },
+  {
+    title: "Cosmetics",
+    description: "Glow up, head to toe",
+    image: "https://images.unsplash.com/photo-1522335789203-aaa18e7b5777?w=800",
+    category: "Cosmetics"
   }
 ];
+
 
 export const CategorySection = () => {
   const scrollToCategory = (category: string) => {
