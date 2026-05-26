@@ -294,7 +294,7 @@ export default function Rewards() {
                 Crew Journey
               </span>
               <span className="font-mono">
-                {formatCurrency(totalSpent)} /{" "}
+                {formatCurrency(combinedScore)} /{" "}
                 {formatCurrency(SPEND_TIERS[SPEND_TIERS.length - 1].min)}
               </span>
             </div>
