@@ -14,7 +14,8 @@ const messageSchema = z.object({
       role: z.enum(['user', 'assistant', 'system']),
       content: z.string().trim().min(1).max(500)
     })
-  ).min(1).max(20)
+  ).min(1).max(20),
+  maxPriceQAR: z.number().positive().optional(),
 });
 
 serve(async (req) => {
