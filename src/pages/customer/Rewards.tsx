@@ -258,30 +258,33 @@ export default function Rewards() {
           </div>
 
           {/* Separate + combined stat tiles */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-            <StatTile
-              label="Points balance"
-              value={(account.points_balance ?? 0).toLocaleString()}
-              suffix="pts"
-              accent="#ec4899"
-              icon={<Sparkles className="w-4 h-4" />}
-            />
-            <StatTile
-              label="Total spent"
-              value={formatCurrency(totalSpent)}
-              accent="#4ade80"
-              icon={<Trophy className="w-4 h-4" />}
-            />
-            <StatTile
-              label="Combined score"
-              value={(
-                (account.points_balance ?? 0) + Math.round(totalSpent)
-              ).toLocaleString()}
-              suffix="XP"
-              gradient
-              icon={<Flame className="w-4 h-4" />}
-            />
-          </div>
+          {(() => {
+            const displayPoints = (account.points_balance ?? 0) + (game.bonusPoints ?? 0);
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                <StatTile
+                  label="Points balance"
+                  value={displayPoints.toLocaleString()}
+                  suffix="pts"
+                  accent="#ec4899"
+                  icon={<Sparkles className="w-4 h-4" />}
+                />
+                <StatTile
+                  label="Total spent"
+                  value={formatCurrency(totalSpent)}
+                  accent="#4ade80"
+                  icon={<Trophy className="w-4 h-4" />}
+                />
+                <StatTile
+                  label="Combined score"
+                  value={(displayPoints + Math.round(totalSpent)).toLocaleString()}
+                  suffix="XP"
+                  gradient
+                  icon={<Flame className="w-4 h-4" />}
+                />
+              </div>
+            );
+          })()}
 
           {/* Full multi-tier journey progress */}
           <div>
