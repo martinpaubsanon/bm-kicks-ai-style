@@ -16,10 +16,10 @@ const Index = () => {
     <div className="min-h-screen">
       <Header />
       <HeroSection onAIClick={() => setIsAIOpen(true)} />
+      <CustomRequestCTA />
       <FeaturedProducts />
       <CategorySection />
       <AllProducts />
-      <CustomRequestCTA />
       <Footer />
       <FloatingButtons />
       <AIShoeConsultant isOpen={isAIOpen} onOpenChange={setIsAIOpen} />
