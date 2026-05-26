@@ -162,7 +162,7 @@ export function LoyaltyProgress({ totalSpent, totalOrders, deliveredOrders, poin
             </p>
             {nextTier ? (
               <p className="text-xs text-muted-foreground">
-                Spend {formatCurrency(remainingToNext)} more to reach{" "}
+                {formatCurrency(remainingToNext)} more (spend or earn) to reach{" "}
                 <span className="font-semibold text-foreground">
                   {nextTier.name}
                 </span>
