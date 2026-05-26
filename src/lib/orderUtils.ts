@@ -35,6 +35,9 @@ export async function createOrder({
   paymentMethod,
   userId,
 }: CreateOrderParams): Promise<string> {
+  if (!userId) {
+    throw new Error("You must be signed in to place an order.");
+  }
   const identifier = userId || shippingInfo.email;
 
   const { data: rateLimitOk, error: rateLimitError } = await supabase

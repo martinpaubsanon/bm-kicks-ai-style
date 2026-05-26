@@ -125,8 +125,8 @@ export default function Checkout() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // If user is not logged in and hasn't chosen to proceed as guest, show auth modal
-    if (!user && !proceedAsGuest) {
+    // Authentication is required to place an order (guest checkout disabled)
+    if (!user) {
       setShowAuthModal(true);
       return;
     }
