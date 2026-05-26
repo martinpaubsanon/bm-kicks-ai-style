@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { loadGameState } from "@/lib/badges";
 
 export interface LoyaltyAccount {
   user_id: string;
@@ -34,6 +35,8 @@ export function useLoyalty() {
   const [tiers, setTiers] = useState<LoyaltyTier[]>([]);
   const [settings, setSettings] = useState<LoyaltySettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [paidSpent, setPaidSpent] = useState(0);
+  const [bonusPoints, setBonusPoints] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,15 +55,21 @@ export function useLoyalty() {
     if (settingsRes.data) setSettings(settingsRes.data as any);
 
     if (user) {
-      const { data } = await supabase
-        .from("loyalty_accounts" as any)
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (data) setAccount(data as any);
+      const [accRes, ordersRes] = await Promise.all([
+        supabase.from("loyalty_accounts" as any).select("*").eq("user_id", user.id).maybeSingle(),
+        supabase.from("orders").select("total").eq("user_id", user.id).eq("payment_status", "paid"),
+      ]);
+      if (accRes.data) setAccount(accRes.data as any);
+      const spent = (ordersRes.data ?? []).reduce(
+        (acc: number, o: any) => acc + Number(o.total ?? 0),
+        0
+      );
+      setPaidSpent(spent);
     } else {
       setAccount(null);
+      setPaidSpent(0);
     }
+    setBonusPoints(loadGameState().bonusPoints ?? 0);
     setLoading(false);
   }, [user]);
 
@@ -68,20 +77,38 @@ export function useLoyalty() {
     load();
   }, [load]);
 
-  const nextTier = (() => {
-    if (!account) return null;
-    return (
-      tiers.find((t) => t.min_points > account.lifetime_points) || null
-    );
-  })();
+  // Re-read local bonus points whenever the game state updates
+  useEffect(() => {
+    const onUpdate = () => setBonusPoints(loadGameState().bonusPoints ?? 0);
+    window.addEventListener("bmkicks:game-updated", onUpdate);
+    window.addEventListener("bmkicks:bonus-awarded", onUpdate);
+    return () => {
+      window.removeEventListener("bmkicks:game-updated", onUpdate);
+      window.removeEventListener("bmkicks:bonus-awarded", onUpdate);
+    };
+  }, []);
 
-  const currentTier = tiers.find((t) => t.name === account?.current_tier) || tiers[0] || null;
+  // Combined score drives tier: paid spend + lifetime points + local bonus points
+  const combinedScore =
+    Math.floor(paidSpent) + (account?.lifetime_points ?? 0) + bonusPoints;
+
+  // Displayed points balance includes bonus points
+  const displayPoints = (account?.points_balance ?? 0) + bonusPoints;
+
+  const sortedTiers = [...tiers].sort((a, b) => a.min_points - b.min_points);
+  const currentTier =
+    [...sortedTiers].reverse().find((t) => combinedScore >= t.min_points) ||
+    sortedTiers[0] ||
+    null;
+
+  const nextTier =
+    sortedTiers.find((t) => t.min_points > combinedScore) || null;
 
   const progressToNext = (() => {
-    if (!account || !nextTier || !currentTier) return 100;
+    if (!nextTier || !currentTier) return 100;
     const span = nextTier.min_points - currentTier.min_points;
     if (span <= 0) return 100;
-    const done = account.lifetime_points - currentTier.min_points;
+    const done = combinedScore - currentTier.min_points;
     return Math.max(0, Math.min(100, Math.round((done / span) * 100)));
   })();
 
@@ -92,6 +119,10 @@ export function useLoyalty() {
     currentTier,
     nextTier,
     progressToNext,
+    combinedScore,
+    displayPoints,
+    bonusPoints,
+    paidSpent,
     loading,
     reload: load,
   };
