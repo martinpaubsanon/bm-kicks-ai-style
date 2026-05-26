@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { PageSEO } from "@/components/seo/PageSEO";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -93,6 +94,7 @@ export default function Checkout() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
+      <PageSEO title="Checkout | BM Kicks" description="Securely complete your sneaker order with flexible payment and pre-order options." path="/checkout" />
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground mb-4">Your cart is empty</p>

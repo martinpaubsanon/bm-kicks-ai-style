@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { PageSEO } from "@/components/seo/PageSEO";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
@@ -173,9 +174,16 @@ const ProductDetail = () => {
     : [resolveProductImage(product.id)];
   const availableSizes = Object.entries(effectiveSizes).filter(([_, stock]) => stock > 0);
 
+  const seoTitle = `${product.name} | BM Kicks`.slice(0, 60);
+  const seoDescRaw = product.description?.replace(/\s+/g, " ").trim() ||
+    `Shop the ${product.brand} ${product.name} at BM Kicks. Authentic sneakers with fast delivery in Qatar.`;
+  const seoDesc = seoDescRaw.length > 155 ? seoDescRaw.slice(0, 152) + "..." : seoDescRaw;
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      <PageSEO title={seoTitle} description={seoDesc} path={`/product/${product.id}`} />
       <Header />
+
 
       <div className="container mx-auto px-4 py-8 flex-1">
         <Button variant="ghost" onClick={() => navigate("/")} className="mb-6">

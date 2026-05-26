@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { PageSEO } from "@/components/seo/PageSEO";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -114,6 +115,7 @@ export default function CustomerAuth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <PageSEO title="Sign In or Create Account | BM Kicks" description="Sign in or create your BM Kicks account to shop sneakers, track orders, and earn rewards." path="/auth" />
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Welcome</CardTitle>

@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { PageSEO } from "@/components/seo/PageSEO";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ShieldCheck, Store, Gavel, Package } from "lucide-react";
@@ -6,6 +7,7 @@ import { ShieldCheck, Store, Gavel, Package } from "lucide-react";
 export default function BrandDisclaimer() {
   return (
     <div className="min-h-screen flex flex-col">
+      <PageSEO title="Brand Disclaimer | BM Kicks" description="BM Kicks is an independent reseller. Read our brand and trademark disclaimer." path="/brand-disclaimer" />
       <Header />
       <main className="flex-1 bg-background pt-20">
         <div className="container mx-auto px-4 py-12 max-w-4xl">

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { PageSEO } from "@/components/seo/PageSEO";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
@@ -9,6 +10,7 @@ export default function ReturnPolicy() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <PageSEO title="Return & Refund Policy | BM Kicks" description="Our 14-day return window, refund process, and conditions for sneaker returns at BM Kicks." path="/return-policy" />
       <Header />
       <main className="flex-1 container mx-auto px-4 py-12 max-w-4xl">
         <h1 className="text-4xl font-bold mb-4 text-foreground">Return & Refund Policy</h1>
