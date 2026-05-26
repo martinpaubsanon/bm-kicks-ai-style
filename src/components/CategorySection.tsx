@@ -28,10 +28,11 @@ const categories = [
   },
   {
     title: "Watches",
-    description: "Wrist game on lock",
-    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800",
+    description: "Rolex-grade wrist game",
+    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=800",
     category: "Watches"
   },
+
   {
     title: "Cosmetics",
     description: "Glow up, head to toe",
