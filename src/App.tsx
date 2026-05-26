@@ -37,6 +37,7 @@ import CustomerOrders from "./pages/customer/Orders";
 import CustomerOrderDetail from "./pages/customer/OrderDetail";
 import CustomerProfile from "./pages/customer/Profile";
 import CustomerRewards from "./pages/customer/Rewards";
+import CustomerBadges from "./pages/customer/Badges";
 import OrderSuccess from "./pages/customer/OrderSuccess";
 
 const queryClient = new QueryClient();
