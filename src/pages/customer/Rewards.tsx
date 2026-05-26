@@ -203,9 +203,10 @@ export default function Rewards() {
 
   const filtered = (kind: string) => rewards.filter((r) => r.kind === kind);
 
-  // Spend-based tier calculation (matches dashboard)
+  // Tier is based on combined score (QAR spent + bonus points earned)
+  const combinedScore = totalSpent + (account.points_balance ?? 0) + (game.bonusPoints ?? 0);
   const currentLevelIndex = SPEND_TIERS.reduce(
-    (acc, t, i) => (totalSpent >= t.min ? i : acc),
+    (acc, t, i) => (combinedScore >= t.min ? i : acc),
     0,
   );
   const currentSpendTier = SPEND_TIERS[currentLevelIndex];
@@ -213,12 +214,12 @@ export default function Rewards() {
   const spendProgress = nextSpendTier
     ? Math.min(
         100,
-        ((totalSpent - currentSpendTier.min) /
+        ((combinedScore - currentSpendTier.min) /
           (nextSpendTier.min - currentSpendTier.min)) *
           100,
       )
     : 100;
-  const remainingToNext = nextSpendTier ? Math.max(0, nextSpendTier.min - totalSpent) : 0;
+  const remainingToNext = nextSpendTier ? Math.max(0, nextSpendTier.min - combinedScore) : 0;
 
   return (
     <div className="space-y-6">
@@ -293,7 +294,7 @@ export default function Rewards() {
                 Crew Journey
               </span>
               <span className="font-mono">
-                {formatCurrency(totalSpent)} /{" "}
+                {formatCurrency(combinedScore)} /{" "}
                 {formatCurrency(SPEND_TIERS[SPEND_TIERS.length - 1].min)}
               </span>
             </div>
@@ -306,7 +307,7 @@ export default function Rewards() {
                 fillPct = 100;
               } else {
                 const within =
-                  (totalSpent - currentSpendTier.min) /
+                  (combinedScore - currentSpendTier.min) /
                   (nextSpendTier.min - currentSpendTier.min);
                 fillPct = (currentLevelIndex + Math.min(1, Math.max(0, within))) * segWidth;
               }
@@ -319,7 +320,7 @@ export default function Rewards() {
                     />
                     {SPEND_TIERS.map((t, i) => {
                       const pct = i * segWidth;
-                      const reached = totalSpent >= t.min;
+                      const reached = combinedScore >= t.min;
                       return (
                         <div
                           key={t.name}
@@ -344,7 +345,7 @@ export default function Rewards() {
                   key={t.name}
                   className={cn(
                     "flex flex-col items-center gap-0.5",
-                    totalSpent >= t.min ? "text-foreground" : "",
+                    combinedScore >= t.min ? "text-foreground" : "",
                     i === currentLevelIndex && "text-[#4ade80] font-bold",
                   )}
                 >
