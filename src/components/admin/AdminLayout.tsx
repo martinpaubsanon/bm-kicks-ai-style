@@ -56,7 +56,7 @@ export default function AdminLayout() {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-border bg-gradient-to-r from-background to-muted/20">
             <Link to="/admin" className="flex items-center gap-3 group">
-              <img src={logo} alt="BM Kicks" className="h-10 w-10 object-contain transition-transform group-hover:scale-105" />
+              <img src={logo} alt="BM Kicks" width={40} height={40} className="h-10 w-10 object-contain transition-transform group-hover:scale-105" />
               <div className="flex flex-col">
                 <span className="text-lg font-bold text-foreground">BM Kicks</span>
                 <span className="text-xs text-muted-foreground">Admin Portal</span>
