@@ -40,7 +40,9 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
               </div>
 
               <h1 className="font-display text-5xl md:text-7xl lg:text-8xl leading-[0.9] uppercase tracking-tight text-foreground">
-                Beyond <span className="text-foreground/40">Measure.</span>
+                Premium Sneakers
+                <br />
+                <span className="text-foreground/40">& Lifestyle Shop</span>
                 <br />
                 <span className="text-primary drop-shadow-[0_0_30px_hsl(var(--primary)/0.5)]">
                   Beyond Limits.
