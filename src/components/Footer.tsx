@@ -73,7 +73,7 @@ export const Footer = () => {
 
         <div className="border-t border-primary-foreground/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-primary-foreground/60">
-            © 2025 BM Kicks. All rights reserved. [Powered by StrategAIz - Tech Arm of Address Gateway]
+            © 2025 BM Kicks. All rights reserved. Powered by: FusionAI Trading & Services
           </p>
           <div className="flex gap-6 text-sm">
             <a href="/privacy-policy" className="text-primary-foreground/60 hover:text-accent transition-colors">Privacy Policy</a>
