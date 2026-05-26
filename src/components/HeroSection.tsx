@@ -155,7 +155,7 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
                 <img
                   src={heroImage}
                   alt="Premium sneakers from BM Kicks"
-                  className="relative rounded-3xl shadow-card w-full max-w-xl object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                  className="relative rounded-3xl shadow-card w-full max-w-2xl object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                 />
                 {/* Logo overlay */}
                 <img
