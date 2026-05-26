@@ -47,10 +47,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
   const { convertPrice, formatPrice } = useCurrency();
 
   const budgetConverted = Math.round(convertPrice(150, 'USD'));
-  const budgetLabel = formatPrice(budgetConverted, 'QAR' as any).replace(/\.00$/, '');
-  // formatPrice uses selectedCurrency for formatting regardless of fromCurrency; pass amount already in selected currency
-  const budgetFormatted = formatPrice(budgetConverted, 'QAR' as any);
-  const budgetDisplay = budgetFormatted.replace(/\.00$/, '');
+  const budgetDisplay = formatPrice(budgetConverted).replace(/\.00$/, '');
 
   const quickReplies = [
     { label: "🏃 Running", query: "Show me running shoes" },
