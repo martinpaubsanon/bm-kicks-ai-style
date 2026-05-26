@@ -44,12 +44,19 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { convertPrice, formatPrice } = useCurrency();
+
+  const budgetConverted = Math.round(convertPrice(150, 'USD'));
+  const budgetLabel = formatPrice(budgetConverted, 'QAR' as any).replace(/\.00$/, '');
+  // formatPrice uses selectedCurrency for formatting regardless of fromCurrency; pass amount already in selected currency
+  const budgetFormatted = formatPrice(budgetConverted, 'QAR' as any);
+  const budgetDisplay = budgetFormatted.replace(/\.00$/, '');
 
   const quickReplies = [
     { label: "🏃 Running", query: "Show me running shoes" },
     { label: "🔥 Limited", query: "Show me limited edition sneakers" },
     { label: "💎 Premium", query: "Show me premium sneakers" },
-    { label: "💰 Under $150", query: "Show me shoes under $150" },
+    { label: `💰 Under ${budgetDisplay}`, query: `Show me shoes under ${budgetDisplay}` },
     { label: "⭐ Featured", query: "Show me featured sneakers" },
   ];
 
