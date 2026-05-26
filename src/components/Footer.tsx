@@ -9,7 +9,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <img src={logo} alt="BM Kicks" className="h-12 w-auto mb-4" />
+            <img src={logo} alt="BM Kicks" width={192} height={48} className="h-12 w-auto mb-4" />
             <p className="text-primary-foreground/80 mb-4 max-w-md">
               Beyond Measure. Beyond Limits. Premium sneakers, bags, watches and cosmetics — backed by AI-powered recommendations and 24/7 support.
             </p>
