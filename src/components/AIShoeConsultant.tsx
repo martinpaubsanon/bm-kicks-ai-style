@@ -50,11 +50,11 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
   const budgetDisplay = formatPrice(150, 'USD').replace(/\.00$/, '');
   const budgetInQAR = Math.round(convertPrice(150, 'USD', 'QAR'));
 
-  const quickReplies = [
+  const quickReplies: { label: string; query: string; maxPriceQAR?: number }[] = [
     { label: "🏃 Running", query: "Show me running shoes" },
     { label: "🔥 Limited", query: "Show me limited edition sneakers" },
     { label: "💎 Premium", query: "Show me premium sneakers" },
-    { label: `💰 Under ${budgetDisplay}`, query: `Show me shoes with price under ${budgetInQAR} QAR (equivalent to 150 USD / ${budgetDisplay})` },
+    { label: `💰 Under ${budgetDisplay}`, query: `Show me shoes under ${budgetDisplay} (budget: ${budgetInQAR} QAR)`, maxPriceQAR: budgetInQAR },
     { label: "⭐ Featured", query: "Show me featured sneakers" },
   ];
 
@@ -64,7 +64,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
     }
   }, [messages]);
 
-  const sendMessage = async (messageText?: string) => {
+  const sendMessage = async (messageText?: string, maxPriceQAR?: number) => {
     const textToSend = messageText || input.trim();
     if (!textToSend || isLoading) return;
 
@@ -88,9 +88,11 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
               role: m.role,
               content: m.content,
             })),
+            maxPriceQAR,
           }),
         }
       );
+
 
       if (!response.ok) {
         if (response.status === 429) {
@@ -150,8 +152,8 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
     }
   };
 
-  const handleQuickReply = (query: string) => {
-    sendMessage(query);
+  const handleQuickReply = (reply: { query: string; maxPriceQAR?: number }) => {
+    sendMessage(reply.query, reply.maxPriceQAR);
   };
 
   return (
@@ -190,7 +192,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
                     <Button
                       key={index}
                       variant="outline"
-                      onClick={() => handleQuickReply(reply.query)}
+                      onClick={() => handleQuickReply(reply)}
                       className="h-auto py-3 text-sm hover:scale-105 transition-transform"
                     >
                       {reply.label}
@@ -265,7 +267,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
                       key={index}
                       variant="outline"
                       size="sm"
-                      onClick={() => handleQuickReply(reply.query)}
+                      onClick={() => handleQuickReply(reply)}
                       disabled={isLoading}
                       className="text-xs hover:scale-105 transition-transform"
                     >

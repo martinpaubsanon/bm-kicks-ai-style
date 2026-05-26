@@ -14,7 +14,8 @@ const messageSchema = z.object({
       role: z.enum(['user', 'assistant', 'system']),
       content: z.string().trim().min(1).max(500)
     })
-  ).min(1).max(20)
+  ).min(1).max(20),
+  maxPriceQAR: z.number().positive().optional(),
 });
 
 serve(async (req) => {
@@ -39,8 +40,8 @@ serve(async (req) => {
       );
     }
     
-    const { messages } = validationResult.data;
-    console.log("🔍 Processing AI shoe consultation with", messages.length, "messages");
+    const { messages, maxPriceQAR } = validationResult.data;
+    console.log("🔍 Processing AI shoe consultation with", messages.length, "messages", maxPriceQAR ? `(maxPriceQAR=${maxPriceQAR})` : "");
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -53,11 +54,17 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
-    // Fetch all available products for AI context
-    const { data: allProducts, error: productsError } = await supabase
+    // Fetch all available products for AI context (apply budget filter when provided)
+    let productsQuery = supabase
       .from("products")
       .select("id, name, brand, price, category, is_featured, is_limited_edition, stock_total, description")
       .gt("stock_total", 0);
+
+    if (maxPriceQAR) {
+      productsQuery = productsQuery.lte("price", maxPriceQAR);
+    }
+
+    const { data: allProducts, error: productsError } = await productsQuery;
 
     if (productsError) {
       console.error("Error fetching products - Status:", productsError.code);
