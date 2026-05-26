@@ -64,7 +64,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
     }
   }, [messages]);
 
-  const sendMessage = async (messageText?: string) => {
+  const sendMessage = async (messageText?: string, maxPriceQAR?: number) => {
     const textToSend = messageText || input.trim();
     if (!textToSend || isLoading) return;
 
@@ -88,10 +88,11 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
               role: m.role,
               content: m.content,
             })),
-            maxPriceQAR: /under/i.test(textToSend) ? budgetInQAR : undefined,
+            maxPriceQAR,
           }),
         }
       );
+
 
       if (!response.ok) {
         if (response.status === 429) {
