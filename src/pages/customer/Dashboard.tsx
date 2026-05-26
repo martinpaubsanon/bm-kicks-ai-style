@@ -149,6 +149,13 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Loyalty / Gamified Progress */}
+      <LoyaltyProgress
+        totalSpent={stats.totalSpent}
+        totalOrders={stats.total}
+        deliveredOrders={stats.delivered}
+      />
+
       {/* Need Help Section */}
       <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
         <CardContent className="pt-6">
