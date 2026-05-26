@@ -78,13 +78,13 @@ export const Header = () => {
                       {account && (
                         <div className="mt-2 flex items-center justify-between px-2 py-1.5 rounded-lg bg-primary/10 border border-primary/20">
                           <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-                            {account.current_tier}
+                            {(currentTier?.name ?? account.current_tier)}
                             {currentTier && currentTier.multiplier > 1 && (
                               <span className="text-gold ml-1">{currentTier.multiplier}x</span>
                             )}
                           </span>
                           <span className="font-display text-sm text-gold">
-                            {account.points_balance.toLocaleString()} pts
+                            {displayPoints.toLocaleString()} pts
                           </span>
                         </div>
                       )}
