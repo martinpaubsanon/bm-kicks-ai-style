@@ -19,7 +19,7 @@ export function CurrencySelector() {
       <SelectContent>
         {Object.entries(CURRENCIES).map(([code, config]) => (
           <SelectItem key={code} value={code}>
-            {config.symbol} {code}
+            {config.symbol === code ? code : `${config.symbol} ${code}`}
           </SelectItem>
         ))}
       </SelectContent>
