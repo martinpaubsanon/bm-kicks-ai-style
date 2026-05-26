@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CompactProductCard } from "@/components/CompactProductCard";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { Send, Sparkles, Loader2 } from "lucide-react";
 
 export interface Product {
