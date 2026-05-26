@@ -211,8 +211,23 @@ export default function Rewards() {
   }
 
   const filtered = (kind: string) => rewards.filter((r) => r.kind === kind);
-  const totalPoints = account.lifetime_points + game.bonusPoints;
-  const currentLevelIndex = tiers.findIndex((t) => t.name === currentTier?.name);
+
+  // Spend-based tier calculation (matches dashboard)
+  const currentLevelIndex = SPEND_TIERS.reduce(
+    (acc, t, i) => (totalSpent >= t.min ? i : acc),
+    0,
+  );
+  const currentSpendTier = SPEND_TIERS[currentLevelIndex];
+  const nextSpendTier = SPEND_TIERS[currentLevelIndex + 1] ?? null;
+  const spendProgress = nextSpendTier
+    ? Math.min(
+        100,
+        ((totalSpent - currentSpendTier.min) /
+          (nextSpendTier.min - currentSpendTier.min)) *
+          100,
+      )
+    : 100;
+  const remainingToNext = nextSpendTier ? Math.max(0, nextSpendTier.min - totalSpent) : 0;
 
   return (
     <div className="space-y-6">
@@ -227,32 +242,39 @@ export default function Rewards() {
                 Your Status
               </p>
               <h1 className="text-4xl md:text-5xl font-black bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent">
-                {currentTier?.name ?? account.current_tier}
+                {currentSpendTier.name}
               </h1>
               <p className="text-muted-foreground mt-1">Member of the BmKicks Crew</p>
             </div>
             <div className="text-right">
               <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
-                Total Points
+                Total Spent
               </p>
-              <p className="text-5xl font-black font-mono bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent">
-                {totalPoints.toLocaleString()}
+              <p className="text-4xl md:text-5xl font-black font-mono bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent">
+                {formatCurrency(totalSpent)}
               </p>
             </div>
           </div>
-          {nextTier ? (
+          {nextSpendTier ? (
             <>
               <div className="flex justify-between text-sm mb-2">
-                <span className="font-bold">{currentTier?.name}</span>
+                <span className="font-bold">{currentSpendTier.name}</span>
+                <span className="text-foreground font-semibold">
+                  You've spent {formatCurrency(totalSpent)} ({Math.round(spendProgress)}%)
+                </span>
                 <span className="text-muted-foreground">
-                  {Math.max(0, nextTier.min_points - account.lifetime_points).toLocaleString()} pts
-                  to <span className="text-[#4ade80] font-bold">{nextTier.name}</span>
+                  {formatCurrency(remainingToNext)} to{" "}
+                  <span className="text-[#4ade80] font-bold">{nextSpendTier.name}</span>
                 </span>
               </div>
               <Progress
-                value={progressToNext}
+                value={spendProgress}
                 className="h-2 bg-secondary [&>div]:bg-[linear-gradient(90deg,#ec4899,#4ade80)]"
               />
+              <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                <span>Starts at {formatCurrency(currentSpendTier.min)}</span>
+                <span>Unlocks at {formatCurrency(nextSpendTier.min)}</span>
+              </div>
             </>
           ) : (
             <p className="text-[#4ade80] font-bold flex items-center gap-2">
