@@ -171,7 +171,7 @@ export default function Rewards() {
   const handleSpin = useCallback(() => {
     if (!canSpin || spinning) return;
     setSpinning(true);
-    const rewards = [10, 25, 50, 75, 100, 150, 250, 500];
+    const rewards = [1, 5, 10, 15, 20, 25, 35, 50];
     const reward = rewards[Math.floor(Math.random() * rewards.length)];
     const turns = 5 + Math.random() * 3;
     setSpinAngle((a) => a + turns * 360);
@@ -272,14 +272,19 @@ export default function Rewards() {
               <Trophy className="w-5 h-5" /> Max tier reached — you're a Legend.
             </p>
           )}
-          <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-border">
+          <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-border">
             <Stat
               label="Streak"
               value={`${game.streak}d`}
               icon={<Flame className="w-4 h-4" />}
             />
             <Stat
-              label="Products viewed"
+              label="Bonus pts"
+              value={game.bonusPoints}
+              icon={<Gift className="w-4 h-4" />}
+            />
+            <Stat
+              label="Viewed"
               value={game.productViews}
               icon={<Sparkles className="w-4 h-4" />}
             />
@@ -416,7 +421,7 @@ export default function Rewards() {
               ["View a product", "+2 pts"],
               ["Add to bag", "+10 pts"],
               ["Complete checkout", "+1 pt per QAR spent"],
-              ["Daily spin", "10–500 pts"],
+              ["Daily spin", "1–50 pts"],
               ["Unlock badge", "+50 pts"],
             ].map(([label, pts]) => (
               <li
