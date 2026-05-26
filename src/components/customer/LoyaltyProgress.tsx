@@ -179,7 +179,7 @@ export function LoyaltyProgress({ totalSpent, totalOrders, deliveredOrders, poin
         {nextTier && (
           <div className="space-y-2">
             <div className="text-center text-xs font-semibold text-foreground">
-              You've spent {formatCurrency(totalSpent)} ({Math.round(progressToNext)}%)
+              Score {formatCurrency(combined)} ({Math.round(progressToNext)}%)
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">{currentTier.name}</span>
