@@ -44,7 +44,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { convertPrice, formatPrice } = useCurrency();
+  const { formatPrice } = useCurrency();
 
   const budgetDisplay = formatPrice(150).replace(/\.00$/, '');
 
