@@ -7,6 +7,7 @@ import { AllProducts } from "@/components/AllProducts";
 import { Footer } from "@/components/Footer";
 import { FloatingButtons } from "@/components/FloatingButtons";
 import { AIShoeConsultant } from "@/components/AIShoeConsultant";
+import { CustomRequestCTA } from "@/components/CustomRequestCTA";
 
 const Index = () => {
   const [isAIOpen, setIsAIOpen] = useState(false);
