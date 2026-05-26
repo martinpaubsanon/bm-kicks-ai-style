@@ -217,6 +217,6 @@ export default function CustomerAuth() {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }
