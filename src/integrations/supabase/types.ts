@@ -61,6 +61,7 @@ export type Database = {
       }
       customer_profiles: {
         Row: {
+          birthdate: string | null
           created_at: string | null
           default_shipping_address: Json | null
           full_name: string | null
@@ -69,6 +70,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          birthdate?: string | null
           created_at?: string | null
           default_shipping_address?: Json | null
           full_name?: string | null
@@ -77,6 +79,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          birthdate?: string | null
           created_at?: string | null
           default_shipping_address?: Json | null
           full_name?: string | null
@@ -187,6 +190,7 @@ export type Database = {
       }
       loyalty_settings: {
         Row: {
+          birthday_bonus_points: number
           created_at: string
           id: string
           points_per_order: number
@@ -196,8 +200,10 @@ export type Database = {
           signup_bonus: number
           singleton: boolean
           updated_at: string
+          welcome_bonus_points: number
         }
         Insert: {
+          birthday_bonus_points?: number
           created_at?: string
           id?: string
           points_per_order?: number
@@ -207,8 +213,10 @@ export type Database = {
           signup_bonus?: number
           singleton?: boolean
           updated_at?: string
+          welcome_bonus_points?: number
         }
         Update: {
+          birthday_bonus_points?: number
           created_at?: string
           id?: string
           points_per_order?: number
@@ -218,6 +226,7 @@ export type Database = {
           signup_bonus?: number
           singleton?: boolean
           updated_at?: string
+          welcome_bonus_points?: number
         }
         Relationships: []
       }
@@ -675,6 +684,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          is_featured: boolean
           kind: Database["public"]["Enums"]["reward_kind"]
           partner_id: string | null
           points_cost: number
@@ -691,6 +701,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_featured?: boolean
           kind: Database["public"]["Enums"]["reward_kind"]
           partner_id?: string | null
           points_cost: number
@@ -707,6 +718,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_featured?: boolean
           kind?: Database["public"]["Enums"]["reward_kind"]
           partner_id?: string | null
           points_cost?: number
@@ -800,6 +812,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      run_birthday_bonus: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
@@ -814,6 +827,8 @@ export type Database = {
         | "admin_adjustment"
         | "expiry"
         | "refund"
+        | "earn_welcome"
+        | "earn_birthday"
       redemption_status: "pending" | "fulfilled" | "expired" | "cancelled"
       referral_status: "pending" | "completed" | "cancelled"
       reward_kind: "store_discount" | "physical_gift" | "partner_voucher"
@@ -956,6 +971,8 @@ export const Constants = {
         "admin_adjustment",
         "expiry",
         "refund",
+        "earn_welcome",
+        "earn_birthday",
       ],
       redemption_status: ["pending", "fulfilled", "expired", "cancelled"],
       referral_status: ["pending", "completed", "cancelled"],

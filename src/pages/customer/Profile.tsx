@@ -15,6 +15,7 @@ export default function CustomerProfile() {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
+    birthdate: "",
     address: "",
     city: "",
     province: "",
@@ -27,6 +28,7 @@ export default function CustomerProfile() {
       setFormData({
         fullName: customerProfile.full_name || "",
         phone: customerProfile.phone || "",
+        birthdate: (customerProfile as any).birthdate || "",
         address: customerProfile.default_shipping_address?.address || "",
         city: customerProfile.default_shipping_address?.city || "",
         province: customerProfile.default_shipping_address?.province || "",
@@ -47,6 +49,7 @@ export default function CustomerProfile() {
         .update({
           full_name: formData.fullName,
           phone: formData.phone,
+          birthdate: formData.birthdate || null,
           default_shipping_address: {
             address: formData.address,
             city: formData.city,
@@ -54,7 +57,7 @@ export default function CustomerProfile() {
             postalCode: formData.postalCode,
             country: formData.country,
           }
-        })
+        } as any)
         .eq("id", user.id);
 
       if (error) throw error;
@@ -108,6 +111,20 @@ export default function CustomerProfile() {
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="birthdate">Birthday 🎂</Label>
+              <Input
+                id="birthdate"
+                type="date"
+                value={formData.birthdate}
+                onChange={(e) => setFormData({ ...formData, birthdate: e.target.value })}
+                max={new Date().toISOString().slice(0, 10)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Get bonus points every year on your birthday.
+              </p>
             </div>
 
             <Button type="submit" disabled={loading}>
