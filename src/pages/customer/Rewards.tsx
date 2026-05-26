@@ -227,6 +227,7 @@ export default function Rewards() {
       {/* === Gamified status card === */}
       <div className="rounded-2xl p-[2px] bg-[linear-gradient(135deg,#ec4899,#4ade80)] shadow-[0_0_40px_-10px_rgba(236,72,153,0.6)]">
         <div className="rounded-2xl bg-card p-6 md:p-8">
+          {/* Header */}
           <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
             <div>
               <p className="text-xs uppercase tracking-widest font-bold mb-2 text-[#4ade80]">
@@ -237,41 +238,109 @@ export default function Rewards() {
               </h1>
               <p className="text-muted-foreground mt-1">Member of the BmKicks Crew</p>
             </div>
-            <div className="text-right">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
-                Total Spent
+            {nextSpendTier ? (
+              <div className="text-right">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
+                  Next rank
+                </p>
+                <p className="text-2xl md:text-3xl font-black text-[#4ade80]">
+                  {nextSpendTier.name}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formatCurrency(remainingToNext)} away
+                </p>
+              </div>
+            ) : (
+              <p className="text-[#4ade80] font-bold flex items-center gap-2">
+                <Trophy className="w-5 h-5" /> Max tier — Legend
               </p>
-              <p className="text-4xl md:text-5xl font-black font-mono bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent">
-                {formatCurrency(totalSpent)}
-              </p>
+            )}
+          </div>
+
+          {/* Separate + combined stat tiles */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+            <StatTile
+              label="Points balance"
+              value={(account.points_balance ?? 0).toLocaleString()}
+              suffix="pts"
+              accent="#ec4899"
+              icon={<Sparkles className="w-4 h-4" />}
+            />
+            <StatTile
+              label="Total spent"
+              value={formatCurrency(totalSpent)}
+              accent="#4ade80"
+              icon={<Trophy className="w-4 h-4" />}
+            />
+            <StatTile
+              label="Combined score"
+              value={(
+                (account.points_balance ?? 0) + Math.round(totalSpent)
+              ).toLocaleString()}
+              suffix="XP"
+              gradient
+              icon={<Flame className="w-4 h-4" />}
+            />
+          </div>
+
+          {/* Full multi-tier journey progress */}
+          <div>
+            <div className="flex items-center justify-between text-xs mb-2">
+              <span className="font-bold uppercase tracking-wider text-muted-foreground">
+                Crew Journey
+              </span>
+              <span className="font-mono">
+                {formatCurrency(totalSpent)} /{" "}
+                {formatCurrency(SPEND_TIERS[SPEND_TIERS.length - 1].min)}
+              </span>
+            </div>
+            <div className="relative h-3 rounded-full bg-secondary overflow-hidden">
+              <div
+                className="absolute inset-y-0 left-0 bg-[linear-gradient(90deg,#ec4899,#4ade80)] transition-all"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    (totalSpent / SPEND_TIERS[SPEND_TIERS.length - 1].min) * 100,
+                  )}%`,
+                }}
+              />
+              {/* tier ticks */}
+              {SPEND_TIERS.map((t, i) => {
+                const pct = (t.min / SPEND_TIERS[SPEND_TIERS.length - 1].min) * 100;
+                const reached = totalSpent >= t.min;
+                return (
+                  <div
+                    key={t.name}
+                    className={cn(
+                      "absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 transition-all",
+                      reached
+                        ? "bg-[#4ade80] border-[#4ade80] shadow-[0_0_8px_#4ade80]"
+                        : "bg-card border-muted-foreground/40",
+                      i === currentLevelIndex && nextSpendTier && "scale-150",
+                    )}
+                    style={{ left: `calc(${pct}% - 4px)` }}
+                  />
+                );
+              })}
+            </div>
+            <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
+              {SPEND_TIERS.map((t, i) => (
+                <div
+                  key={t.name}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5",
+                    totalSpent >= t.min ? "text-foreground" : "",
+                    i === currentLevelIndex && "text-[#4ade80] font-bold",
+                  )}
+                >
+                  <span className="uppercase tracking-wider">{t.name}</span>
+                  <span className="font-mono">{formatCurrency(t.min)}</span>
+                </div>
+              ))}
             </div>
           </div>
-          {nextSpendTier ? (
-            <>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="font-bold">{currentSpendTier.name}</span>
-                <span className="text-foreground font-semibold">
-                  You've spent {formatCurrency(totalSpent)} ({Math.round(spendProgress)}%)
-                </span>
-                <span className="text-muted-foreground">
-                  {formatCurrency(remainingToNext)} to{" "}
-                  <span className="text-[#4ade80] font-bold">{nextSpendTier.name}</span>
-                </span>
-              </div>
-              <Progress
-                value={spendProgress}
-                className="h-2 bg-secondary [&>div]:bg-[linear-gradient(90deg,#ec4899,#4ade80)]"
-              />
-              <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-                <span>Starts at {formatCurrency(currentSpendTier.min)}</span>
-                <span>Unlocks at {formatCurrency(nextSpendTier.min)}</span>
-              </div>
-            </>
-          ) : (
-            <p className="text-[#4ade80] font-bold flex items-center gap-2">
-              <Trophy className="w-5 h-5" /> Max tier reached — you're a Legend.
-            </p>
-          )}
+
+          {/* Gamified stats row */}
           <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-border">
             <Stat
               label="Streak"
