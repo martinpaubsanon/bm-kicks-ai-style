@@ -24,7 +24,7 @@ export const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const { user, customerProfile, signOut } = useAuth();
   const { cartCount } = useCart();
-  const { account, currentTier, displayPoints } = useLoyalty();
+  const { account, currentTier, combinedScore } = useLoyalty();
   const navigate = useNavigate();
 
   return (
@@ -84,7 +84,7 @@ export const Header = () => {
                             )}
                           </span>
                           <span className="font-display text-sm text-gold">
-                            {displayPoints.toLocaleString()} pts
+                            {combinedScore.toLocaleString()} xp
                           </span>
                         </div>
                       )}

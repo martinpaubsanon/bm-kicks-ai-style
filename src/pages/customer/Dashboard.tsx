@@ -11,10 +11,12 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { LoyaltyProgress } from "@/components/customer/LoyaltyProgress";
 import { useLoyalty } from "@/hooks/useLoyalty";
+import { loadGameState } from "@/lib/badges";
 
 export default function Dashboard() {
   const { user, customerProfile } = useAuth();
-  const { account } = useLoyalty();
+  const { account, combinedScore, bonusPoints } = useLoyalty();
+  const game = loadGameState();
   const [orders, setOrders] = useState<any[]>([]);
   const [stats, setStats] = useState({
     total: 0,
@@ -156,8 +158,12 @@ export default function Dashboard() {
         totalSpent={stats.totalSpent}
         totalOrders={stats.total}
         deliveredOrders={stats.delivered}
-        pointsBalance={account?.points_balance ?? 0}
+        pointsBalance={(account?.points_balance ?? 0) + bonusPoints}
+        productViews={game.productViews}
+        streak={game.streak}
+        badgesEarned={game.badges.length}
       />
+
 
       {/* Need Help Section */}
       <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
