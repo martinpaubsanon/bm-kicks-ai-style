@@ -294,35 +294,47 @@ export default function Rewards() {
                 {formatCurrency(SPEND_TIERS[SPEND_TIERS.length - 1].min)}
               </span>
             </div>
-            <div className="relative h-3 rounded-full bg-secondary overflow-hidden">
-              <div
-                className="absolute inset-y-0 left-0 bg-[linear-gradient(90deg,#ec4899,#4ade80)] transition-all"
-                style={{
-                  width: `${Math.min(
-                    100,
-                    (totalSpent / SPEND_TIERS[SPEND_TIERS.length - 1].min) * 100,
-                  )}%`,
-                }}
-              />
-              {/* tier ticks */}
-              {SPEND_TIERS.map((t, i) => {
-                const pct = (t.min / SPEND_TIERS[SPEND_TIERS.length - 1].min) * 100;
-                const reached = totalSpent >= t.min;
-                return (
-                  <div
-                    key={t.name}
-                    className={cn(
-                      "absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 transition-all",
-                      reached
-                        ? "bg-[#4ade80] border-[#4ade80] shadow-[0_0_8px_#4ade80]"
-                        : "bg-card border-muted-foreground/40",
-                      i === currentLevelIndex && nextSpendTier && "scale-150",
-                    )}
-                    style={{ left: `calc(${pct}% - 4px)` }}
-                  />
-                );
-              })}
-            </div>
+            {(() => {
+              // Equal-width tier segments so each rank takes the same visual space.
+              const segCount = SPEND_TIERS.length - 1; // 5 gaps between 6 tiers
+              const segWidth = 100 / segCount;
+              let fillPct: number;
+              if (!nextSpendTier) {
+                fillPct = 100;
+              } else {
+                const within =
+                  (totalSpent - currentSpendTier.min) /
+                  (nextSpendTier.min - currentSpendTier.min);
+                fillPct = (currentLevelIndex + Math.min(1, Math.max(0, within))) * segWidth;
+              }
+              return (
+                <>
+                  <div className="relative h-3 rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className="absolute inset-y-0 left-0 bg-[linear-gradient(90deg,#ec4899,#4ade80)] transition-all"
+                      style={{ width: `${fillPct}%` }}
+                    />
+                    {SPEND_TIERS.map((t, i) => {
+                      const pct = i * segWidth;
+                      const reached = totalSpent >= t.min;
+                      return (
+                        <div
+                          key={t.name}
+                          className={cn(
+                            "absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 transition-all",
+                            reached
+                              ? "bg-[#4ade80] border-[#4ade80] shadow-[0_0_8px_#4ade80]"
+                              : "bg-card border-muted-foreground/40",
+                            i === currentLevelIndex && nextSpendTier && "scale-150",
+                          )}
+                          style={{ left: `calc(${pct}% - 4px)` }}
+                        />
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
             <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
               {SPEND_TIERS.map((t, i) => (
                 <div
