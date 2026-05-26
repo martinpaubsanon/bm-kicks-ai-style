@@ -50,11 +50,14 @@ interface LoyaltyProgressProps {
   totalSpent: number;
   totalOrders: number;
   deliveredOrders: number;
+  pointsBalance?: number;
 }
 
-export function LoyaltyProgress({ totalSpent, totalOrders, deliveredOrders }: LoyaltyProgressProps) {
+export function LoyaltyProgress({ totalSpent, totalOrders, deliveredOrders, pointsBalance = 0 }: LoyaltyProgressProps) {
+  // Tier is based on combined score: QAR spent + bonus points earned
+  const combined = totalSpent + pointsBalance;
   const currentTierIndex = TIERS.reduce(
-    (acc, tier, i) => (totalSpent >= tier.min ? i : acc),
+    (acc, tier, i) => (combined >= tier.min ? i : acc),
     0,
   );
   const currentTier = TIERS[currentTierIndex];
@@ -63,12 +66,12 @@ export function LoyaltyProgress({ totalSpent, totalOrders, deliveredOrders }: Lo
   const progressToNext = nextTier
     ? Math.min(
         100,
-        ((totalSpent - currentTier.min) / (nextTier.min - currentTier.min)) * 100,
+        ((combined - currentTier.min) / (nextTier.min - currentTier.min)) * 100,
       )
     : 100;
 
-  const remainingToNext = nextTier ? Math.max(0, nextTier.min - totalSpent) : 0;
-  const points = Math.floor(totalSpent);
+  const remainingToNext = nextTier ? Math.max(0, nextTier.min - combined) : 0;
+  const points = Math.floor(pointsBalance);
 
   const TierIcon = currentTier.icon;
 
