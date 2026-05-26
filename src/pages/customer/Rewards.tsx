@@ -345,7 +345,7 @@ export default function Rewards() {
                   key={t.name}
                   className={cn(
                     "flex flex-col items-center gap-0.5",
-                    totalSpent >= t.min ? "text-foreground" : "",
+                    combinedScore >= t.min ? "text-foreground" : "",
                     i === currentLevelIndex && "text-[#4ade80] font-bold",
                   )}
                 >
