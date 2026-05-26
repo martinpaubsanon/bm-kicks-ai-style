@@ -48,12 +48,13 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
   const { formatPrice } = useCurrency();
 
   const budgetDisplay = formatPrice(150, 'USD').replace(/\.00$/, '');
+  const budgetInQAR = Math.round(convertPrice(150, 'USD', 'QAR'));
 
   const quickReplies = [
     { label: "🏃 Running", query: "Show me running shoes" },
     { label: "🔥 Limited", query: "Show me limited edition sneakers" },
     { label: "💎 Premium", query: "Show me premium sneakers" },
-    { label: `💰 Under ${budgetDisplay}`, query: `Show me shoes under ${budgetDisplay}` },
+    { label: `💰 Under ${budgetDisplay}`, query: `Show me shoes with price under ${budgetInQAR} QAR (equivalent to 150 USD / ${budgetDisplay})` },
     { label: "⭐ Featured", query: "Show me featured sneakers" },
   ];
 
