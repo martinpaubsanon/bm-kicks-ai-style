@@ -13,9 +13,32 @@ import { CustomRequestCTA } from "@/components/CustomRequestCTA";
 const Index = () => {
   const [isAIOpen, setIsAIOpen] = useState(false);
 
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "BM Kicks",
+      url: "https://bmkicks.shop",
+      logo: "https://bmkicks.shop/favicon.ico",
+      description: "Premium sneaker reseller in Qatar offering authentic Nike, Adidas and Jordan footwear.",
+      areaServed: "QA",
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "BM Kicks",
+      url: "https://bmkicks.shop",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://bmkicks.shop/?q={search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ];
+
   return (
     <div className="min-h-screen">
-      <PageSEO title="BM Kicks | Premium Sneakers in Qatar" description="Shop authentic Nike, Adidas & Jordan sneakers in Qatar with AI styling and loyalty rewards." path="/" />
+      <PageSEO title="BM Kicks | Premium Sneakers in Qatar" description="Shop authentic Nike, Adidas & Jordan sneakers in Qatar with AI styling and loyalty rewards." path="/" jsonLd={jsonLd} />
       <Header />
       <main>
         <HeroSection onAIClick={() => setIsAIOpen(true)} />
