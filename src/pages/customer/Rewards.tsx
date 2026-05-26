@@ -307,7 +307,7 @@ export default function Rewards() {
                 fillPct = 100;
               } else {
                 const within =
-                  (totalSpent - currentSpendTier.min) /
+                  (combinedScore - currentSpendTier.min) /
                   (nextSpendTier.min - currentSpendTier.min);
                 fillPct = (currentLevelIndex + Math.min(1, Math.max(0, within))) * segWidth;
               }
