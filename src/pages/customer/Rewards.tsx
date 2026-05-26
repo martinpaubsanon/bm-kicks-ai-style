@@ -203,9 +203,10 @@ export default function Rewards() {
 
   const filtered = (kind: string) => rewards.filter((r) => r.kind === kind);
 
-  // Spend-based tier calculation (matches dashboard)
+  // Tier is based on combined score (QAR spent + bonus points earned)
+  const combinedScore = totalSpent + (account.points_balance ?? 0) + (game.bonusPoints ?? 0);
   const currentLevelIndex = SPEND_TIERS.reduce(
-    (acc, t, i) => (totalSpent >= t.min ? i : acc),
+    (acc, t, i) => (combinedScore >= t.min ? i : acc),
     0,
   );
   const currentSpendTier = SPEND_TIERS[currentLevelIndex];
@@ -213,12 +214,12 @@ export default function Rewards() {
   const spendProgress = nextSpendTier
     ? Math.min(
         100,
-        ((totalSpent - currentSpendTier.min) /
+        ((combinedScore - currentSpendTier.min) /
           (nextSpendTier.min - currentSpendTier.min)) *
           100,
       )
     : 100;
-  const remainingToNext = nextSpendTier ? Math.max(0, nextSpendTier.min - totalSpent) : 0;
+  const remainingToNext = nextSpendTier ? Math.max(0, nextSpendTier.min - combinedScore) : 0;
 
   return (
     <div className="space-y-6">
