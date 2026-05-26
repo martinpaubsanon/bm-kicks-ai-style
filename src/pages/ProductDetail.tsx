@@ -57,6 +57,10 @@ const ProductDetail = () => {
   } | null>(null);
 
   useEffect(() => {
+    if (id) tryViewProduct(id, 2);
+  }, [id]);
+
+  useEffect(() => {
     const load = async () => {
       if (!id) return;
       setLoading(true);
