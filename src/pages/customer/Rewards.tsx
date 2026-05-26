@@ -17,9 +17,25 @@ import {
   Trophy,
   Flame,
   Lock,
+  Star,
+  Medal,
+  Award,
+  Crown,
+  Gem,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
+
+// Spend-based tiers — MUST match src/components/customer/LoyaltyProgress.tsx
+const SPEND_TIERS = [
+  { name: "Rookie",   min: 0,     icon: Star,   color: "#cbd5e1" },
+  { name: "Bronze",   min: 500,   icon: Medal,  color: "#d97706" },
+  { name: "Silver",   min: 2000,  icon: Award,  color: "#d4d4d8" },
+  { name: "Gold",     min: 5000,  icon: Trophy, color: "#facc15" },
+  { name: "Platinum", min: 10000, icon: Crown,  color: "#67e8f9" },
+  { name: "Diamond",  min: 25000, icon: Gem,    color: "#e879f9" },
+];
 
 // ---------- Gamified config ----------
 const BADGES = [
@@ -71,19 +87,11 @@ function saveState(s: LocalGameState) {
 
 export default function Rewards() {
   const { user } = useAuth();
-  const {
-    account,
-    currentTier,
-    nextTier,
-    tiers,
-    progressToNext,
-    settings,
-    loading,
-    reload,
-  } = useLoyalty();
+  const { account, settings, loading, reload } = useLoyalty();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [rewards, setRewards] = useState<any[]>([]);
   const [redeeming, setRedeeming] = useState<string | null>(null);
+  const [totalSpent, setTotalSpent] = useState(0);
 
   const [game, setGame] = useState<LocalGameState>(loadState);
   const [spinning, setSpinning] = useState(false);
@@ -113,7 +121,7 @@ export default function Rewards() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [txnRes, rewardsRes] = await Promise.all([
+      const [txnRes, rewardsRes, ordersRes] = await Promise.all([
         supabase
           .from("loyalty_transactions" as any)
           .select("*")
@@ -125,9 +133,18 @@ export default function Rewards() {
           .select("*, loyalty_partners(name, logo_url, category)")
           .eq("is_active", true)
           .order("sort_order"),
+        supabase
+          .from("orders")
+          .select("total")
+          .eq("user_id", user.id),
       ]);
       if (txnRes.data) setTransactions(txnRes.data as any[]);
       if (rewardsRes.data) setRewards(rewardsRes.data as any[]);
+      if (ordersRes.data) {
+        setTotalSpent(
+          ordersRes.data.reduce((sum: number, o: any) => sum + Number(o.total ?? 0), 0)
+        );
+      }
     })();
   }, [user]);
 
@@ -185,8 +202,23 @@ export default function Rewards() {
   }
 
   const filtered = (kind: string) => rewards.filter((r) => r.kind === kind);
-  const totalPoints = account.lifetime_points + game.bonusPoints;
-  const currentLevelIndex = tiers.findIndex((t) => t.name === currentTier?.name);
+
+  // Spend-based tier calculation (matches dashboard)
+  const currentLevelIndex = SPEND_TIERS.reduce(
+    (acc, t, i) => (totalSpent >= t.min ? i : acc),
+    0,
+  );
+  const currentSpendTier = SPEND_TIERS[currentLevelIndex];
+  const nextSpendTier = SPEND_TIERS[currentLevelIndex + 1] ?? null;
+  const spendProgress = nextSpendTier
+    ? Math.min(
+        100,
+        ((totalSpent - currentSpendTier.min) /
+          (nextSpendTier.min - currentSpendTier.min)) *
+          100,
+      )
+    : 100;
+  const remainingToNext = nextSpendTier ? Math.max(0, nextSpendTier.min - totalSpent) : 0;
 
   return (
     <div className="space-y-6">
@@ -201,32 +233,39 @@ export default function Rewards() {
                 Your Status
               </p>
               <h1 className="text-4xl md:text-5xl font-black bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent">
-                {currentTier?.name ?? account.current_tier}
+                {currentSpendTier.name}
               </h1>
               <p className="text-muted-foreground mt-1">Member of the BmKicks Crew</p>
             </div>
             <div className="text-right">
               <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
-                Total Points
+                Total Spent
               </p>
-              <p className="text-5xl font-black font-mono bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent">
-                {totalPoints.toLocaleString()}
+              <p className="text-4xl md:text-5xl font-black font-mono bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent">
+                {formatCurrency(totalSpent)}
               </p>
             </div>
           </div>
-          {nextTier ? (
+          {nextSpendTier ? (
             <>
               <div className="flex justify-between text-sm mb-2">
-                <span className="font-bold">{currentTier?.name}</span>
+                <span className="font-bold">{currentSpendTier.name}</span>
+                <span className="text-foreground font-semibold">
+                  You've spent {formatCurrency(totalSpent)} ({Math.round(spendProgress)}%)
+                </span>
                 <span className="text-muted-foreground">
-                  {Math.max(0, nextTier.min_points - account.lifetime_points).toLocaleString()} pts
-                  to <span className="text-[#4ade80] font-bold">{nextTier.name}</span>
+                  {formatCurrency(remainingToNext)} to{" "}
+                  <span className="text-[#4ade80] font-bold">{nextSpendTier.name}</span>
                 </span>
               </div>
               <Progress
-                value={progressToNext}
+                value={spendProgress}
                 className="h-2 bg-secondary [&>div]:bg-[linear-gradient(90deg,#ec4899,#4ade80)]"
               />
+              <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                <span>Starts at {formatCurrency(currentSpendTier.min)}</span>
+                <span>Unlocks at {formatCurrency(nextSpendTier.min)}</span>
+              </div>
             </>
           ) : (
             <p className="text-[#4ade80] font-bold flex items-center gap-2">
@@ -295,12 +334,13 @@ export default function Rewards() {
           <CardContent className="p-6">
             <h2 className="text-2xl font-black mb-4">Crew Ranks</h2>
             <div className="space-y-3">
-              {tiers.map((tier, i) => {
+              {SPEND_TIERS.map((tier, i) => {
                 const unlocked = i <= currentLevelIndex;
                 const isYou = i === currentLevelIndex;
+                const TierIcon = tier.icon;
                 return (
                   <div
-                    key={tier.id}
+                    key={tier.name}
                     className={cn(
                       "flex items-center justify-between p-3 rounded-lg border",
                       isYou
@@ -312,22 +352,19 @@ export default function Rewards() {
                   >
                     <div className="flex items-center gap-3">
                       {unlocked ? (
-                        <Trophy
-                          className="w-5 h-5"
-                          style={{ color: tier.color_hex ?? "#ec4899" }}
-                        />
+                        <TierIcon className="w-5 h-5" style={{ color: tier.color }} />
                       ) : (
                         <Lock className="w-5 h-5 text-muted-foreground" />
                       )}
                       <div>
                         <p
                           className="font-bold"
-                          style={{ color: unlocked ? tier.color_hex ?? undefined : undefined }}
+                          style={{ color: unlocked ? tier.color : undefined }}
                         >
                           {tier.name}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {tier.min_points.toLocaleString()}+ points
+                          {formatCurrency(tier.min)}+ spent
                         </p>
                       </div>
                     </div>
