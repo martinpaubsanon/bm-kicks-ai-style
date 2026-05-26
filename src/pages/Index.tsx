@@ -17,11 +17,13 @@ const Index = () => {
     <div className="min-h-screen">
       <PageSEO title="BM Kicks | Premium Sneakers in Qatar" description="Shop authentic Nike, Adidas & Jordan sneakers in Qatar with AI styling and loyalty rewards." path="/" />
       <Header />
-      <HeroSection onAIClick={() => setIsAIOpen(true)} />
-      <CustomRequestCTA />
-      <FeaturedProducts />
-      <CategorySection />
-      <AllProducts />
+      <main>
+        <HeroSection onAIClick={() => setIsAIOpen(true)} />
+        <CustomRequestCTA />
+        <FeaturedProducts />
+        <CategorySection />
+        <AllProducts />
+      </main>
       <Footer />
       <FloatingButtons />
       <AIShoeConsultant isOpen={isAIOpen} onOpenChange={setIsAIOpen} />

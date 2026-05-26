@@ -185,7 +185,7 @@ const ProductDetail = () => {
       <Header />
 
 
-      <div className="container mx-auto px-4 py-8 flex-1">
+      <main className="container mx-auto px-4 py-8 flex-1">
         <Button variant="ghost" onClick={() => navigate("/")} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Home
@@ -386,7 +386,7 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       <Footer />
 
