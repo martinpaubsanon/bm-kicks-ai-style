@@ -170,39 +170,10 @@ export async function createOrder({
     });
 
     if (itemError) throw itemError;
-
-    // Decrement stock from the right source
-    if (item.colorway_id) {
-      const { data: cw } = await supabase
-        .from("product_colorways")
-        .select("sizes, stock_total")
-        .eq("id", item.colorway_id)
-        .single();
-      if (cw) {
-        const sizes = (cw.sizes as Record<string, number>) || {};
-        sizes[item.size] = (sizes[item.size] || 0) - item.quantity;
-        const stock_total = Object.values(sizes).reduce((s, n) => s + (typeof n === "number" ? n : 0), 0);
-        await supabase
-          .from("product_colorways")
-          .update({ sizes, stock_total })
-          .eq("id", item.colorway_id);
-      }
-    } else {
-      const { data: product } = await supabase
-        .from("products")
-        .select("sizes")
-        .eq("id", item.product_id)
-        .single();
-      if (product) {
-        const sizes = (product.sizes as Record<string, number>) || {};
-        sizes[item.size] = (sizes[item.size] || 0) - item.quantity;
-        await supabase
-          .from("products")
-          .update({ sizes })
-          .eq("id", item.product_id);
-      }
-    }
+    // Stock is decremented automatically by a SECURITY DEFINER trigger
+    // (decrement_stock_on_order_item) on order_items INSERT.
   }
+
 
   return order.id;
 }
