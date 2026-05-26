@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CompactProductCard } from "@/components/CompactProductCard";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { Send, Sparkles, Loader2 } from "lucide-react";
 
 export interface Product {
@@ -43,12 +44,16 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { convertPrice, formatPrice } = useCurrency();
+
+  const budgetConverted = Math.round(convertPrice(150, 'USD'));
+  const budgetDisplay = formatPrice(budgetConverted).replace(/\.00$/, '');
 
   const quickReplies = [
     { label: "🏃 Running", query: "Show me running shoes" },
     { label: "🔥 Limited", query: "Show me limited edition sneakers" },
     { label: "💎 Premium", query: "Show me premium sneakers" },
-    { label: "💰 Under $150", query: "Show me shoes under $150" },
+    { label: `💰 Under ${budgetDisplay}`, query: `Show me shoes under ${budgetDisplay}` },
     { label: "⭐ Featured", query: "Show me featured sneakers" },
   ];
 
