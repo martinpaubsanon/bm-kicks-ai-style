@@ -87,16 +87,7 @@ function saveState(s: LocalGameState) {
 
 export default function Rewards() {
   const { user } = useAuth();
-  const {
-    account,
-    currentTier,
-    nextTier,
-    tiers,
-    progressToNext,
-    settings,
-    loading,
-    reload,
-  } = useLoyalty();
+  const { account, settings, loading, reload } = useLoyalty();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [rewards, setRewards] = useState<any[]>([]);
   const [redeeming, setRedeeming] = useState<string | null>(null);
