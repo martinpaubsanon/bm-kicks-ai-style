@@ -281,6 +281,7 @@ const ProductDetail = () => {
                         key={cw.id}
                         type="button"
                         onClick={() => handleSelectColorway(cw)}
+                        aria-label={cw.name}
                         title={cw.name}
                         className={`relative h-12 w-12 rounded-full border-2 transition-all overflow-hidden ${
                           isActive
@@ -325,13 +326,13 @@ const ProductDetail = () => {
 
             {product.description && (
               <div>
-                <h3 className="font-semibold mb-2">Description</h3>
+                <h2 className="font-semibold mb-2">Description</h2>
                 <p className="text-muted-foreground">{product.description}</p>
               </div>
             )}
 
             <div>
-              <h3 className="font-semibold mb-2">Details</h3>
+              <h2 className="font-semibold mb-2">Details</h2>
               <div className="space-y-1 text-sm">
                 <div className="flex gap-2">
                   <span className="text-muted-foreground">Category:</span>
@@ -355,7 +356,7 @@ const ProductDetail = () => {
             {/* Size Selector */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold">Select Size (US)</h3>
+                <h2 className="font-semibold">Select Size (US)</h2>
               </div>
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                 {availableSizes.map(([size, stock]) => (

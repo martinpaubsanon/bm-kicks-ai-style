@@ -158,10 +158,10 @@ export default function OrderSuccess() {
               {/* Order Items */}
               {orderItems.length > 0 && (
                 <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-left">
-                  <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                  <h2 className="text-sm font-semibold mb-2 flex items-center gap-2">
                     <Package className="h-4 w-4" />
                     Items Ordered
-                  </h3>
+                  </h2>
                   {orderItems.map((item, index) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span className="text-muted-foreground">

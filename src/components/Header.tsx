@@ -46,6 +46,7 @@ export const Header = () => {
             size="icon"
             className="hidden md:flex rounded-full"
             onClick={() => setSearchOpen(!searchOpen)}
+            aria-label="Search products"
           >
             <Search className="h-4 w-4 md:h-5 md:w-5" />
           </Button>
@@ -56,6 +57,7 @@ export const Header = () => {
                 variant="ghost"
                 size="icon"
                 className={`rounded-full ${user ? "ring-1 ring-gold/40" : ""}`}
+                aria-label="User menu"
               >
                 {user && customerProfile ? (
                   <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-gradient-accent text-primary-foreground flex items-center justify-center font-semibold text-xs md:text-sm shadow-glow">
@@ -128,6 +130,7 @@ export const Header = () => {
             size="icon"
             className="relative rounded-full"
             onClick={() => setCartOpen(true)}
+            aria-label="Shopping cart"
           >
             <ShoppingCart className="h-5 w-5" />
             {cartCount > 0 && (
@@ -141,6 +144,7 @@ export const Header = () => {
             size="icon"
             className="md:hidden rounded-full"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
           </Button>
