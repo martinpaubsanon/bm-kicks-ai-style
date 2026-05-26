@@ -44,9 +44,10 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { formatPrice } = useCurrency();
+  const { convertPrice, formatPrice } = useCurrency();
 
-  const budgetDisplay = formatPrice(150).replace(/\.00$/, '');
+  const budgetConverted = Math.round(convertPrice(150, 'USD'));
+  const budgetDisplay = formatPrice(budgetConverted).replace(/\.00$/, '');
 
   const quickReplies = [
     { label: "🏃 Running", query: "Show me running shoes" },
