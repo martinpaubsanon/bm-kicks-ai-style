@@ -152,8 +152,8 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
     }
   };
 
-  const handleQuickReply = (query: string) => {
-    sendMessage(query);
+  const handleQuickReply = (reply: { query: string; maxPriceQAR?: number }) => {
+    sendMessage(reply.query, reply.maxPriceQAR);
   };
 
   return (
