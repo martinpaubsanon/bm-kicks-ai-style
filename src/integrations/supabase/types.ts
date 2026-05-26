@@ -812,6 +812,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      run_birthday_bonus: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
