@@ -443,7 +443,7 @@ export default function Checkout() {
           </div>
         </form>
         </div>
-      </div>
+      </main>
       
       <AuthRequiredModal
         open={showAuthModal}
