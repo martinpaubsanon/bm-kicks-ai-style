@@ -421,7 +421,7 @@ export default function Rewards() {
               ["View a product", "+2 pts"],
               ["Add to bag", "+10 pts"],
               ["Complete checkout", "+1 pt per QAR spent"],
-              ["Daily spin", "10–500 pts"],
+              ["Daily spin", "1–50 pts"],
               ["Unlock badge", "+50 pts"],
             ].map(([label, pts]) => (
               <li
