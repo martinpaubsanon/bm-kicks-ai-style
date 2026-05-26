@@ -259,48 +259,65 @@ export function LoyaltyProgress({
           })}
         </div>
 
-        {/* Achievements */}
-        <div className="space-y-3 pt-2 border-t border-border">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-foreground">Achievements</p>
-            <Badge variant="secondary" className="text-xs">
-              {unlockedCount} / {achievements.length}
-            </Badge>
-          </div>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-            {achievements.map((a) => {
-              const Icon = a.unlocked ? a.icon : Lock;
-              return (
-                <div
-                  key={a.id}
-                  title={`${a.name} — ${a.description}`}
-                  className={cn(
-                    "group relative aspect-square flex flex-col items-center justify-center gap-1 rounded-lg border p-2 transition-all",
-                    a.unlocked
-                      ? "border-border bg-card hover:scale-105 hover:shadow-lg"
-                      : "border-dashed border-border/50 bg-muted/20 opacity-60",
-                  )}
-                >
-                  <Icon
+        {/* Achievements (collapsible) */}
+        <Collapsible className="pt-2 border-t border-border">
+          <CollapsibleTrigger className="group flex w-full items-center justify-between py-1 text-left">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-semibold text-foreground">Achievements</p>
+              <Badge variant="secondary" className="text-xs">
+                {unlockedCount} / {achievements.length}
+              </Badge>
+            </div>
+            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pt-3">
+              {achievements.map((a) => {
+                const Icon = a.unlocked ? a.icon : Lock;
+                return (
+                  <div
+                    key={a.id}
                     className={cn(
-                      "h-5 w-5",
-                      a.unlocked ? a.color : "text-muted-foreground",
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      "text-[9px] md:text-[10px] font-medium text-center leading-tight line-clamp-2",
-                      a.unlocked ? "text-foreground" : "text-muted-foreground",
+                      "flex items-start gap-2 rounded-lg border p-2.5 transition-all",
+                      a.unlocked
+                        ? "border-border bg-card hover:shadow-md"
+                        : "border-dashed border-border/50 bg-muted/20",
                     )}
                   >
-                    {a.name}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                    <div
+                      className={cn(
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
+                        a.unlocked ? "bg-primary/10" : "bg-muted/40",
+                      )}
+                    >
+                      <Icon
+                        className={cn(
+                          "h-4 w-4",
+                          a.unlocked ? a.color : "text-muted-foreground",
+                        )}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className={cn(
+                          "text-xs font-semibold leading-tight",
+                          a.unlocked ? "text-foreground" : "text-muted-foreground",
+                        )}
+                      >
+                        {a.name}
+                      </p>
+                      <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground line-clamp-2">
+                        {a.unlocked ? `Earned: ${a.description}` : `How to earn: ${a.description}`}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </CardContent>
     </Card>
   );
 }
+
