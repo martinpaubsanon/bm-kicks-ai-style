@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { PageSEO } from "@/components/seo/PageSEO";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
