@@ -49,6 +49,7 @@ export default function CustomerProfile() {
         .update({
           full_name: formData.fullName,
           phone: formData.phone,
+          birthdate: formData.birthdate || null,
           default_shipping_address: {
             address: formData.address,
             city: formData.city,
@@ -56,7 +57,7 @@ export default function CustomerProfile() {
             postalCode: formData.postalCode,
             country: formData.country,
           }
-        })
+        } as any)
         .eq("id", user.id);
 
       if (error) throw error;
