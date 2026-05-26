@@ -100,6 +100,7 @@ export default function Rewards() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [rewards, setRewards] = useState<any[]>([]);
   const [redeeming, setRedeeming] = useState<string | null>(null);
+  const [totalSpent, setTotalSpent] = useState(0);
 
   const [game, setGame] = useState<LocalGameState>(loadState);
   const [spinning, setSpinning] = useState(false);
