@@ -45,7 +45,7 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
                 <span className="text-foreground/40">& Lifestyle Shop</span>
                 <br />
                 <span className="text-primary drop-shadow-[0_0_30px_hsl(var(--primary)/0.5)]">
-                  Beyond Limits.
+                  Beyond Measure. Beyond Limits.
                 </span>
               </h1>
 
