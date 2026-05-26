@@ -84,7 +84,7 @@ export const Header = () => {
                             )}
                           </span>
                           <span className="font-display text-sm text-gold">
-                            {displayPoints.toLocaleString()} pts
+                            {combinedScore.toLocaleString()} xp
                           </span>
                         </div>
                       )}
