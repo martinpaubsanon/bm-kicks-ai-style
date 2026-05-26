@@ -88,6 +88,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
               role: m.role,
               content: m.content,
             })),
+            maxPriceQAR: /under/i.test(textToSend) ? budgetInQAR : undefined,
           }),
         }
       );
