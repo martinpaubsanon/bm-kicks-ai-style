@@ -171,7 +171,7 @@ export default function Rewards() {
   const handleSpin = useCallback(() => {
     if (!canSpin || spinning) return;
     setSpinning(true);
-    const rewards = [10, 25, 50, 75, 100, 150, 250, 500];
+    const rewards = [1, 5, 10, 15, 20, 25, 35, 50];
     const reward = rewards[Math.floor(Math.random() * rewards.length)];
     const turns = 5 + Math.random() * 3;
     setSpinAngle((a) => a + turns * 360);
