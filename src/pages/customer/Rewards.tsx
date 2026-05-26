@@ -138,19 +138,12 @@ export default function Rewards() {
     setSpinAngle((a) => a + turns * 360);
     setTimeout(() => {
       setSpinning(false);
-      setGame((prev) => {
-        const badges = [...prev.badges];
-        if (!badges.includes("spinner")) badges.push("spinner");
-        const next = {
-          ...prev,
-          lastSpin: todayStr(),
-          badges,
-          bonusPoints: prev.bonusPoints + reward,
-        };
-        saveState(next);
-        return next;
-      });
-      toast({ title: `🎉 +${reward} bonus points!`, description: "Daily spin reward" });
+      // Mark the spin so it's once-a-day, then award via global bonus toast.
+      const prev = loadState();
+      const badges = [...prev.badges];
+      if (!badges.includes("spinner")) badges.push("spinner");
+      saveState({ ...prev, lastSpin: todayStr(), badges });
+      awardBonus(reward, "Daily spin reward", "🎰");
     }, 3000);
   }, [canSpin, spinning]);
 
