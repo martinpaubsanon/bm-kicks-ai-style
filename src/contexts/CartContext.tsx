@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { tryAddToCart } from "@/lib/badges";
 
 interface CartItem {
   id: string;
