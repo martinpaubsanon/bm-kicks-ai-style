@@ -19,6 +19,7 @@ const Index = () => {
       <FeaturedProducts />
       <CategorySection />
       <AllProducts />
+      <CustomRequestCTA />
       <Footer />
       <FloatingButtons />
       <AIShoeConsultant isOpen={isAIOpen} onOpenChange={setIsAIOpen} />
