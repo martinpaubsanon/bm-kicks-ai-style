@@ -11,6 +11,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { LoyaltyProgress } from "@/components/customer/LoyaltyProgress";
 import { useLoyalty } from "@/hooks/useLoyalty";
+import { loadGameState } from "@/lib/badges";
 
 export default function Dashboard() {
   const { user, customerProfile } = useAuth();
