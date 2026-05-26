@@ -82,6 +82,7 @@ const App = () => (
                 <Route path="orders/:id" element={<CustomerOrderDetail />} />
                 <Route path="profile" element={<CustomerProfile />} />
                 <Route path="rewards" element={<CustomerRewards />} />
+                <Route path="badges" element={<CustomerBadges />} />
               </Route>
               
               {/* Admin login */}
