@@ -77,6 +77,11 @@ export default function Badges() {
 
   const earned = useMemo(() => computeEarnedBadges(ctx), [ctx]);
 
+  // Award +50 bonus once for any newly-unlocked badge
+  useEffect(() => {
+    if (earned.size > 0) syncBadgeUnlocks(earned, 50);
+  }, [earned]);
+
   const visible =
     filter === "all" ? BADGES : BADGES.filter((b) => b.category === filter);
 
