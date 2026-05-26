@@ -156,6 +156,7 @@ export default function Dashboard() {
         totalSpent={stats.totalSpent}
         totalOrders={stats.total}
         deliveredOrders={stats.delivered}
+        pointsBalance={account?.points_balance ?? 0}
       />
 
       {/* Need Help Section */}
