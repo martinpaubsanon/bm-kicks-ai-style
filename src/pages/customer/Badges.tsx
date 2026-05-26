@@ -58,8 +58,9 @@ export default function Badges() {
     })();
   }, [user]);
 
+  const combinedScore = totalSpent + (account?.points_balance ?? 0) + (game.bonusPoints ?? 0);
   const tierIndex = SPEND_TIERS_MIN.reduce(
-    (acc, min, i) => (totalSpent >= min ? i : acc),
+    (acc, min, i) => (combinedScore >= min ? i : acc),
     0,
   );
 
