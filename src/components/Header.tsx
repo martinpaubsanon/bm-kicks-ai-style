@@ -33,7 +33,7 @@ export const Header = () => {
         {/* Logo */}
         <div className="flex items-center gap-4 md:gap-8">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="BM Kicks" className="h-8 md:h-9 w-auto" />
+            <img src={logo} alt="BM Kicks" width={144} height={36} className="h-8 md:h-9 w-auto" />
             <span className="hidden sm:inline font-display text-lg tracking-tight uppercase">BM Kicks</span>
           </Link>
         </div>
