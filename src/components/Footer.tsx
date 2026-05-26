@@ -11,8 +11,9 @@ export const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <img src={logo} alt="BM Kicks" className="h-12 w-auto mb-4" />
             <p className="text-primary-foreground/80 mb-4 max-w-md">
-              The world under your kicks. Premium sneakers for every style, backed by AI-powered recommendations and 24/7 support.
+              Beyond Measure. Beyond Limits. Premium sneakers, bags, watches and cosmetics — backed by AI-powered recommendations and 24/7 support.
             </p>
+
             <div className="flex flex-col gap-4">
               <div className="flex gap-4">
                 <a href="https://www.facebook.com/BMKicks" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" aria-label="Facebook">

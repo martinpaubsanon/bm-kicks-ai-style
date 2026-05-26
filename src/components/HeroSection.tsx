@@ -34,16 +34,17 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
               alt="BM Kicks Logo" 
               className="w-16 h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 opacity-90 md:opacity-95 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] animate-fade-in"
             />
-            <h1 className="text-2xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight">
-              The World Under
+            <h1 className="text-2xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight tracking-tight">
+              Beyond Measure.
               <br />
-              <span className="text-accent">Your Kicks</span>
+              <span className="text-accent">Beyond Limits.</span>
             </h1>
           </div>
           
           <p className="text-xs md:text-xl lg:text-2xl text-white/90 mb-4 md:mb-8 max-w-2xl animate-fade-in leading-relaxed" style={{ animationDelay: "0.2s" }}>
-            Discover your perfect sneakers with our AI consultant. From streetwear to sports.
+            Sneakers, bags, watches & cosmetics — curated drops with AI-powered picks.
           </p>
+
 
           <div className="flex flex-col sm:flex-row gap-2 md:gap-4 animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <Button 

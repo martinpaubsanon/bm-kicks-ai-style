@@ -8,52 +8,51 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* BM Kicks Brand Colors - Navy, Red, Light Gray */
+    /* BM Kicks Brand - Jet Black, Hot Red, Crisp White */
     --background: 0 0% 100%;
-    --foreground: 215 25% 15%;
+    --foreground: 0 0% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 0 0% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 0 0% 8%;
 
-    /* Primary Navy - Bold and energetic */
-    --primary: 215 42% 20%;
+    /* Primary - Jet black for bold streetwear feel */
+    --primary: 0 0% 6%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Light Gray for contrast */
-    --secondary: 214 15% 95%;
-    --secondary-foreground: 215 25% 15%;
+    /* Secondary - Soft off-white */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 8%;
 
-    --muted: 214 15% 95%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
 
-    /* Accent Red - Energetic and bold */
-    --accent: 0 84% 60%;
+    /* Accent - Signature BM Kicks red */
+    --accent: 0 85% 52%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 85% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 20% 90%;
-    --input: 214 20% 90%;
-    --ring: 0 84% 60%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 85% 52%;
 
     --radius: 0.75rem;
 
-    /* Custom gradients for hero sections */
-    --gradient-hero: linear-gradient(135deg, hsl(215 42% 20%), hsl(215 42% 12%));
-    --gradient-accent: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 74% 55%));
-    
-    /* Smooth transitions */
+    /* Hip gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 4%) 0%, hsl(0 0% 10%) 60%, hsl(0 70% 25%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(0 85% 52%), hsl(0 75% 45%));
+
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Shadows with brand colors */
-    --shadow-sm: 0 1px 2px 0 hsl(215 42% 20% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(215 42% 20% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(215 42% 20% / 0.15);
-    --shadow-accent: 0 10px 30px -10px hsl(0 84% 60% / 0.3);
+
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.08);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.12);
+    --shadow-lg: 0 10px 25px -3px hsl(0 0% 0% / 0.2);
+    --shadow-accent: 0 10px 30px -8px hsl(0 85% 52% / 0.45);
+
 
     --sidebar-background: 0 0% 98%;
 
