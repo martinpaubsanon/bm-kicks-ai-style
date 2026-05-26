@@ -320,7 +320,7 @@ export default function Rewards() {
                     />
                     {SPEND_TIERS.map((t, i) => {
                       const pct = i * segWidth;
-                      const reached = totalSpent >= t.min;
+                      const reached = combinedScore >= t.min;
                       return (
                         <div
                           key={t.name}
