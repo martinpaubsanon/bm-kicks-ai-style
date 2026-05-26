@@ -192,7 +192,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
                     <Button
                       key={index}
                       variant="outline"
-                      onClick={() => handleQuickReply(reply.query)}
+                      onClick={() => handleQuickReply(reply)}
                       className="h-auto py-3 text-sm hover:scale-105 transition-transform"
                     >
                       {reply.label}
@@ -267,7 +267,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
                       key={index}
                       variant="outline"
                       size="sm"
-                      onClick={() => handleQuickReply(reply.query)}
+                      onClick={() => handleQuickReply(reply)}
                       disabled={isLoading}
                       className="text-xs hover:scale-105 transition-transform"
                     >
