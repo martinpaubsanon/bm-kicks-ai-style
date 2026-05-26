@@ -15,6 +15,7 @@ export default function CustomerProfile() {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
+    birthdate: "",
     address: "",
     city: "",
     province: "",
@@ -27,6 +28,7 @@ export default function CustomerProfile() {
       setFormData({
         fullName: customerProfile.full_name || "",
         phone: customerProfile.phone || "",
+        birthdate: (customerProfile as any).birthdate || "",
         address: customerProfile.default_shipping_address?.address || "",
         city: customerProfile.default_shipping_address?.city || "",
         province: customerProfile.default_shipping_address?.province || "",
