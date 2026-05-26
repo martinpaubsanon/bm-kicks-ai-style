@@ -343,12 +343,13 @@ export default function Rewards() {
           <CardContent className="p-6">
             <h2 className="text-2xl font-black mb-4">Crew Ranks</h2>
             <div className="space-y-3">
-              {tiers.map((tier, i) => {
+              {SPEND_TIERS.map((tier, i) => {
                 const unlocked = i <= currentLevelIndex;
                 const isYou = i === currentLevelIndex;
+                const TierIcon = tier.icon;
                 return (
                   <div
-                    key={tier.id}
+                    key={tier.name}
                     className={cn(
                       "flex items-center justify-between p-3 rounded-lg border",
                       isYou
@@ -360,22 +361,19 @@ export default function Rewards() {
                   >
                     <div className="flex items-center gap-3">
                       {unlocked ? (
-                        <Trophy
-                          className="w-5 h-5"
-                          style={{ color: tier.color_hex ?? "#ec4899" }}
-                        />
+                        <TierIcon className="w-5 h-5" style={{ color: tier.color }} />
                       ) : (
                         <Lock className="w-5 h-5 text-muted-foreground" />
                       )}
                       <div>
                         <p
                           className="font-bold"
-                          style={{ color: unlocked ? tier.color_hex ?? undefined : undefined }}
+                          style={{ color: unlocked ? tier.color : undefined }}
                         >
                           {tier.name}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {tier.min_points.toLocaleString()}+ points
+                          {formatCurrency(tier.min)}+ spent
                         </p>
                       </div>
                     </div>
