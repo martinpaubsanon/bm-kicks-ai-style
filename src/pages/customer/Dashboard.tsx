@@ -9,6 +9,7 @@ import { Package, TrendingUp, Clock, CheckCircle, ShoppingBag } from "lucide-rea
 import { toast } from "@/hooks/use-toast";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { LoyaltyProgress } from "@/components/customer/LoyaltyProgress";
 
 export default function Dashboard() {
   const { user, customerProfile } = useAuth();
