@@ -159,12 +159,12 @@ export default function Dashboard() {
       {/* Need Help Section */}
       <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
         <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-center sm:text-left">
             <div>
-              <h3 className="text-lg font-semibold text-foreground mb-1">Need Help with Your Order?</h3>
-              <p className="text-sm text-muted-foreground">Our team is available 24/7 to assist you via WhatsApp</p>
+              <h3 className="text-base md:text-lg font-semibold text-green-900 dark:text-green-100 mb-1">Need Help with Your Order?</h3>
+              <p className="text-xs md:text-sm text-green-800/80 dark:text-green-200/80">Our team is available 24/7 to assist you via WhatsApp</p>
             </div>
-            <WhatsAppButton 
+            <WhatsAppButton
               message="Hi! I need help with my order from BM Kicks."
               size="lg"
             />
@@ -191,35 +191,35 @@ export default function Dashboard() {
               </Link>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {orders.map((order) => (
-                <div
+                <Link
                   key={order.id}
-                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                  to={`/customer/orders/${order.id}`}
+                  className="block p-3 md:p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <p className="font-semibold text-foreground">{order.order_number}</p>
-                      <StatusBadge status={order.order_status} type="order" />
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-foreground text-sm md:text-base truncate">
+                        {order.order_number}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {new Date(order.created_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(order.created_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                    <p className="font-bold text-foreground text-sm md:text-base whitespace-nowrap">
+                      QAR {Number(order.total).toFixed(2)}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="font-bold text-foreground">QAR {Number(order.total).toFixed(2)}</p>
-                      <StatusBadge status={order.payment_status} type="payment" />
-                    </div>
-                    <Link to={`/customer/orders/${order.id}`}>
-                      <Button variant="outline" size="sm">View</Button>
-                    </Link>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <StatusBadge status={order.order_status} type="order" />
+                    <StatusBadge status={order.payment_status} type="payment" />
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

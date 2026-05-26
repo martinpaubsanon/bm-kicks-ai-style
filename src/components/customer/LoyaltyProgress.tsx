@@ -175,11 +175,11 @@ export function LoyaltyProgress({ totalSpent, totalOrders, deliveredOrders }: Lo
         {/* Progress Bar */}
         {nextTier && (
           <div className="space-y-2">
-            <div className="flex justify-between items-end text-xs">
+            <div className="text-center text-xs font-semibold text-foreground">
+              You've spent {formatCurrency(totalSpent)} ({Math.round(progressToNext)}%)
+            </div>
+            <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">{currentTier.name}</span>
-              <span className="text-foreground font-semibold">
-                You've spent {formatCurrency(totalSpent)} ({Math.round(progressToNext)}%)
-              </span>
               <span className="text-muted-foreground">{nextTier.name}</span>
             </div>
             <Progress value={progressToNext} className="h-3" />
