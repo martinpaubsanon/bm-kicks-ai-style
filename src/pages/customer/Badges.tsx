@@ -13,6 +13,7 @@ import {
   RARITY_STYLE,
   computeEarnedBadges,
   loadGameState,
+  syncBadgeUnlocks,
   type BadgeContext,
   type BadgeRarity,
 } from "@/lib/badges";
