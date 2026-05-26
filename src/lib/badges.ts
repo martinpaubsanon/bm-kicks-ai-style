@@ -3,19 +3,25 @@ export const STORAGE_KEY = "bmkicks-gamified-v1";
 export interface LocalGameState {
   productViews: number;
   lastVisit: string | null;
+  lastVisitTs: number | null;
   streak: number;
   lastSpin: string | null;
   badges: string[];
   bonusPoints: number;
+  viewedProductIds: string[];
+  cartProductIds: string[];
 }
 
 export const defaultGameState: LocalGameState = {
   productViews: 0,
   lastVisit: null,
+  lastVisitTs: null,
   streak: 0,
   lastSpin: null,
   badges: [],
   bonusPoints: 0,
+  viewedProductIds: [],
+  cartProductIds: [],
 };
 
 export function loadGameState(): LocalGameState {
@@ -32,10 +38,101 @@ export function loadGameState(): LocalGameState {
 export function saveGameState(s: LocalGameState) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    window.dispatchEvent(new CustomEvent("bmkicks:game-updated", { detail: s }));
   } catch {}
 }
 
 export const todayStr = () => new Date().toISOString().slice(0, 10);
+
+/* ---------------- Bonus events (animated toast) ---------------- */
+
+export interface BonusEvent {
+  amount: number;
+  label: string;
+  emoji?: string;
+}
+
+export function awardBonus(amount: number, label: string, emoji = "✨") {
+  if (typeof window === "undefined" || amount <= 0) return;
+  const s = loadGameState();
+  s.bonusPoints = (s.bonusPoints ?? 0) + amount;
+  saveGameState(s);
+  window.dispatchEvent(
+    new CustomEvent<BonusEvent>("bmkicks:bonus-awarded", {
+      detail: { amount, label, emoji },
+    })
+  );
+}
+
+/* ---------------- Anti-exploit task helpers ---------------- */
+
+/** Daily visit: +15 every 24h. Also updates streak. */
+export function tryDailyVisit(points = 15) {
+  if (typeof window === "undefined") return false;
+  const s = loadGameState();
+  const now = Date.now();
+  const last = s.lastVisitTs ?? 0;
+  if (now - last < 24 * 60 * 60 * 1000) return false;
+
+  const today = todayStr();
+  let streak = s.streak;
+  if (s.lastVisit) {
+    const yest = new Date(now - 86400000).toISOString().slice(0, 10);
+    streak = s.lastVisit === yest ? streak + 1 : 1;
+  } else {
+    streak = 1;
+  }
+  const badges = [...s.badges];
+  if (!badges.includes("first_steps")) badges.push("first_steps");
+
+  saveGameState({ ...s, lastVisit: today, lastVisitTs: now, streak, badges });
+  awardBonus(points, "Daily visit", "🗓️");
+  return true;
+}
+
+/** View a unique product: +2, once per product id ever. */
+export function tryViewProduct(productId: string, points = 2) {
+  if (typeof window === "undefined" || !productId) return false;
+  const s = loadGameState();
+  if (s.viewedProductIds.includes(productId)) return false;
+  const viewedProductIds = [...s.viewedProductIds, productId];
+  saveGameState({
+    ...s,
+    viewedProductIds,
+    productViews: viewedProductIds.length,
+  });
+  awardBonus(points, "Viewed a product", "👀");
+  return true;
+}
+
+/** Add unique product to cart: +10, once per product id ever (can't exploit by re-adding). */
+export function tryAddToCart(productId: string, points = 10) {
+  if (typeof window === "undefined" || !productId) return false;
+  const s = loadGameState();
+  if (s.cartProductIds.includes(productId)) return false;
+  const cartProductIds = [...s.cartProductIds, productId];
+  const badges = [...s.badges];
+  if (!badges.includes("cart_starter")) badges.push("cart_starter");
+  saveGameState({ ...s, cartProductIds, badges });
+  awardBonus(points, "Added to bag", "🛒");
+  return true;
+}
+
+/** Compare earned-badge IDs vs persisted ones; award +50 for each newly earned. */
+export function syncBadgeUnlocks(earnedIds: Iterable<string>, perBadge = 50) {
+  if (typeof window === "undefined") return;
+  const s = loadGameState();
+  const known = new Set(s.badges);
+  const newly: string[] = [];
+  for (const id of earnedIds) if (!known.has(id)) newly.push(id);
+  if (newly.length === 0) return;
+  const badges = [...s.badges, ...newly];
+  saveGameState({ ...s, badges });
+  newly.forEach((id) => {
+    const def = BADGES.find((b) => b.id === id);
+    awardBonus(perBadge, `Badge unlocked: ${def?.label ?? id}`, def?.emoji ?? "🏆");
+  });
+}
 
 export type BadgeRarity = "common" | "rare" | "epic" | "legendary";
 
@@ -96,7 +193,7 @@ export const BADGES: BadgeDef[] = [
     emoji: "🛒",
     rarity: "common",
     category: "journey",
-    check: (c) => c.orderCount >= 1,
+    check: (c) => c.orderCount >= 1 || c.game.cartProductIds.length >= 1,
   },
   {
     id: "repeat_buyer",

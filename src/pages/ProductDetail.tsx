@@ -15,6 +15,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { resolveProductImage } from "@/lib/productImageOverrides";
 import { AuthRequiredModal } from "@/components/AuthRequiredModal";
 import { fetchColorways, type Colorway, pickDefaultColorway } from "@/lib/colorwayUtils";
+import { tryViewProduct } from "@/lib/badges";
 
 interface Product {
   id: string;
@@ -54,6 +55,10 @@ const ProductDetail = () => {
     colorwayId: string | null;
     size: string;
   } | null>(null);
+
+  useEffect(() => {
+    if (id) tryViewProduct(id, 2);
+  }, [id]);
 
   useEffect(() => {
     const load = async () => {

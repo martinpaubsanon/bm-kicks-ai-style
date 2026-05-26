@@ -47,43 +47,14 @@ const BADGES = [
   { id: "streaker", label: "On a Streak", description: "Visited 3 days in a row", emoji: "⚡" },
 ];
 
-const STORAGE_KEY = "bmkicks-gamified-v1";
-const todayStr = () => new Date().toISOString().slice(0, 10);
-
-interface LocalGameState {
-  productViews: number;
-  lastVisit: string | null;
-  streak: number;
-  lastSpin: string | null;
-  badges: string[];
-  bonusPoints: number; // local-only (visual)
-}
-
-const defaultState: LocalGameState = {
-  productViews: 0,
-  lastVisit: null,
-  streak: 0,
-  lastSpin: null,
-  badges: [],
-  bonusPoints: 0,
-};
-
-function loadState(): LocalGameState {
-  if (typeof window === "undefined") return defaultState;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultState;
-    return { ...defaultState, ...JSON.parse(raw) };
-  } catch {
-    return defaultState;
-  }
-}
-
-function saveState(s: LocalGameState) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-  } catch {}
-}
+import {
+  loadGameState as loadState,
+  saveGameState as saveState,
+  awardBonus,
+  syncBadgeUnlocks,
+  todayStr,
+  type LocalGameState,
+} from "@/lib/badges";
 
 export default function Rewards() {
   const { user } = useAuth();
@@ -97,25 +68,15 @@ export default function Rewards() {
   const [spinning, setSpinning] = useState(false);
   const [spinAngle, setSpinAngle] = useState(0);
 
-  // record visit + streak on mount
+  // Stay in sync with localStorage updates triggered elsewhere (toast events, etc.)
   useEffect(() => {
-    setGame((prev) => {
-      const today = todayStr();
-      if (prev.lastVisit === today) return prev;
-      let streak = prev.streak;
-      if (prev.lastVisit) {
-        const yest = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-        streak = prev.lastVisit === yest ? streak + 1 : 1;
-      } else {
-        streak = 1;
-      }
-      const badges = [...prev.badges];
-      if (!badges.includes("first_steps")) badges.push("first_steps");
-      if (streak >= 3 && !badges.includes("streaker")) badges.push("streaker");
-      const next = { ...prev, lastVisit: today, streak, badges };
-      saveState(next);
-      return next;
-    });
+    const refresh = () => setGame(loadState());
+    window.addEventListener("bmkicks:game-updated", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("bmkicks:game-updated", refresh);
+      window.removeEventListener("storage", refresh);
+    };
   }, []);
 
   useEffect(() => {
@@ -177,19 +138,12 @@ export default function Rewards() {
     setSpinAngle((a) => a + turns * 360);
     setTimeout(() => {
       setSpinning(false);
-      setGame((prev) => {
-        const badges = [...prev.badges];
-        if (!badges.includes("spinner")) badges.push("spinner");
-        const next = {
-          ...prev,
-          lastSpin: todayStr(),
-          badges,
-          bonusPoints: prev.bonusPoints + reward,
-        };
-        saveState(next);
-        return next;
-      });
-      toast({ title: `🎉 +${reward} bonus points!`, description: "Daily spin reward" });
+      // Mark the spin so it's once-a-day, then award via global bonus toast.
+      const prev = loadState();
+      const badges = [...prev.badges];
+      if (!badges.includes("spinner")) badges.push("spinner");
+      saveState({ ...prev, lastSpin: todayStr(), badges });
+      awardBonus(reward, "Daily spin reward", "🎰");
     }, 3000);
   }, [canSpin, spinning]);
 
@@ -505,7 +459,6 @@ export default function Rewards() {
               ["Daily visit", "+15 pts"],
               ["View a product", "+2 pts"],
               ["Add to bag", "+10 pts"],
-              ["Complete checkout", "+1 pt per QAR spent"],
               ["Daily spin", "1–50 pts"],
               ["Unlock badge", "+50 pts"],
             ].map(([label, pts]) => (

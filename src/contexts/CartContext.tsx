@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { tryAddToCart } from "@/lib/badges";
 
 interface CartItem {
   id: string;
@@ -155,6 +156,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error;
         await loadCart();
       }
+
+      // Award bonus once per unique product (anti-exploit: re-adding won't earn again)
+      tryAddToCart(productId, 10);
     } catch (error: any) {
       console.error("Error adding to cart:", error);
       throw error;
