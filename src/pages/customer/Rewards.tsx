@@ -47,43 +47,14 @@ const BADGES = [
   { id: "streaker", label: "On a Streak", description: "Visited 3 days in a row", emoji: "⚡" },
 ];
 
-const STORAGE_KEY = "bmkicks-gamified-v1";
-const todayStr = () => new Date().toISOString().slice(0, 10);
-
-interface LocalGameState {
-  productViews: number;
-  lastVisit: string | null;
-  streak: number;
-  lastSpin: string | null;
-  badges: string[];
-  bonusPoints: number; // local-only (visual)
-}
-
-const defaultState: LocalGameState = {
-  productViews: 0,
-  lastVisit: null,
-  streak: 0,
-  lastSpin: null,
-  badges: [],
-  bonusPoints: 0,
-};
-
-function loadState(): LocalGameState {
-  if (typeof window === "undefined") return defaultState;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultState;
-    return { ...defaultState, ...JSON.parse(raw) };
-  } catch {
-    return defaultState;
-  }
-}
-
-function saveState(s: LocalGameState) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-  } catch {}
-}
+import {
+  loadGameState as loadState,
+  saveGameState as saveState,
+  awardBonus,
+  syncBadgeUnlocks,
+  todayStr,
+  type LocalGameState,
+} from "@/lib/badges";
 
 export default function Rewards() {
   const { user } = useAuth();
