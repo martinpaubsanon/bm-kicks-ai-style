@@ -175,18 +175,21 @@ export function LoyaltyProgress({ totalSpent, totalOrders, deliveredOrders }: Lo
         {/* Progress Bar */}
         {nextTier && (
           <div className="space-y-2">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{currentTier.name}</span>
-              <span>{Math.round(progressToNext)}%</span>
-              <span>{nextTier.name}</span>
+            <div className="flex justify-between items-end text-xs">
+              <span className="text-muted-foreground">{currentTier.name}</span>
+              <span className="text-foreground font-semibold">
+                You've spent {formatCurrency(totalSpent)} ({Math.round(progressToNext)}%)
+              </span>
+              <span className="text-muted-foreground">{nextTier.name}</span>
             </div>
             <Progress value={progressToNext} className="h-3" />
             <div className="flex justify-between text-[10px] text-muted-foreground">
-              <span>{formatCurrency(currentTier.min)}</span>
-              <span>{formatCurrency(nextTier.min)}</span>
+              <span>Starts at {formatCurrency(currentTier.min)}</span>
+              <span>Unlocks at {formatCurrency(nextTier.min)}</span>
             </div>
           </div>
         )}
+
 
         {/* Tier ladder */}
         <div className="flex items-center justify-between gap-1 pt-2">
