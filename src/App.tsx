@@ -3,11 +3,14 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ProtectedCustomerRoute } from "@/components/ProtectedCustomerRoute";
+import { BonusToast } from "@/components/BonusToast";
+import { tryDailyVisit } from "@/lib/badges";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
@@ -42,6 +45,15 @@ import OrderSuccess from "./pages/customer/OrderSuccess";
 
 const queryClient = new QueryClient();
 
+function DailyVisitTracker() {
+  useEffect(() => {
+    // small delay so the toast feels like a welcome, not part of initial load
+    const t = setTimeout(() => tryDailyVisit(15), 1200);
+    return () => clearTimeout(t);
+  }, []);
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -50,7 +62,9 @@ const App = () => (
           <TooltipProvider>
           <Toaster />
           <Sonner />
+          <BonusToast />
           <BrowserRouter>
+            <DailyVisitTracker />
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Index />} />
