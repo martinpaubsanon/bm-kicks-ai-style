@@ -113,6 +113,20 @@ export default function CustomerProfile() {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="birthdate">Birthday 🎂</Label>
+              <Input
+                id="birthdate"
+                type="date"
+                value={formData.birthdate}
+                onChange={(e) => setFormData({ ...formData, birthdate: e.target.value })}
+                max={new Date().toISOString().slice(0, 10)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Get bonus points every year on your birthday.
+              </p>
+            </div>
+
             <Button type="submit" disabled={loading}>
               {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Save Changes
