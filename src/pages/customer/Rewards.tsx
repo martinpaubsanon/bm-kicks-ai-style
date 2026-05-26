@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoyalty } from "@/hooks/useLoyalty";
@@ -7,15 +7,108 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { Gift, Copy, Sparkles, Store, Package, Ticket } from "lucide-react";
+import {
+  Gift,
+  Copy,
+  Sparkles,
+  Store,
+  Package,
+  Ticket,
+  Trophy,
+  Flame,
+  Lock,
+} from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+
+// ---------- Gamified config ----------
+const BADGES = [
+  { id: "first_steps", label: "First Steps", description: "Joined the BmKicks crew", emoji: "👟" },
+  { id: "browser", label: "Window Shopper", description: "Viewed 10 products", emoji: "👀" },
+  { id: "cart_starter", label: "Cart Starter", description: "Added your first item", emoji: "🛒" },
+  { id: "hypebeast", label: "Hypebeast", description: "Reached Level 3", emoji: "🔥" },
+  { id: "spinner", label: "Lucky Spinner", description: "Spun the daily wheel", emoji: "🎰" },
+  { id: "streaker", label: "On a Streak", description: "Visited 3 days in a row", emoji: "⚡" },
+];
+
+const STORAGE_KEY = "bmkicks-gamified-v1";
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
+interface LocalGameState {
+  productViews: number;
+  lastVisit: string | null;
+  streak: number;
+  lastSpin: string | null;
+  badges: string[];
+  bonusPoints: number; // local-only (visual)
+}
+
+const defaultState: LocalGameState = {
+  productViews: 0,
+  lastVisit: null,
+  streak: 0,
+  lastSpin: null,
+  badges: [],
+  bonusPoints: 0,
+};
+
+function loadState(): LocalGameState {
+  if (typeof window === "undefined") return defaultState;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState;
+    return { ...defaultState, ...JSON.parse(raw) };
+  } catch {
+    return defaultState;
+  }
+}
+
+function saveState(s: LocalGameState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  } catch {}
+}
 
 export default function Rewards() {
   const { user } = useAuth();
-  const { account, currentTier, nextTier, progressToNext, settings, loading, reload } = useLoyalty();
+  const {
+    account,
+    currentTier,
+    nextTier,
+    tiers,
+    progressToNext,
+    settings,
+    loading,
+    reload,
+  } = useLoyalty();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [rewards, setRewards] = useState<any[]>([]);
   const [redeeming, setRedeeming] = useState<string | null>(null);
+
+  const [game, setGame] = useState<LocalGameState>(loadState);
+  const [spinning, setSpinning] = useState(false);
+  const [spinAngle, setSpinAngle] = useState(0);
+
+  // record visit + streak on mount
+  useEffect(() => {
+    setGame((prev) => {
+      const today = todayStr();
+      if (prev.lastVisit === today) return prev;
+      let streak = prev.streak;
+      if (prev.lastVisit) {
+        const yest = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        streak = prev.lastVisit === yest ? streak + 1 : 1;
+      } else {
+        streak = 1;
+      }
+      const badges = [...prev.badges];
+      if (!badges.includes("first_steps")) badges.push("first_steps");
+      if (streak >= 3 && !badges.includes("streaker")) badges.push("streaker");
+      const next = { ...prev, lastVisit: today, streak, badges };
+      saveState(next);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -56,6 +149,33 @@ export default function Rewards() {
     reload();
   };
 
+  const canSpin = game.lastSpin !== todayStr();
+
+  const handleSpin = useCallback(() => {
+    if (!canSpin || spinning) return;
+    setSpinning(true);
+    const rewards = [10, 25, 50, 75, 100, 150, 250, 500];
+    const reward = rewards[Math.floor(Math.random() * rewards.length)];
+    const turns = 5 + Math.random() * 3;
+    setSpinAngle((a) => a + turns * 360);
+    setTimeout(() => {
+      setSpinning(false);
+      setGame((prev) => {
+        const badges = [...prev.badges];
+        if (!badges.includes("spinner")) badges.push("spinner");
+        const next = {
+          ...prev,
+          lastSpin: todayStr(),
+          badges,
+          bonusPoints: prev.bonusPoints + reward,
+        };
+        saveState(next);
+        return next;
+      });
+      toast({ title: `🎉 +${reward} bonus points!`, description: "Daily spin reward" });
+    }, 3000);
+  }, [canSpin, spinning]);
+
   if (loading || !account) {
     return (
       <div className="flex items-center justify-center min-h-96">
@@ -65,73 +185,217 @@ export default function Rewards() {
   }
 
   const filtered = (kind: string) => rewards.filter((r) => r.kind === kind);
+  const totalPoints = account.lifetime_points + game.bonusPoints;
+  const currentLevelIndex = tiers.findIndex((t) => t.name === currentTier?.name);
 
   return (
     <div className="space-y-6">
       <Breadcrumbs items={[{ label: "Dashboard", href: "/customer" }, { label: "Rewards" }]} />
 
-      {/* Tier card */}
-      <Card className="glass-surface border-border/60 overflow-hidden relative">
-        <div className="absolute -top-20 -right-10 w-72 h-72 rounded-full bg-primary/10 blur-3xl" />
-        <CardContent className="relative p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      {/* === Gamified status card === */}
+      <div className="rounded-2xl p-[2px] bg-[linear-gradient(135deg,#ec4899,#4ade80)] shadow-[0_0_40px_-10px_rgba(236,72,153,0.6)]">
+        <div className="rounded-2xl bg-card p-6 md:p-8">
+          <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-                Inner Circle Member
+              <p className="text-xs uppercase tracking-widest font-bold mb-2 text-[#4ade80]">
+                Your Status
               </p>
-              <h1 className="font-display text-5xl md:text-6xl mt-1">
-                {account.current_tier}
-                {currentTier && currentTier.multiplier > 1 && (
-                  <span className="text-gold text-2xl ml-3">{currentTier.multiplier}x earn</span>
-                )}
+              <h1 className="text-4xl md:text-5xl font-black bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent">
+                {currentTier?.name ?? account.current_tier}
               </h1>
-              <p className="text-muted-foreground mt-2">
-                Lifetime points: {account.lifetime_points.toLocaleString()}
-              </p>
+              <p className="text-muted-foreground mt-1">Member of the BmKicks Crew</p>
             </div>
             <div className="text-right">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-                Available balance
+              <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
+                Total Points
               </p>
-              <p className="font-display text-5xl text-gold">
-                {account.points_balance.toLocaleString()}
+              <p className="text-5xl font-black font-mono bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent">
+                {totalPoints.toLocaleString()}
               </p>
-              <p className="text-xs text-muted-foreground">points</p>
             </div>
           </div>
-
           {nextTier ? (
-            <div className="mt-8 space-y-2">
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{currentTier?.name}</span>
-                <span>
-                  {(nextTier.min_points - account.lifetime_points).toLocaleString()} pts to {nextTier.name}
+            <>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="font-bold">{currentTier?.name}</span>
+                <span className="text-muted-foreground">
+                  {Math.max(0, nextTier.min_points - account.lifetime_points).toLocaleString()} pts
+                  to <span className="text-[#4ade80] font-bold">{nextTier.name}</span>
                 </span>
               </div>
-              <Progress value={progressToNext} className="h-2" />
-            </div>
+              <Progress
+                value={progressToNext}
+                className="h-2 bg-secondary [&>div]:bg-[linear-gradient(90deg,#ec4899,#4ade80)]"
+              />
+            </>
           ) : (
-            <p className="mt-6 text-sm text-gold">You've reached the top tier. Enjoy the perks.</p>
+            <p className="text-[#4ade80] font-bold flex items-center gap-2">
+              <Trophy className="w-5 h-5" /> Max tier reached — you're a Legend.
+            </p>
           )}
+          <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-border">
+            <Stat
+              label="Streak"
+              value={`${game.streak}d`}
+              icon={<Flame className="w-4 h-4" />}
+            />
+            <Stat
+              label="Products viewed"
+              value={game.productViews}
+              icon={<Sparkles className="w-4 h-4" />}
+            />
+            <Stat
+              label="Badges"
+              value={`${game.badges.length}/${BADGES.length}`}
+              icon={<Trophy className="w-4 h-4" />}
+            />
+          </div>
+        </div>
+      </div>
 
-          {currentTier?.perks && currentTier.perks.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-6">
-              {currentTier.perks.map((p, i) => (
-                <span
-                  key={i}
-                  className="text-xs px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-foreground"
-                >
-                  <Sparkles className="inline w-3 h-3 mr-1 text-primary" />
-                  {p}
-                </span>
-              ))}
+      {/* === Spin + Crew Ranks === */}
+      <section className="grid md:grid-cols-2 gap-6">
+        {/* Daily Spin */}
+        <Card className="border-border/60">
+          <CardContent className="p-6 flex flex-col items-center text-center">
+            <h2 className="text-2xl font-black mb-2 flex items-center gap-2">
+              <Gift className="w-6 h-6 text-[#4ade80]" /> Daily Spin
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Free points every day. No catch.
+            </p>
+            <div className="relative w-56 h-56 mb-6">
+              <div
+                className="absolute inset-0 rounded-full border-4 border-[#ec4899] transition-transform ease-out"
+                style={{
+                  transform: `rotate(${spinAngle}deg)`,
+                  transitionDuration: "3s",
+                  background:
+                    "conic-gradient(#ec4899 0deg 45deg, #4ade80 45deg 90deg, #ec4899 90deg 135deg, #4ade80 135deg 180deg, #ec4899 180deg 225deg, #4ade80 225deg 270deg, #ec4899 270deg 315deg, #4ade80 315deg 360deg)",
+                }}
+              />
+              <div className="absolute inset-8 rounded-full bg-card border-2 border-border flex items-center justify-center text-3xl font-black">
+                🎰
+              </div>
+              <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-[#4ade80]" />
             </div>
-          )}
+            <Button
+              onClick={handleSpin}
+              disabled={spinning || !canSpin}
+              className="w-full font-bold text-foreground bg-[linear-gradient(90deg,#ec4899,#4ade80)] hover:opacity-90"
+              size="lg"
+            >
+              {spinning ? "Spinning..." : canSpin ? "Spin to Win" : "Come back tomorrow"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Crew Ranks */}
+        <Card className="border-border/60">
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-black mb-4">Crew Ranks</h2>
+            <div className="space-y-3">
+              {tiers.map((tier, i) => {
+                const unlocked = i <= currentLevelIndex;
+                const isYou = i === currentLevelIndex;
+                return (
+                  <div
+                    key={tier.id}
+                    className={cn(
+                      "flex items-center justify-between p-3 rounded-lg border",
+                      isYou
+                        ? "border-[#ec4899] bg-secondary/40 shadow-[0_0_20px_-8px_#ec4899]"
+                        : unlocked
+                          ? "border-border bg-secondary/40"
+                          : "border-border opacity-50",
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      {unlocked ? (
+                        <Trophy
+                          className="w-5 h-5"
+                          style={{ color: tier.color_hex ?? "#ec4899" }}
+                        />
+                      ) : (
+                        <Lock className="w-5 h-5 text-muted-foreground" />
+                      )}
+                      <div>
+                        <p
+                          className="font-bold"
+                          style={{ color: unlocked ? tier.color_hex ?? undefined : undefined }}
+                        >
+                          {tier.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {tier.min_points.toLocaleString()}+ points
+                        </p>
+                      </div>
+                    </div>
+                    {isYou && (
+                      <span className="text-xs font-bold px-2 py-1 rounded bg-[#4ade80] text-black">
+                        YOU
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* === Achievements === */}
+      <section>
+        <h2 className="text-2xl font-black mb-4">Achievements</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {BADGES.map((b) => {
+            const earned = game.badges.includes(b.id);
+            return (
+              <div
+                key={b.id}
+                className={cn(
+                  "p-4 rounded-xl border text-center transition-all",
+                  earned
+                    ? "border-[#4ade80] bg-secondary/40 shadow-[0_0_20px_-10px_#4ade80]"
+                    : "border-border opacity-50",
+                )}
+              >
+                <div className="text-4xl mb-2">{earned ? b.emoji : "🔒"}</div>
+                <p className="font-bold text-sm">{b.label}</p>
+                <p className="text-xs text-muted-foreground mt-1">{b.description}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* === How to earn === */}
+      <Card className="border-border/60">
+        <CardContent className="p-6">
+          <h2 className="text-2xl font-black mb-4">How to Earn</h2>
+          <ul className="grid md:grid-cols-2 gap-3 text-sm">
+            {[
+              ["Daily visit", "+15 pts"],
+              ["View a product", "+2 pts"],
+              ["Add to bag", "+10 pts"],
+              ["Complete checkout", "+1 pt per QAR spent"],
+              ["Daily spin", "10–500 pts"],
+              ["Unlock badge", "+50 pts"],
+            ].map(([label, pts]) => (
+              <li
+                key={label}
+                className="flex justify-between p-3 rounded-lg bg-secondary/40 border border-border/40"
+              >
+                <span>{label}</span>
+                <span className="font-bold text-[#4ade80] font-mono">{pts}</span>
+              </li>
+            ))}
+          </ul>
         </CardContent>
       </Card>
 
-      {/* Referral */}
-      <Card className="glass-surface border-border/60">
+      {/* === Referral === */}
+      <Card className="border-border/60">
         <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
@@ -142,14 +406,14 @@ export default function Rewards() {
               Earn {settings?.referral_bonus ?? 500} pts when a friend places their first order.
             </p>
           </div>
-          <Button onClick={copyReferral} variant="outline" className="glass-surface">
+          <Button onClick={copyReferral} variant="outline">
             <Copy className="w-4 h-4 mr-2" /> Copy code
           </Button>
         </CardContent>
       </Card>
 
-      {/* Reward catalog */}
-      <Card className="glass-surface border-border/60">
+      {/* === Reward catalog === */}
+      <Card className="border-border/60">
         <CardHeader>
           <CardTitle className="font-display text-2xl uppercase tracking-tight">
             Reward catalog
@@ -191,7 +455,7 @@ export default function Rewards() {
                       return (
                         <div
                           key={r.id}
-                          className="glass-surface rounded-2xl p-4 flex flex-col gap-3"
+                          className="rounded-2xl p-4 flex flex-col gap-3 border border-border/60 bg-card"
                         >
                           {r.image_url && (
                             <img
@@ -214,12 +478,14 @@ export default function Rewards() {
                             )}
                           </div>
                           <div className="mt-auto flex items-center justify-between">
-                            <span className="font-display text-lg text-gold">
+                            <span className="font-display text-lg text-[#4ade80]">
                               {r.points_cost.toLocaleString()} pts
                             </span>
                             <Button
                               size="sm"
-                              disabled={!canAfford || !settings?.redemption_enabled || redeeming === r.id}
+                              disabled={
+                                !canAfford || !settings?.redemption_enabled || redeeming === r.id
+                              }
                               onClick={() => handleRedeem(r.id)}
                             >
                               {redeeming === r.id ? "..." : canAfford ? "Redeem" : "Not enough"}
@@ -236,8 +502,8 @@ export default function Rewards() {
         </CardContent>
       </Card>
 
-      {/* History */}
-      <Card className="glass-surface border-border/60">
+      {/* === History === */}
+      <Card className="border-border/60">
         <CardHeader>
           <CardTitle className="font-display text-xl uppercase tracking-tight">
             Points history
@@ -262,7 +528,7 @@ export default function Rewards() {
                   </div>
                   <span
                     className={`font-display text-base ${
-                      t.delta > 0 ? "text-gold" : "text-muted-foreground"
+                      t.delta > 0 ? "text-[#4ade80]" : "text-muted-foreground"
                     }`}
                   >
                     {t.delta > 0 ? "+" : ""}
@@ -274,6 +540,25 @@ export default function Rewards() {
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground font-bold mb-1">
+        {icon} {label}
+      </div>
+      <p className="text-2xl font-black font-mono">{value}</p>
     </div>
   );
 }
