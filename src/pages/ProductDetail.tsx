@@ -179,9 +179,29 @@ const ProductDetail = () => {
     `Shop the ${product.brand} ${product.name} at BM Kicks. Authentic sneakers with fast delivery in Qatar.`;
   const seoDesc = seoDescRaw.length > 155 ? seoDescRaw.slice(0, 152) + "..." : seoDescRaw;
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: `${product.brand} ${product.name}`,
+    description: seoDescRaw,
+    image: images,
+    brand: { "@type": "Brand", name: product.brand },
+    category: product.category,
+    offers: {
+      "@type": "Offer",
+      url: `https://bmkicks.shop/product/${product.id}`,
+      priceCurrency: "QAR",
+      price: effectivePrice,
+      availability: availableSizes.length > 0
+        ? (effectiveIsPreorder ? "https://schema.org/PreOrder" : "https://schema.org/InStock")
+        : "https://schema.org/OutOfStock",
+      seller: { "@type": "Organization", name: "BM Kicks" },
+    },
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <PageSEO title={seoTitle} description={seoDesc} path={`/product/${product.id}`} />
+      <PageSEO title={seoTitle} description={seoDesc} path={`/product/${product.id}`} jsonLd={productJsonLd} />
       <Header />
 
 

@@ -4,10 +4,12 @@ interface PageSEOProps {
   title: string;
   description: string;
   path?: string;
+  jsonLd?: object | object[];
 }
 
-export const PageSEO = ({ title, description, path }: PageSEOProps) => {
+export const PageSEO = ({ title, description, path, jsonLd }: PageSEOProps) => {
   const url = path ? `https://bmkicks.shop${path}` : undefined;
+  const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   return (
     <Helmet>
       <title>{title}</title>
@@ -18,6 +20,11 @@ export const PageSEO = ({ title, description, path }: PageSEOProps) => {
       {url && <meta property="og:url" content={url} />}
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
+      {schemas.map((schema, i) => (
+        <script key={i} type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      ))}
     </Helmet>
   );
 };
