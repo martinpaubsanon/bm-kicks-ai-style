@@ -68,25 +68,15 @@ export default function Rewards() {
   const [spinning, setSpinning] = useState(false);
   const [spinAngle, setSpinAngle] = useState(0);
 
-  // record visit + streak on mount
+  // Stay in sync with localStorage updates triggered elsewhere (toast events, etc.)
   useEffect(() => {
-    setGame((prev) => {
-      const today = todayStr();
-      if (prev.lastVisit === today) return prev;
-      let streak = prev.streak;
-      if (prev.lastVisit) {
-        const yest = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-        streak = prev.lastVisit === yest ? streak + 1 : 1;
-      } else {
-        streak = 1;
-      }
-      const badges = [...prev.badges];
-      if (!badges.includes("first_steps")) badges.push("first_steps");
-      if (streak >= 3 && !badges.includes("streaker")) badges.push("streaker");
-      const next = { ...prev, lastVisit: today, streak, badges };
-      saveState(next);
-      return next;
-    });
+    const refresh = () => setGame(loadState());
+    window.addEventListener("bmkicks:game-updated", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("bmkicks:game-updated", refresh);
+      window.removeEventListener("storage", refresh);
+    };
   }, []);
 
   useEffect(() => {
