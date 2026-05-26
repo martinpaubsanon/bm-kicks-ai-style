@@ -192,7 +192,7 @@ export default function Checkout() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-background pt-24 pb-8">
+      <main className="min-h-screen bg-background pt-24 pb-8">
         <div className="container max-w-4xl">
           <Breadcrumbs items={[{ label: "Cart", href: "/" }, { label: "Checkout" }]} />
           <h1 className="text-3xl font-bold my-6">Checkout</h1>
