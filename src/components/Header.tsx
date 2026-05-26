@@ -24,7 +24,7 @@ export const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const { user, customerProfile, signOut } = useAuth();
   const { cartCount } = useCart();
-  const { account, currentTier, displayPoints } = useLoyalty();
+  const { account, currentTier, combinedScore } = useLoyalty();
   const navigate = useNavigate();
 
   return (
