@@ -32,7 +32,8 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   };
 
   const formatPriceWrapper = (amount: number, fromCurrency: Currency = 'QAR') => {
-    return formatCurrency(amount, selectedCurrency);
+    const amountInQAR = convertPrice(amount, fromCurrency, 'QAR');
+    return formatCurrency(amountInQAR, selectedCurrency);
   };
 
   const exchangeRate = CURRENCIES[selectedCurrency].rate;
