@@ -673,3 +673,47 @@ function Stat({
     </div>
   );
 }
+
+function StatTile({
+  label,
+  value,
+  suffix,
+  icon,
+  accent,
+  gradient,
+}: {
+  label: string;
+  value: string | number;
+  suffix?: string;
+  icon: React.ReactNode;
+  accent?: string;
+  gradient?: boolean;
+}) {
+  return (
+    <div
+      className="rounded-xl border border-border bg-secondary/40 p-4 relative overflow-hidden"
+      style={accent ? { borderColor: `${accent}55` } : undefined}
+    >
+      <div
+        className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold mb-2"
+        style={{ color: accent ?? undefined }}
+      >
+        {icon} {label}
+      </div>
+      <p
+        className={cn(
+          "text-3xl font-black font-mono leading-none",
+          gradient &&
+            "bg-[linear-gradient(135deg,#ec4899,#4ade80)] bg-clip-text text-transparent",
+        )}
+      >
+        {value}
+        {suffix && (
+          <span className="text-sm font-bold ml-1 text-muted-foreground">
+            {suffix}
+          </span>
+        )}
+      </p>
+    </div>
+  );
+}
