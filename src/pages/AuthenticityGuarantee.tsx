@@ -214,8 +214,8 @@ export default function AuthenticityGuarantee() {
             <div className="flex gap-3 items-start bg-amber-50 dark:bg-amber-950/20 p-6 rounded-lg">
               <AlertCircle className="h-6 w-6 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">Official Website Only</h3>
-                <p className="text-foreground/80 leading-relaxed">
+                <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2">Official Website Only</h3>
+                <p className="text-amber-900/90 dark:text-amber-100/90 leading-relaxed">
                   Only purchase from our official website (www.bmkicks.shop) or authorized retail partners. We are not responsible for products purchased from unauthorized sellers, social media marketplaces, or third-party websites claiming to represent BM Kicks.
                 </p>
               </div>
