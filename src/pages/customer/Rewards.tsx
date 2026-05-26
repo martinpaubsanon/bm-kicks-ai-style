@@ -130,7 +130,7 @@ export default function Rewards() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [txnRes, rewardsRes] = await Promise.all([
+      const [txnRes, rewardsRes, ordersRes] = await Promise.all([
         supabase
           .from("loyalty_transactions" as any)
           .select("*")
@@ -142,9 +142,18 @@ export default function Rewards() {
           .select("*, loyalty_partners(name, logo_url, category)")
           .eq("is_active", true)
           .order("sort_order"),
+        supabase
+          .from("orders")
+          .select("total")
+          .eq("user_id", user.id),
       ]);
       if (txnRes.data) setTransactions(txnRes.data as any[]);
       if (rewardsRes.data) setRewards(rewardsRes.data as any[]);
+      if (ordersRes.data) {
+        setTotalSpent(
+          ordersRes.data.reduce((sum: number, o: any) => sum + Number(o.total ?? 0), 0)
+        );
+      }
     })();
   }, [user]);
 
