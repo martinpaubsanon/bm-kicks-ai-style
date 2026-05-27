@@ -55,10 +55,10 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
                 <div className="flex items-stretch gap-3 glass-surface rounded-2xl p-3 w-fit">
                   <div className="flex flex-col px-2">
                     <span className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold mb-0.5">
-                      Your points
+                      Total points
                     </span>
                     <span className="font-display text-2xl text-gold">
-                      {displayPoints.toLocaleString()}
+                      {lifetimePoints.toLocaleString()}
                     </span>
                   </div>
                   <div className="w-px bg-border" />
