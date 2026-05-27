@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
+import cosmeticsImage from "@/assets/category-cosmetics.jpg";
 
 const categories = [
   {
@@ -36,7 +37,7 @@ const categories = [
   {
     title: "Cosmetics",
     description: "Glow up, head to toe",
-    image: "https://images.unsplash.com/photo-1522335789203-aaa18e7b5777?w=800",
+    image: cosmeticsImage,
     category: "Cosmetics"
   }
 ];
