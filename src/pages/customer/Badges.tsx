@@ -35,27 +35,69 @@ export default function Badges() {
   const [totalSpent, setTotalSpent] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
   const [referralsCompleted, setReferralsCompleted] = useState(0);
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
+  const [brandCounts, setBrandCounts] = useState<Record<string, number>>({});
+  const [maxItemPrice, setMaxItemPrice] = useState(0);
+  const [maxOrderTotal, setMaxOrderTotal] = useState(0);
   const [filter, setFilter] = useState<string>("all");
   const game = loadGameState();
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [ordersRes, refRes] = await Promise.all([
-        supabase.from("orders").select("total").eq("user_id", user.id),
+      const [ordersRes, refRes, itemsRes] = await Promise.all([
+        supabase.from("orders").select("id, total").eq("user_id", user.id),
         supabase
           .from("loyalty_referrals" as any)
           .select("id", { count: "exact", head: true })
           .eq("referrer_user_id", user.id)
           .eq("status", "completed"),
+        supabase
+          .from("order_items")
+          .select("quantity, actual_price, product_id, orders!inner(user_id)")
+          .eq("orders.user_id", user.id),
       ]);
       if (ordersRes.data) {
         setOrderCount(ordersRes.data.length);
-        setTotalSpent(
-          ordersRes.data.reduce((s: number, o: any) => s + Number(o.total ?? 0), 0),
-        );
+        const orderTotals = ordersRes.data.map((o: any) => Number(o.total ?? 0));
+        setTotalSpent(orderTotals.reduce((s, n) => s + n, 0));
+        setMaxOrderTotal(orderTotals.length ? Math.max(...orderTotals) : 0);
       }
       if (typeof refRes.count === "number") setReferralsCompleted(refRes.count);
+
+      // Build category/brand counts + max single-item price from order items
+      const items = (itemsRes.data ?? []) as any[];
+      const productIds = Array.from(
+        new Set(items.map((i) => i.product_id).filter(Boolean)),
+      );
+      let maxPrice = 0;
+      for (const it of items) {
+        const p = Number(it.actual_price ?? 0);
+        if (p > maxPrice) maxPrice = p;
+      }
+      setMaxItemPrice(maxPrice);
+
+      if (productIds.length) {
+        const { data: prods } = await supabase
+          .from("products")
+          .select("id, category, brand")
+          .in("id", productIds);
+        const byId: Record<string, { category?: string; brand?: string }> = {};
+        (prods ?? []).forEach((p: any) => {
+          byId[p.id] = { category: p.category, brand: p.brand };
+        });
+        const cc: Record<string, number> = {};
+        const bc: Record<string, number> = {};
+        for (const it of items) {
+          const meta = byId[it.product_id];
+          if (!meta) continue;
+          const qty = Number(it.quantity ?? 1);
+          if (meta.category) cc[meta.category] = (cc[meta.category] ?? 0) + qty;
+          if (meta.brand) bc[meta.brand] = (bc[meta.brand] ?? 0) + qty;
+        }
+        setCategoryCounts(cc);
+        setBrandCounts(bc);
+      }
     })();
   }, [user]);
 
