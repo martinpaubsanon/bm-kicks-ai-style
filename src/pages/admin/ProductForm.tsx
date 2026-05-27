@@ -32,6 +32,7 @@ export default function ProductForm() {
     name: "",
     brand: "",
     category: "Running",
+    gender: "unisex",
     description: "",
     price: "",
     images: [] as string[],
