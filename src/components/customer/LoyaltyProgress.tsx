@@ -266,6 +266,7 @@ export function LoyaltyProgress({
           {visibleTiers.map((tier) => {
             const Icon = tier.icon;
             const reached = combined >= tier.min;
+            const masked = SECRET_TIER_NAMES.has(tier.name) && !hasDiamond;
 
             return (
               <div
@@ -278,22 +279,28 @@ export function LoyaltyProgress({
                     reached
                       ? cn(tier.bg, "ring-1 ring-border")
                       : "bg-muted/30 opacity-40",
+                    masked && "border border-dashed border-muted-foreground/40",
                   )}
                 >
-                  <Icon
-                    className={cn(
-                      "h-4 w-4",
-                      reached ? tier.color : "text-muted-foreground",
-                    )}
-                  />
+                  {masked ? (
+                    <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                  ) : (
+                    <Icon
+                      className={cn(
+                        "h-4 w-4",
+                        reached ? tier.color : "text-muted-foreground",
+                      )}
+                    />
+                  )}
                 </div>
                 <span
                   className={cn(
                     "text-[9px] md:text-[10px] truncate w-full text-center",
                     reached ? "text-foreground font-medium" : "text-muted-foreground",
+                    masked && "italic",
                   )}
                 >
-                  {tier.name}
+                  {tierLabel(tier)}
                 </span>
               </div>
             );
