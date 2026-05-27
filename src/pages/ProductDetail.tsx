@@ -387,43 +387,47 @@ const ProductDetail = () => {
             </div>
 
             {/* Size Selector */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-semibold">Select Size (US)</h2>
+            {!isInquiryOnly && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-semibold">Select Size (US)</h2>
+                </div>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  {availableSizes.map(([size, stock]) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`relative py-3 px-2 rounded border-2 transition-all font-medium ${
+                        selectedSize === size
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      {size}
+                      {stock < 5 && (
+                        <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+                {availableSizes.length === 0 && (
+                  <p className="text-destructive">Out of stock</p>
+                )}
               </div>
-              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                {availableSizes.map(([size, stock]) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`relative py-3 px-2 rounded border-2 transition-all font-medium ${
-                      selectedSize === size
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    {size}
-                    {stock < 5 && (
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" />
-                    )}
-                  </button>
-                ))}
-              </div>
-              {availableSizes.length === 0 && (
-                <p className="text-destructive">Out of stock</p>
-              )}
-            </div>
+            )}
 
             {/* Add to Cart */}
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={handleAddToCart}
-              disabled={availableSizes.length === 0 || addingToCart}
-            >
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              {effectiveIsPreorder ? "Pre-Order Now (50% Down)" : "Add to Cart"}
-            </Button>
+            {!isInquiryOnly && (
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={handleAddToCart}
+                disabled={availableSizes.length === 0 || addingToCart}
+              >
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                {effectiveIsPreorder ? "Pre-Order Now (50% Down)" : "Add to Cart"}
+              </Button>
+            )}
 
             {/* WhatsApp Help */}
             <div className="pt-6 border-t border-border">
