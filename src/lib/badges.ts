@@ -469,6 +469,7 @@ export const BADGES: BadgeDef[] = [
     emoji: "🔮",
     rarity: "legendary",
     category: "elite",
+    secret: true,
     check: (c) => c.combinedScore >= 30000,
   },
   {
@@ -478,6 +479,7 @@ export const BADGES: BadgeDef[] = [
     emoji: "🜲",
     rarity: "legendary",
     category: "elite",
+    secret: true,
     check: (c) => c.combinedScore >= 50000,
   },
 
