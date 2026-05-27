@@ -123,7 +123,7 @@ export function LoyaltyProgress({
       segWidth;
 
 
-  const achievements: Achievement[] = [
+  const allAchievements: (Achievement & { secret?: boolean })[] = [
     { id: "first",        name: "First Step",           description: "Place your first order",         icon: ShoppingBag, emoji: "👟", unlocked: totalOrders >= 1,        color: "text-green-400" },
     { id: "repeat",       name: "Coming Back",          description: "Complete 3 orders",              icon: Repeat,      emoji: "🔁", unlocked: totalOrders >= 3,        color: "text-blue-400" },
     { id: "loyal",        name: "Loyal Fan",            description: "Complete 10 orders",             icon: Heart,       emoji: "❤️", unlocked: totalOrders >= 10,       color: "text-rose-400" },
@@ -139,14 +139,17 @@ export function LoyaltyProgress({
     { id: "influencer",   name: "Influencer",           description: "Refer 5 friends",               icon: PartyPopper, emoji: "📣", unlocked: referralsCompleted >= 5, color: "text-amber-400" },
     { id: "collector",    name: "Badge Collector",      description: "Earn 5 badges",                  icon: Trophy,      emoji: "🏆", unlocked: badgesEarned >= 5,       color: "text-yellow-300" },
     { id: "vip",          name: "VIP Status",           description: "Reach Gold tier",                icon: Crown,       emoji: "👑", unlocked: currentTierIndex >= 3,   color: "text-yellow-400" },
-    { id: "mythic",       name: "Mythic Ascended",      description: "Reach Mythic tier",              icon: Sparkles,    emoji: "🔮", unlocked: currentTierIndex >= 5,   color: "text-purple-300" },
-    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier",             icon: Gem,         emoji: "💎", unlocked: currentTierIndex >= 6,   color: "text-fuchsia-300" },
+    { id: "legend",       name: "Living Legend",        description: `Reach Diamond tier (${formatCurrency(20000)})`, icon: Gem, emoji: "💎", unlocked: currentTierIndex >= DIAMOND_INDEX, color: "text-fuchsia-300" },
     { id: "saver",        name: "Point Saver",          description: "Hold 1,000 points",              icon: Coins,       emoji: "🪙", unlocked: pointsBalance >= 1000,   color: "text-amber-300" },
     { id: "gifter",       name: "Gift Giver",           description: "Redeem a reward",                icon: Gift,        emoji: "🎁", unlocked: false,                   color: "text-rose-300" },
+    // Secret achievements — hidden until Diamond is reached
+    { id: "mythic",       name: "Mythic Ascended",      description: `Reach Mythic tier (${formatCurrency(30000)})`,  icon: Sparkles, emoji: "🔮", unlocked: currentTierIndex >= 6, color: "text-purple-300", secret: true },
+    { id: "arcana",       name: "Arcana Awakened",      description: `Reach Arcana tier (${formatCurrency(50000)})`,  icon: Sparkles, emoji: "🜲", unlocked: currentTierIndex >= 7, color: "text-pink-300",   secret: true },
   ];
 
-
+  const achievements = allAchievements.filter((a) => hasDiamond || !a.secret);
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
+
 
   return (
     <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-primary/5">
