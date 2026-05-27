@@ -260,8 +260,7 @@ export default function Rewards() {
                 Crew Journey
               </span>
               <span className="font-mono">
-                {formatCurrency(combinedScore)} /{" "}
-                {formatCurrency(SPEND_TIERS[SPEND_TIERS.length - 1].min)}
+                {combinedScore.toLocaleString()} pts / {tierMinLabel(SPEND_TIERS[SPEND_TIERS.length - 1])}
               </span>
             </div>
             {(() => {
