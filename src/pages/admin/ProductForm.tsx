@@ -350,6 +350,28 @@ export default function ProductForm() {
             </div>
 
             <div>
+              <Label htmlFor="gender">Gender / Audience *</Label>
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => setFormData({ ...formData, gender: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="men">Men (Kings)</SelectItem>
+                  <SelectItem value="women">Women (Queens)</SelectItem>
+                  <SelectItem value="unisex">Unisex (Everyone)</SelectItem>
+                  <SelectItem value="kids">Kids</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground mt-1">
+                Drives the homepage Kings / Queens filter
+              </p>
+            </div>
+
+
+            <div>
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
