@@ -72,6 +72,7 @@ export default function ProductForm() {
         name: data.name || "",
         brand: data.brand || "",
         category: data.category || "Running",
+        gender: (data as any).gender || "unisex",
         description: data.description || "",
         price: data.price?.toString() || "",
         images: data.images || [],
