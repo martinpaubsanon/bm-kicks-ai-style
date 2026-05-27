@@ -112,6 +112,7 @@ export default function Badges() {
     orderCount,
     pointsBalance: account?.points_balance ?? 0,
     lifetimePoints: account?.lifetime_points ?? 0,
+    combinedScore,
     tierIndex,
     game,
     referralsCompleted,
@@ -120,6 +121,9 @@ export default function Badges() {
     maxItemPrice,
     maxOrderTotal,
   };
+
+  // Diamond is tier index 5. Secret badges stay masked until then.
+  const hasDiamond = tierIndex >= 5;
 
   const earned = useMemo(() => computeEarnedBadges(ctx), [ctx]);
 
