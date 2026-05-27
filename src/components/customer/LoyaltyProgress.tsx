@@ -130,9 +130,9 @@ export function LoyaltyProgress({
     { id: "first",        name: "First Step",           description: "Place your first order",         icon: ShoppingBag, emoji: "👟", unlocked: totalOrders >= 1,        color: "text-green-400" },
     { id: "repeat",       name: "Coming Back",          description: "Complete 3 orders",              icon: Repeat,      emoji: "🔁", unlocked: totalOrders >= 3,        color: "text-blue-400" },
     { id: "loyal",        name: "Loyal Fan",            description: "Complete 10 orders",             icon: Heart,       emoji: "❤️", unlocked: totalOrders >= 10,       color: "text-rose-400" },
-    { id: "bigspender",   name: "Big Spender",          description: `Spend ${formatCurrency(5000)}`,  icon: Flame,       emoji: "🔥", unlocked: totalSpent >= 5000,      color: "text-orange-400" },
+    { id: "bigspender",   name: "Big Spender",          description: "Earn 5,000 points",              icon: Flame,       emoji: "🔥", unlocked: combined >= 5000,        color: "text-orange-400" },
     { id: "delivered5",   name: "Verified Sneakerhead", description: "5 delivered orders",             icon: Zap,         emoji: "👟", unlocked: deliveredOrders >= 5,    color: "text-yellow-400" },
-    { id: "elite",        name: "Elite Collector",      description: `Spend ${formatCurrency(10000)}`, icon: Sparkles,    emoji: "✨", unlocked: totalSpent >= 10000,     color: "text-fuchsia-400" },
+    { id: "elite",        name: "Elite Collector",      description: "Earn 10,000 points",             icon: Sparkles,    emoji: "✨", unlocked: combined >= 10000,       color: "text-fuchsia-400" },
     { id: "browser",      name: "Window Shopper",       description: "View 10 products",               icon: Eye,         emoji: "👀", unlocked: productViews >= 10,      color: "text-sky-400" },
     { id: "explorer",     name: "Explorer",             description: "View 50 products",               icon: Target,      emoji: "🧭", unlocked: productViews >= 50,      color: "text-indigo-400" },
     { id: "streaker",     name: "On a Streak",          description: "Visit 3 days in a row",          icon: Calendar,    emoji: "⚡", unlocked: streak >= 3,             color: "text-emerald-400" },
@@ -142,15 +142,16 @@ export function LoyaltyProgress({
     { id: "influencer",   name: "Influencer",           description: "Refer 5 friends",               icon: PartyPopper, emoji: "📣", unlocked: referralsCompleted >= 5, color: "text-amber-400" },
     { id: "collector",    name: "Badge Collector",      description: "Earn 5 badges",                  icon: Trophy,      emoji: "🏆", unlocked: badgesEarned >= 5,       color: "text-yellow-300" },
     { id: "vip",          name: "VIP Status",           description: "Reach Gold tier",                icon: Crown,       emoji: "👑", unlocked: currentTierIndex >= 3,   color: "text-yellow-400" },
-    { id: "legend",       name: "Living Legend",        description: `Reach Diamond tier (${formatCurrency(20000)})`, icon: Gem, emoji: "💎", unlocked: currentTierIndex >= DIAMOND_INDEX, color: "text-fuchsia-300" },
+    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier (20,000 pts)", icon: Gem,        emoji: "💎", unlocked: currentTierIndex >= DIAMOND_INDEX, color: "text-fuchsia-300" },
     { id: "saver",        name: "Point Saver",          description: "Hold 1,000 points",              icon: Coins,       emoji: "🪙", unlocked: pointsBalance >= 1000,   color: "text-amber-300" },
     { id: "gifter",       name: "Gift Giver",           description: "Redeem a reward",                icon: Gift,        emoji: "🎁", unlocked: false,                   color: "text-rose-300" },
-    // Secret achievements — hidden until Diamond is reached
-    { id: "mythic",       name: "Mythic Ascended",      description: `Reach Mythic tier (${formatCurrency(30000)})`,  icon: Sparkles, emoji: "🔮", unlocked: currentTierIndex >= 6, color: "text-purple-300", secret: true },
-    { id: "arcana",       name: "Arcana Awakened",      description: `Reach Arcana tier (${formatCurrency(50000)})`,  icon: Sparkles, emoji: "🜲", unlocked: currentTierIndex >= 7, color: "text-pink-300",   secret: true },
+    // Secret achievements — masked until Diamond is reached
+    { id: "mythic",       name: "Mythic Ascended",      description: "Earn 30,000 points",             icon: Sparkles, emoji: "🔮", unlocked: currentTierIndex >= 6, color: "text-purple-300", secret: true },
+    { id: "arcana",       name: "Arcana Awakened",      description: "Earn 50,000 points",             icon: Sparkles, emoji: "🜲", unlocked: currentTierIndex >= 7, color: "text-pink-300",   secret: true },
   ];
 
-  const achievements = allAchievements.filter((a) => hasDiamond || !a.secret);
+  // Always include secret achievements so they show as locked mystery cards
+  const achievements = allAchievements;
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
 
 
