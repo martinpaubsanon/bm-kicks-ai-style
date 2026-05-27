@@ -51,6 +51,7 @@ interface Achievement {
   name: string;
   description: string;
   icon: typeof ShoppingBag;
+  emoji: string;
   unlocked: boolean;
   color: string;
 }
