@@ -262,7 +262,11 @@ const ProductDetail = () => {
                 {product.is_featured && <Badge>⭐ Featured</Badge>}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{product.name}</h1>
-              <div className="text-3xl font-bold text-primary">{formatPrice(effectivePrice)}</div>
+              {isInquiryOnly ? (
+                <div className="text-xl font-semibold text-primary">Message us for pricing</div>
+              ) : (
+                <div className="text-3xl font-bold text-primary">{formatPrice(effectivePrice)}</div>
+              )}
             </div>
 
             {/* Colorway selector */}
