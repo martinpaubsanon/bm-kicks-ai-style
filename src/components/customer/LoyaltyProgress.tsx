@@ -277,7 +277,6 @@ export function LoyaltyProgress({
           <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pt-3">
               {achievements.map((a) => {
-                const Icon = a.unlocked ? a.icon : Lock;
                 return (
                   <div
                     key={a.id}
@@ -290,16 +289,22 @@ export function LoyaltyProgress({
                   >
                     <div
                       className={cn(
-                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
-                        a.unlocked ? "bg-primary/10" : "bg-muted/40",
+                        "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-xl",
+                        a.unlocked
+                          ? "bg-gradient-to-br from-primary/15 to-primary/5 shadow-inner"
+                          : "bg-muted/40",
                       )}
                     >
-                      <Icon
-                        className={cn(
-                          "h-4 w-4",
-                          a.unlocked ? a.color : "text-muted-foreground",
-                        )}
-                      />
+                      {a.unlocked ? (
+                        <span
+                          className="drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]"
+                          aria-hidden
+                        >
+                          {a.emoji}
+                        </span>
+                      ) : (
+                        <Lock className="h-4 w-4 text-muted-foreground" />
+                      )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p
