@@ -183,7 +183,7 @@ export default function Badges() {
             className="h-3 bg-secondary [&>div]:bg-[linear-gradient(90deg,#f59e0b,#ec4899,#8b5cf6)]"
           />
           <p className="text-xs text-muted-foreground mt-2">
-            {Math.round(progressPct)}% complete · {formatCurrency(totalSpent)} spent ·{" "}
+            {Math.round(progressPct)}% complete · {combinedScore.toLocaleString()} pts ·{" "}
             {orderCount} orders · {game.streak}d streak
           </p>
 
