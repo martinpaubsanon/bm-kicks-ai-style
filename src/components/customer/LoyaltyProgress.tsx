@@ -241,19 +241,23 @@ export function LoyaltyProgress({
             })}
           </div>
           <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
-            {visibleTiers.map((t) => (
-              <div
-                key={t.name}
-                className={cn(
-                  "flex flex-col items-center gap-0.5",
-                  combined >= t.min ? "text-foreground" : "",
-                  t.name === currentTier.name && "text-[#4ade80] font-bold",
-                )}
-              >
-                <span className="uppercase tracking-wider">{t.name}</span>
-                <span className="font-mono">{formatCurrency(t.min)}</span>
-              </div>
-            ))}
+            {visibleTiers.map((t) => {
+              const masked = SECRET_TIER_NAMES.has(t.name) && !hasDiamond;
+              return (
+                <div
+                  key={t.name}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5",
+                    combined >= t.min ? "text-foreground" : "",
+                    t.name === currentTier.name && "text-[#4ade80] font-bold",
+                    masked && "italic text-muted-foreground/70",
+                  )}
+                >
+                  <span className="uppercase tracking-wider">{tierLabel(t)}</span>
+                  <span className="font-mono">{tierMinLabel(t)}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
