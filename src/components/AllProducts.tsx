@@ -34,6 +34,10 @@ export const AllProducts = () => {
   const { toast } = useToast();
 
   const selectedCategory = searchParams.get("category") || "all";
+  const selectedGender = searchParams.get("gender") || "all"; // all | kings | queens
+
+  const isWomens = (p: Product) => /\b(women|woman|womens|wmns|w'?s)\b/i.test(p.name);
+  const isMens = (p: Product) => !isWomens(p);
 
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
