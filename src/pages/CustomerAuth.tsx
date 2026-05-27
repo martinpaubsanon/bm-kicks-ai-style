@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { lovable } from "@/integrations/lovable";
 import { signUpSchema, signInSchema } from "@/lib/validationSchemas";
 
 export default function CustomerAuth() {
