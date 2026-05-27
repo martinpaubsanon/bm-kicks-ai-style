@@ -109,6 +109,11 @@ const ProductDetail = () => {
     activeColorway?.price_override != null ? activeColorway.price_override : product?.price || 0;
   const effectiveIsPreorder = activeColorway?.is_preorder ?? product?.is_preorder ?? false;
   const effectiveIsLimited = activeColorway?.is_limited_edition ?? product?.is_limited_edition ?? false;
+  // Inquiry-only colorway: price 0 + no stock = "message us for pricing"
+  const isInquiryOnly =
+    !!activeColorway &&
+    activeColorway.price_override === 0 &&
+    activeColorway.stock_total === 0;
 
   const handleSelectColorway = (cw: Colorway) => {
     setActiveColorwayId(cw.id);
@@ -257,7 +262,11 @@ const ProductDetail = () => {
                 {product.is_featured && <Badge>⭐ Featured</Badge>}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{product.name}</h1>
-              <div className="text-3xl font-bold text-primary">{formatPrice(effectivePrice)}</div>
+              {isInquiryOnly ? (
+                <div className="text-xl font-semibold text-primary">Message us for pricing</div>
+              ) : (
+                <div className="text-3xl font-bold text-primary">{formatPrice(effectivePrice)}</div>
+              )}
             </div>
 
             {/* Colorway selector */}
@@ -312,7 +321,7 @@ const ProductDetail = () => {
             )}
 
             {/* Pre-Order Info Box */}
-            {effectiveIsPreorder && (
+            {effectiveIsPreorder && !isInquiryOnly && (
               <div className="bg-orange-50 dark:bg-orange-950 border-2 border-orange-200 dark:border-orange-800 rounded-lg p-4 space-y-2">
                 <div className="flex items-center gap-2 text-orange-700 dark:text-orange-300 font-semibold">
                   <span className="text-xl">🔔</span>
@@ -326,6 +335,25 @@ const ProductDetail = () => {
                 <p className="text-xs text-orange-700 dark:text-orange-300 ml-7 pt-1">
                   ✓ Full payment collected upon delivery
                 </p>
+              </div>
+            )}
+
+            {/* Inquiry-only colorway box */}
+            {isInquiryOnly && (
+              <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-4 space-y-3">
+                <div className="flex items-center gap-2 font-semibold">
+                  <span className="text-xl">💬</span>
+                  <span>Available on request</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  The <strong className="text-foreground">{activeColorway?.name}</strong> colorway is sourced on demand.
+                  Message us on WhatsApp for current pricing, availability and delivery time.
+                </p>
+                <WhatsAppButton
+                  message={`Hi! I'm interested in the ${product.brand} ${product.name} — ${activeColorway?.name} colorway. Could you share the price and availability?`}
+                  size="default"
+                  className="w-full"
+                />
               </div>
             )}
 
@@ -359,43 +387,47 @@ const ProductDetail = () => {
             </div>
 
             {/* Size Selector */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-semibold">Select Size (US)</h2>
+            {!isInquiryOnly && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-semibold">Select Size (US)</h2>
+                </div>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  {availableSizes.map(([size, stock]) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`relative py-3 px-2 rounded border-2 transition-all font-medium ${
+                        selectedSize === size
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      {size}
+                      {stock < 5 && (
+                        <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+                {availableSizes.length === 0 && (
+                  <p className="text-destructive">Out of stock</p>
+                )}
               </div>
-              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                {availableSizes.map(([size, stock]) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`relative py-3 px-2 rounded border-2 transition-all font-medium ${
-                      selectedSize === size
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    {size}
-                    {stock < 5 && (
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" />
-                    )}
-                  </button>
-                ))}
-              </div>
-              {availableSizes.length === 0 && (
-                <p className="text-destructive">Out of stock</p>
-              )}
-            </div>
+            )}
 
             {/* Add to Cart */}
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={handleAddToCart}
-              disabled={availableSizes.length === 0 || addingToCart}
-            >
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              {effectiveIsPreorder ? "Pre-Order Now (50% Down)" : "Add to Cart"}
-            </Button>
+            {!isInquiryOnly && (
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={handleAddToCart}
+                disabled={availableSizes.length === 0 || addingToCart}
+              >
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                {effectiveIsPreorder ? "Pre-Order Now (50% Down)" : "Add to Cart"}
+              </Button>
+            )}
 
             {/* WhatsApp Help */}
             <div className="pt-6 border-t border-border">
