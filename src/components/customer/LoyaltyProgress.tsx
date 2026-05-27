@@ -43,6 +43,7 @@ const TIERS: Tier[] = [
   { name: "Silver",   min: 2000,  icon: Award,   color: "text-zinc-300",    bg: "bg-zinc-400/10",    glow: "shadow-zinc-400/30" },
   { name: "Gold",     min: 5000,  icon: Trophy,  color: "text-yellow-400",  bg: "bg-yellow-500/10",  glow: "shadow-yellow-500/40" },
   { name: "Platinum", min: 10000, icon: Crown,   color: "text-cyan-300",    bg: "bg-cyan-400/10",    glow: "shadow-cyan-400/40" },
+  { name: "Mythic",   min: 15000, icon: Sparkles,color: "text-purple-300",  bg: "bg-purple-500/10",  glow: "shadow-purple-500/50" },
   { name: "Diamond",  min: 25000, icon: Gem,     color: "text-fuchsia-400", bg: "bg-fuchsia-500/10", glow: "shadow-fuchsia-500/50" },
 ];
 
@@ -119,7 +120,8 @@ export function LoyaltyProgress({
     { id: "influencer",   name: "Influencer",           description: "Refer 5 friends",               icon: PartyPopper, emoji: "📣", unlocked: referralsCompleted >= 5, color: "text-amber-400" },
     { id: "collector",    name: "Badge Collector",      description: "Earn 5 badges",                  icon: Trophy,      emoji: "🏆", unlocked: badgesEarned >= 5,       color: "text-yellow-300" },
     { id: "vip",          name: "VIP Status",           description: "Reach Gold tier",                icon: Crown,       emoji: "👑", unlocked: currentTierIndex >= 3,   color: "text-yellow-400" },
-    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier",             icon: Gem,         emoji: "💎", unlocked: currentTierIndex >= 5,   color: "text-fuchsia-300" },
+    { id: "mythic",       name: "Mythic Ascended",      description: "Reach Mythic tier",              icon: Sparkles,    emoji: "🔮", unlocked: currentTierIndex >= 5,   color: "text-purple-300" },
+    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier",             icon: Gem,         emoji: "💎", unlocked: currentTierIndex >= 6,   color: "text-fuchsia-300" },
     { id: "saver",        name: "Point Saver",          description: "Hold 1,000 points",              icon: Coins,       emoji: "🪙", unlocked: pointsBalance >= 1000,   color: "text-amber-300" },
     { id: "gifter",       name: "Gift Giver",           description: "Redeem a reward",                icon: Gift,        emoji: "🎁", unlocked: false,                   color: "text-rose-300" },
   ];

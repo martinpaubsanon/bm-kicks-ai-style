@@ -155,7 +155,18 @@ export interface BadgeContext {
   tierIndex: number;
   game: LocalGameState;
   referralsCompleted: number;
+  /** Number of order items per product category (e.g. Basketball, Running, Lifestyle, Bags) */
+  categoryCounts?: Record<string, number>;
+  /** Number of order items per brand (e.g. Nike, Adidas, Jordan, Li Ning) */
+  brandCounts?: Record<string, number>;
+  /** Highest single-item price ever ordered (QAR) */
+  maxItemPrice?: number;
+  /** Highest single-order total (QAR) */
+  maxOrderTotal?: number;
 }
+
+const cat = (c: BadgeContext, key: string) => c.categoryCounts?.[key] ?? 0;
+const brnd = (c: BadgeContext, key: string) => c.brandCounts?.[key] ?? 0;
 
 export const BADGES: BadgeDef[] = [
   // Journey
@@ -316,6 +327,142 @@ export const BADGES: BadgeDef[] = [
     rarity: "legendary",
     category: "social",
     check: (c) => c.referralsCompleted >= 5,
+  },
+
+  // Category mastery
+  {
+    id: "hardwood_hero",
+    label: "Hardwood Hero",
+    description: "Order 3 Basketball pairs",
+    emoji: "🏀",
+    rarity: "rare",
+    category: "engagement",
+    check: (c) => cat(c, "Basketball") >= 3,
+  },
+  {
+    id: "pavement_pounder",
+    label: "Pavement Pounder",
+    description: "Order 3 Running pairs",
+    emoji: "🏃‍♂️",
+    rarity: "rare",
+    category: "engagement",
+    check: (c) => cat(c, "Running") >= 3,
+  },
+  {
+    id: "lifestyle_icon",
+    label: "Lifestyle Icon",
+    description: "Order 5 Lifestyle pairs",
+    emoji: "🕶️",
+    rarity: "epic",
+    category: "engagement",
+    check: (c) => cat(c, "Lifestyle") >= 5,
+  },
+  {
+    id: "bag_boss",
+    label: "Bag Boss",
+    description: "Order 3 bags",
+    emoji: "🎒",
+    rarity: "rare",
+    category: "engagement",
+    check: (c) => cat(c, "Bags") >= 3,
+  },
+  {
+    id: "category_curator",
+    label: "Category Curator",
+    description: "Order from every category",
+    emoji: "🗂️",
+    rarity: "epic",
+    category: "engagement",
+    check: (c) =>
+      ["Basketball", "Running", "Lifestyle", "Bags"].every((k) => cat(c, k) >= 1),
+  },
+
+  // Brand loyalty
+  {
+    id: "swoosh_crew",
+    label: "Swoosh Crew",
+    description: "Order 5 Nike items",
+    emoji: "✔️",
+    rarity: "rare",
+    category: "engagement",
+    check: (c) => brnd(c, "Nike") >= 5,
+  },
+  {
+    id: "three_stripes",
+    label: "Three Stripes",
+    description: "Order 3 Adidas items",
+    emoji: "🟰",
+    rarity: "rare",
+    category: "engagement",
+    check: (c) => brnd(c, "Adidas") >= 3,
+  },
+  {
+    id: "jumpman",
+    label: "Jumpman",
+    description: "Order 3 Jordan items",
+    emoji: "🪂",
+    rarity: "epic",
+    category: "engagement",
+    check: (c) => brnd(c, "Jordan") >= 3,
+  },
+  {
+    id: "li_ning_loyalist",
+    label: "Li-Ning Loyalist",
+    description: "Order 3 Li-Ning items",
+    emoji: "🐉",
+    rarity: "rare",
+    category: "engagement",
+    check: (c) => brnd(c, "Li Ning") >= 3,
+  },
+  {
+    id: "brand_collector",
+    label: "Brand Collector",
+    description: "Own items from 4 different brands",
+    emoji: "🏷️",
+    rarity: "epic",
+    category: "engagement",
+    check: (c) =>
+      ["Nike", "Adidas", "Jordan", "Li Ning"].filter((k) => brnd(c, k) >= 1).length >= 4,
+  },
+
+  // High roller / premium
+  {
+    id: "high_roller",
+    label: "High Roller",
+    description: "Order a premium item worth QAR 2,500+",
+    emoji: "💸",
+    rarity: "epic",
+    category: "elite",
+    check: (c) => (c.maxItemPrice ?? 0) >= 2500,
+  },
+  {
+    id: "whale",
+    label: "Whale",
+    description: "Place a single order worth QAR 5,000+",
+    emoji: "🐋",
+    rarity: "legendary",
+    category: "elite",
+    check: (c) => (c.maxOrderTotal ?? 0) >= 5000,
+  },
+  {
+    id: "grail_hunter",
+    label: "Grail Hunter",
+    description: "Score a single item worth QAR 5,000+",
+    emoji: "🏆",
+    rarity: "legendary",
+    category: "elite",
+    check: (c) => (c.maxItemPrice ?? 0) >= 5000,
+  },
+
+  // New mythic tier
+  {
+    id: "mythic_ascended",
+    label: "Mythic Ascended",
+    description: "Reach Mythic tier (QAR 15,000+ combined)",
+    emoji: "🔮",
+    rarity: "legendary",
+    category: "elite",
+    check: (c) => c.tierIndex >= 5,
   },
 ];
 
