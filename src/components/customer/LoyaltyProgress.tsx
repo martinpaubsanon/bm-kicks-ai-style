@@ -315,7 +315,7 @@ export function LoyaltyProgress({
                       >
                         {a.name}
                       </p>
-                      <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground line-clamp-2">
+                      <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground break-words">
                         {a.unlocked ? `Earned: ${a.description}` : `How to earn: ${a.description}`}
                       </p>
                     </div>
