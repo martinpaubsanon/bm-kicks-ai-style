@@ -152,6 +152,8 @@ export interface BadgeContext {
   orderCount: number;
   pointsBalance: number;
   lifetimePoints: number;
+  /** Combined score = QAR spent + lifetime/bonus points. Drives tier and spend badges. */
+  combinedScore: number;
   tierIndex: number;
   game: LocalGameState;
   referralsCompleted: number;
