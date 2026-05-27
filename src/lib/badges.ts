@@ -155,7 +155,18 @@ export interface BadgeContext {
   tierIndex: number;
   game: LocalGameState;
   referralsCompleted: number;
+  /** Number of order items per product category (e.g. Basketball, Running, Lifestyle, Bags) */
+  categoryCounts?: Record<string, number>;
+  /** Number of order items per brand (e.g. Nike, Adidas, Jordan, Li Ning) */
+  brandCounts?: Record<string, number>;
+  /** Highest single-item price ever ordered (QAR) */
+  maxItemPrice?: number;
+  /** Highest single-order total (QAR) */
+  maxOrderTotal?: number;
 }
+
+const cat = (c: BadgeContext, key: string) => c.categoryCounts?.[key] ?? 0;
+const brnd = (c: BadgeContext, key: string) => c.brandCounts?.[key] ?? 0;
 
 export const BADGES: BadgeDef[] = [
   // Journey
