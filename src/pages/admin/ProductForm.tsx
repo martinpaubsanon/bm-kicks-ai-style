@@ -196,6 +196,7 @@ export default function ProductForm() {
         name: formData.name,
         brand: formData.brand,
         category: formData.category,
+        gender: formData.gender,
         description: formData.description,
         price: validation.data.price,
         images: formData.images,
