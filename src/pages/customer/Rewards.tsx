@@ -209,10 +209,12 @@ export default function Rewards() {
                   Next rank
                 </p>
                 <p className="text-2xl md:text-3xl font-black text-[#4ade80]">
-                  {nextSpendTier.name}
+                  {nextTierMasked ? "???" : nextSpendTier.name}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {formatCurrency(remainingToNext)} away
+                  {nextTierMasked
+                    ? "Reach Diamond to unveil…"
+                    : `${remainingToNext.toLocaleString()} pts away`}
                 </p>
               </div>
             ) : (
