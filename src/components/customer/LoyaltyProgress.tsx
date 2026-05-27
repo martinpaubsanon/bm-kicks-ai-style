@@ -321,6 +321,7 @@ export function LoyaltyProgress({
           <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pt-3">
               {achievements.map((a) => {
+                const masked = !!a.secret && !hasDiamond && !a.unlocked;
                 return (
                   <div
                     key={a.id}
@@ -346,6 +347,8 @@ export function LoyaltyProgress({
                         >
                           {a.emoji}
                         </span>
+                      ) : masked ? (
+                        <span className="text-base text-muted-foreground" aria-hidden>❓</span>
                       ) : (
                         <Lock className="h-4 w-4 text-muted-foreground" />
                       )}
@@ -357,10 +360,14 @@ export function LoyaltyProgress({
                           a.unlocked ? "text-foreground" : "text-muted-foreground",
                         )}
                       >
-                        {a.name}
+                        {masked ? "??? (Secret)" : a.name}
                       </p>
                       <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground break-words">
-                        {a.unlocked ? `Earned: ${a.description}` : `How to earn: ${a.description}`}
+                        {a.unlocked
+                          ? `Earned: ${a.description}`
+                          : masked
+                            ? "Reach Diamond tier to reveal"
+                            : `How to earn: ${a.description}`}
                       </p>
                     </div>
                   </div>
