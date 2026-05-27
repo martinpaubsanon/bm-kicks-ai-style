@@ -120,7 +120,8 @@ export function LoyaltyProgress({
     { id: "influencer",   name: "Influencer",           description: "Refer 5 friends",               icon: PartyPopper, emoji: "📣", unlocked: referralsCompleted >= 5, color: "text-amber-400" },
     { id: "collector",    name: "Badge Collector",      description: "Earn 5 badges",                  icon: Trophy,      emoji: "🏆", unlocked: badgesEarned >= 5,       color: "text-yellow-300" },
     { id: "vip",          name: "VIP Status",           description: "Reach Gold tier",                icon: Crown,       emoji: "👑", unlocked: currentTierIndex >= 3,   color: "text-yellow-400" },
-    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier",             icon: Gem,         emoji: "💎", unlocked: currentTierIndex >= 5,   color: "text-fuchsia-300" },
+    { id: "mythic",       name: "Mythic Ascended",      description: "Reach Mythic tier",              icon: Sparkles,    emoji: "🔮", unlocked: currentTierIndex >= 5,   color: "text-purple-300" },
+    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier",             icon: Gem,         emoji: "💎", unlocked: currentTierIndex >= 6,   color: "text-fuchsia-300" },
     { id: "saver",        name: "Point Saver",          description: "Hold 1,000 points",              icon: Coins,       emoji: "🪙", unlocked: pointsBalance >= 1000,   color: "text-amber-300" },
     { id: "gifter",       name: "Gift Giver",           description: "Redeem a reward",                icon: Gift,        emoji: "🎁", unlocked: false,                   color: "text-rose-300" },
   ];
