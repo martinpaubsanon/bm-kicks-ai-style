@@ -91,24 +91,20 @@ export function LoyaltyProgress({
     0,
   );
   const currentTier = TIERS[currentTierIndex];
-  // Secret tiers (Mythic, Arcana) stay hidden until the user reaches Diamond
+  // Secret tiers (Mythic, Arcana) stay as mystery teasers until the user reaches Diamond
   const hasDiamond = currentTierIndex >= DIAMOND_INDEX;
-  const visibleTiers = hasDiamond
-    ? TIERS
-    : TIERS.filter((t) => !SECRET_TIER_NAMES.has(t.name));
+  // Always render all tiers on the progress so secret ones appear as locked teasers
+  const visibleTiers = TIERS;
   const nextTier = TIERS[currentTierIndex + 1];
-  // Hide the next tier's name/threshold if it's still a secret
-  const nextTierVisible =
-    nextTier && (hasDiamond || !SECRET_TIER_NAMES.has(nextTier.name))
-      ? nextTier
-      : null;
+  const nextTierIsSecret = nextTier ? SECRET_TIER_NAMES.has(nextTier.name) : false;
+  const nextTierLocked = nextTierIsSecret && !hasDiamond;
   const remainingToNext = nextTier ? Math.max(0, nextTier.min - combined) : 0;
   const TierIcon = currentTier.icon;
 
   // Multi-segment progress that mirrors the Rewards page
   const segCount = visibleTiers.length - 1;
   const segWidth = 100 / segCount;
-  const visibleIndex = visibleTiers.findIndex((t) => t.name === currentTier.name);
+  const visibleIndex = currentTierIndex;
   const visibleNext = visibleTiers[visibleIndex + 1];
   const fillPct = !visibleNext
     ? 100
@@ -121,6 +117,13 @@ export function LoyaltyProgress({
           ),
         )) *
       segWidth;
+
+  const tierLabel = (t: Tier) =>
+    SECRET_TIER_NAMES.has(t.name) && !hasDiamond ? "???" : t.name;
+  const tierMinLabel = (t: Tier) =>
+    SECRET_TIER_NAMES.has(t.name) && !hasDiamond
+      ? "??? pts"
+      : `${t.min.toLocaleString()} pts`;
 
 
   const allAchievements: (Achievement & { secret?: boolean })[] = [
