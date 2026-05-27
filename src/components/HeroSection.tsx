@@ -57,7 +57,7 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
                       Your points
                     </span>
                     <span className="font-display text-2xl text-gold">
-                      {account.points_balance.toLocaleString()}
+                      {displayPoints.toLocaleString()}
                     </span>
                   </div>
                   <div className="w-px bg-border" />
