@@ -177,6 +177,13 @@ export default function Rewards() {
       )
     : 100;
   const remainingToNext = nextSpendTier ? Math.max(0, nextSpendTier.min - combinedScore) : 0;
+  // Diamond is index 5. Secret tiers (Mythic, Arcana) are masked until Diamond is reached.
+  const hasDiamond = currentLevelIndex >= 5;
+  const nextTierMasked = !!nextSpendTier?.secret && !hasDiamond;
+  const tierName = (t: (typeof SPEND_TIERS)[number]) =>
+    t.secret && !hasDiamond ? "???" : t.name;
+  const tierMinLabel = (t: (typeof SPEND_TIERS)[number]) =>
+    t.secret && !hasDiamond ? "??? pts" : `${t.min.toLocaleString()} pts`;
 
   return (
     <div className="space-y-6">
