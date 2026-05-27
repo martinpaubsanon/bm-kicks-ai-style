@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
+import cosmeticsImage from "@/assets/category-cosmetics.jpg";
 
 const categories = [
   {
