@@ -109,6 +109,11 @@ const ProductDetail = () => {
     activeColorway?.price_override != null ? activeColorway.price_override : product?.price || 0;
   const effectiveIsPreorder = activeColorway?.is_preorder ?? product?.is_preorder ?? false;
   const effectiveIsLimited = activeColorway?.is_limited_edition ?? product?.is_limited_edition ?? false;
+  // Inquiry-only colorway: price 0 + no stock = "message us for pricing"
+  const isInquiryOnly =
+    !!activeColorway &&
+    activeColorway.price_override === 0 &&
+    activeColorway.stock_total === 0;
 
   const handleSelectColorway = (cw: Colorway) => {
     setActiveColorwayId(cw.id);
