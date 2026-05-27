@@ -43,9 +43,15 @@ const TIERS: Tier[] = [
   { name: "Silver",   min: 2000,  icon: Award,   color: "text-zinc-300",    bg: "bg-zinc-400/10",    glow: "shadow-zinc-400/30" },
   { name: "Gold",     min: 5000,  icon: Trophy,  color: "text-yellow-400",  bg: "bg-yellow-500/10",  glow: "shadow-yellow-500/40" },
   { name: "Platinum", min: 10000, icon: Crown,   color: "text-cyan-300",    bg: "bg-cyan-400/10",    glow: "shadow-cyan-400/40" },
-  { name: "Mythic",   min: 15000, icon: Sparkles,color: "text-purple-300",  bg: "bg-purple-500/10",  glow: "shadow-purple-500/50" },
-  { name: "Diamond",  min: 25000, icon: Gem,     color: "text-fuchsia-400", bg: "bg-fuchsia-500/10", glow: "shadow-fuchsia-500/50" },
+  { name: "Diamond",  min: 20000, icon: Gem,     color: "text-fuchsia-400", bg: "bg-fuchsia-500/10", glow: "shadow-fuchsia-500/50" },
+  // Secret tiers — only revealed once Diamond is reached
+  { name: "Mythic",   min: 30000, icon: Sparkles,color: "text-purple-300",  bg: "bg-purple-500/10",  glow: "shadow-purple-500/50" },
+  { name: "Arcana",   min: 50000, icon: Sparkles,color: "text-pink-300",    bg: "bg-pink-500/10",    glow: "shadow-pink-500/60" },
 ];
+
+const DIAMOND_INDEX = 5;
+const SECRET_TIER_NAMES = new Set(["Mythic", "Arcana"]);
+
 
 interface Achievement {
   id: string;
@@ -85,26 +91,39 @@ export function LoyaltyProgress({
     0,
   );
   const currentTier = TIERS[currentTierIndex];
+  // Secret tiers (Mythic, Arcana) stay hidden until the user reaches Diamond
+  const hasDiamond = currentTierIndex >= DIAMOND_INDEX;
+  const visibleTiers = hasDiamond
+    ? TIERS
+    : TIERS.filter((t) => !SECRET_TIER_NAMES.has(t.name));
   const nextTier = TIERS[currentTierIndex + 1];
+  // Hide the next tier's name/threshold if it's still a secret
+  const nextTierVisible =
+    nextTier && (hasDiamond || !SECRET_TIER_NAMES.has(nextTier.name))
+      ? nextTier
+      : null;
   const remainingToNext = nextTier ? Math.max(0, nextTier.min - combined) : 0;
   const TierIcon = currentTier.icon;
 
   // Multi-segment progress that mirrors the Rewards page
-  const segCount = TIERS.length - 1;
+  const segCount = visibleTiers.length - 1;
   const segWidth = 100 / segCount;
-  const fillPct = !nextTier
+  const visibleIndex = visibleTiers.findIndex((t) => t.name === currentTier.name);
+  const visibleNext = visibleTiers[visibleIndex + 1];
+  const fillPct = !visibleNext
     ? 100
-    : (currentTierIndex +
+    : (visibleIndex +
         Math.min(
           1,
           Math.max(
             0,
-            (combined - currentTier.min) / (nextTier.min - currentTier.min),
+            (combined - currentTier.min) / (visibleNext.min - currentTier.min),
           ),
         )) *
       segWidth;
 
-  const achievements: Achievement[] = [
+
+  const allAchievements: (Achievement & { secret?: boolean })[] = [
     { id: "first",        name: "First Step",           description: "Place your first order",         icon: ShoppingBag, emoji: "👟", unlocked: totalOrders >= 1,        color: "text-green-400" },
     { id: "repeat",       name: "Coming Back",          description: "Complete 3 orders",              icon: Repeat,      emoji: "🔁", unlocked: totalOrders >= 3,        color: "text-blue-400" },
     { id: "loyal",        name: "Loyal Fan",            description: "Complete 10 orders",             icon: Heart,       emoji: "❤️", unlocked: totalOrders >= 10,       color: "text-rose-400" },
@@ -120,14 +139,17 @@ export function LoyaltyProgress({
     { id: "influencer",   name: "Influencer",           description: "Refer 5 friends",               icon: PartyPopper, emoji: "📣", unlocked: referralsCompleted >= 5, color: "text-amber-400" },
     { id: "collector",    name: "Badge Collector",      description: "Earn 5 badges",                  icon: Trophy,      emoji: "🏆", unlocked: badgesEarned >= 5,       color: "text-yellow-300" },
     { id: "vip",          name: "VIP Status",           description: "Reach Gold tier",                icon: Crown,       emoji: "👑", unlocked: currentTierIndex >= 3,   color: "text-yellow-400" },
-    { id: "mythic",       name: "Mythic Ascended",      description: "Reach Mythic tier",              icon: Sparkles,    emoji: "🔮", unlocked: currentTierIndex >= 5,   color: "text-purple-300" },
-    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier",             icon: Gem,         emoji: "💎", unlocked: currentTierIndex >= 6,   color: "text-fuchsia-300" },
+    { id: "legend",       name: "Living Legend",        description: `Reach Diamond tier (${formatCurrency(20000)})`, icon: Gem, emoji: "💎", unlocked: currentTierIndex >= DIAMOND_INDEX, color: "text-fuchsia-300" },
     { id: "saver",        name: "Point Saver",          description: "Hold 1,000 points",              icon: Coins,       emoji: "🪙", unlocked: pointsBalance >= 1000,   color: "text-amber-300" },
     { id: "gifter",       name: "Gift Giver",           description: "Redeem a reward",                icon: Gift,        emoji: "🎁", unlocked: false,                   color: "text-rose-300" },
+    // Secret achievements — hidden until Diamond is reached
+    { id: "mythic",       name: "Mythic Ascended",      description: `Reach Mythic tier (${formatCurrency(30000)})`,  icon: Sparkles, emoji: "🔮", unlocked: currentTierIndex >= 6, color: "text-purple-300", secret: true },
+    { id: "arcana",       name: "Arcana Awakened",      description: `Reach Arcana tier (${formatCurrency(50000)})`,  icon: Sparkles, emoji: "🜲", unlocked: currentTierIndex >= 7, color: "text-pink-300",   secret: true },
   ];
 
-
+  const achievements = allAchievements.filter((a) => hasDiamond || !a.secret);
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
+
 
   return (
     <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-primary/5">
@@ -161,18 +183,23 @@ export function LoyaltyProgress({
             <p className={cn("text-2xl font-bold", currentTier.color)}>
               {currentTier.name}
             </p>
-            {nextTier ? (
+            {nextTierVisible ? (
               <p className="text-xs text-muted-foreground">
                 {formatCurrency(remainingToNext)} more (spend or earn) to reach{" "}
                 <span className="font-semibold text-foreground">
-                  {nextTier.name}
+                  {nextTierVisible.name}
                 </span>
+              </p>
+            ) : nextTier ? (
+              <p className="text-xs text-muted-foreground">
+                You've reached the highest known tier… but whispers speak of something beyond. 🜲
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
                 You've reached the highest tier — legend status!
               </p>
             )}
+
           </div>
         </div>
 
@@ -184,7 +211,7 @@ export function LoyaltyProgress({
             </span>
             <span className="font-mono">
               {formatCurrency(combined)} /{" "}
-              {formatCurrency(TIERS[TIERS.length - 1].min)}
+              {formatCurrency(visibleTiers[visibleTiers.length - 1].min)}
             </span>
           </div>
           <div className="relative h-3 rounded-full bg-secondary overflow-hidden">
@@ -192,7 +219,7 @@ export function LoyaltyProgress({
               className="absolute inset-y-0 left-0 bg-[linear-gradient(90deg,#ec4899,#4ade80)] transition-all"
               style={{ width: `${fillPct}%` }}
             />
-            {TIERS.map((t, i) => {
+            {visibleTiers.map((t, i) => {
               const pct = i * segWidth;
               const reached = combined >= t.min;
               return (
@@ -203,7 +230,7 @@ export function LoyaltyProgress({
                     reached
                       ? "bg-[#4ade80] border-[#4ade80] shadow-[0_0_8px_#4ade80]"
                       : "bg-card border-muted-foreground/40",
-                    i === currentTierIndex && nextTier && "scale-150",
+                    t.name === currentTier.name && visibleNext && "scale-150",
                   )}
                   style={{ left: `calc(${pct}% - 4px)` }}
                 />
@@ -211,13 +238,13 @@ export function LoyaltyProgress({
             })}
           </div>
           <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
-            {TIERS.map((t, i) => (
+            {visibleTiers.map((t) => (
               <div
                 key={t.name}
                 className={cn(
                   "flex flex-col items-center gap-0.5",
                   combined >= t.min ? "text-foreground" : "",
-                  i === currentTierIndex && "text-[#4ade80] font-bold",
+                  t.name === currentTier.name && "text-[#4ade80] font-bold",
                 )}
               >
                 <span className="uppercase tracking-wider">{t.name}</span>
@@ -229,9 +256,10 @@ export function LoyaltyProgress({
 
         {/* Tier ladder with icons */}
         <div className="flex items-center justify-between gap-1 pt-2">
-          {TIERS.map((tier, i) => {
+          {visibleTiers.map((tier) => {
             const Icon = tier.icon;
-            const reached = i <= currentTierIndex;
+            const reached = combined >= tier.min;
+
             return (
               <div
                 key={tier.name}
