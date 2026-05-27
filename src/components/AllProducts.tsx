@@ -258,6 +258,27 @@ export const AllProducts = () => {
           </p>
         </div>
 
+        {/* Gender subcategory — cool labels */}
+        <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3 mb-6 md:mb-8">
+          {[
+            { key: "all", label: "Everyone", count: products.length },
+            { key: "kings", label: "KINGS", sub: "for him", count: products.filter(isMens).length },
+            { key: "queens", label: "QUEENS", sub: "for her", count: products.filter(isWomens).length },
+          ].map(g => (
+            <Badge
+              key={g.key}
+              variant={selectedGender === g.key ? "default" : "outline"}
+              className="cursor-pointer px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm tracking-widest uppercase font-bold hover:bg-primary/20 transition-colors"
+              onClick={() => handleGenderChange(g.key)}
+            >
+              {g.label}
+              {g.sub && <span className="ml-1.5 text-[10px] font-normal opacity-70 normal-case tracking-normal">· {g.sub}</span>}
+              <span className="ml-2 opacity-60">({g.count})</span>
+            </Badge>
+          ))}
+        </div>
+
+
         <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-6 md:mb-8">
           <Badge
             variant={selectedCategory === "all" ? "default" : "outline"}
