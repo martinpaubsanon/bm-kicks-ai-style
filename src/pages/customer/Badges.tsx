@@ -115,6 +115,10 @@ export default function Badges() {
     tierIndex,
     game,
     referralsCompleted,
+    categoryCounts,
+    brandCounts,
+    maxItemPrice,
+    maxOrderTotal,
   };
 
   const earned = useMemo(() => computeEarnedBadges(ctx), [ctx]);
