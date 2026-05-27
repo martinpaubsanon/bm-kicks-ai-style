@@ -12,7 +12,7 @@ interface HeroSectionProps {
 
 export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
   const { user } = useAuth();
-  const { account, currentTier, settings } = useLoyalty();
+  const { account, currentTier, settings, displayPoints } = useLoyalty();
 
   return (
     <section className="relative min-h-[80vh] lg:min-h-screen flex items-center bg-gradient-hero overflow-hidden pt-20 pb-16">
@@ -57,7 +57,7 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
                       Your points
                     </span>
                     <span className="font-display text-2xl text-gold">
-                      {account.points_balance.toLocaleString()}
+                      {displayPoints.toLocaleString()}
                     </span>
                   </div>
                   <div className="w-px bg-border" />
@@ -176,22 +176,42 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
               </div>
 
               {/* Loyalty earn badge */}
-              {settings && (settings.points_per_qar > 0 || settings.points_per_order > 0) && (
-                <div className="absolute -bottom-4 -right-2 md:bottom-4 md:-right-4 z-20 glass-strong p-4 rounded-2xl flex flex-col items-center gap-1 transform rotate-3 shadow-card max-w-[200px]">
-                  <div className="w-14 h-14 bg-gradient-gold rounded-full flex flex-col items-center justify-center text-gold-foreground font-display shadow-glow leading-none">
-                    <span className="text-lg">+{settings.points_per_qar}</span>
-                    <span className="text-[8px] uppercase tracking-wider mt-0.5">pt/QAR</span>
+              {settings && (() => {
+                const perQar = settings.points_per_qar ?? 0;
+                const perOrder = settings.points_per_order ?? 0;
+                const signup = (settings as any).signup_bonus ?? 0;
+
+                // Pick the most meaningful number to feature
+                let headline = "+0";
+                let topLabel = "Base Pts";
+                let bottomLabel = "Per Order";
+
+                if (perQar > 0) {
+                  headline = `+${perQar}`;
+                  topLabel = "Pts / QAR";
+                  bottomLabel = perOrder > 0 ? `+${perOrder} bonus / order` : "Every Purchase";
+                } else if (perOrder > 0) {
+                  headline = `+${perOrder}`;
+                  topLabel = "Bonus Pts";
+                  bottomLabel = "Per Order";
+                } else if (signup > 0) {
+                  headline = `+${signup}`;
+                  topLabel = "Signup Bonus";
+                  bottomLabel = "Join & Earn";
+                }
+
+                return (
+                  <div className="absolute -bottom-4 -right-2 md:bottom-4 md:-right-4 z-20 glass-strong p-4 rounded-2xl flex flex-col items-center gap-1 transform rotate-3 shadow-card max-w-[200px]">
+                    <div className="w-14 h-14 bg-gradient-gold rounded-full flex items-center justify-center text-gold-foreground font-display text-lg shadow-glow">
+                      {headline}
+                    </div>
+                    <div className="text-[10px] font-bold text-center">
+                      <p className="text-muted-foreground uppercase tracking-widest">{topLabel}</p>
+                      <p className="text-gold mt-0.5">{bottomLabel}</p>
+                    </div>
                   </div>
-                  <div className="text-[10px] font-bold text-center">
-                    <p className="text-muted-foreground uppercase tracking-widest">Earn Points</p>
-                    <p className="text-gold mt-0.5">
-                      {settings.points_per_order > 0
-                        ? `+${settings.points_per_order} bonus / order`
-                        : "On every order"}
-                    </p>
-                  </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </div>
         </div>
