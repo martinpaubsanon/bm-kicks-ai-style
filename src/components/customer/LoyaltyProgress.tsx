@@ -211,7 +211,7 @@ export function LoyaltyProgress({
             </span>
             <span className="font-mono">
               {formatCurrency(combined)} /{" "}
-              {formatCurrency(TIERS[TIERS.length - 1].min)}
+              {formatCurrency(visibleTiers[visibleTiers.length - 1].min)}
             </span>
           </div>
           <div className="relative h-3 rounded-full bg-secondary overflow-hidden">
@@ -219,7 +219,7 @@ export function LoyaltyProgress({
               className="absolute inset-y-0 left-0 bg-[linear-gradient(90deg,#ec4899,#4ade80)] transition-all"
               style={{ width: `${fillPct}%` }}
             />
-            {TIERS.map((t, i) => {
+            {visibleTiers.map((t, i) => {
               const pct = i * segWidth;
               const reached = combined >= t.min;
               return (
@@ -230,7 +230,7 @@ export function LoyaltyProgress({
                     reached
                       ? "bg-[#4ade80] border-[#4ade80] shadow-[0_0_8px_#4ade80]"
                       : "bg-card border-muted-foreground/40",
-                    i === currentTierIndex && nextTier && "scale-150",
+                    t.name === currentTier.name && visibleNext && "scale-150",
                   )}
                   style={{ left: `calc(${pct}% - 4px)` }}
                 />
@@ -238,13 +238,13 @@ export function LoyaltyProgress({
             })}
           </div>
           <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
-            {TIERS.map((t, i) => (
+            {visibleTiers.map((t) => (
               <div
                 key={t.name}
                 className={cn(
                   "flex flex-col items-center gap-0.5",
                   combined >= t.min ? "text-foreground" : "",
-                  i === currentTierIndex && "text-[#4ade80] font-bold",
+                  t.name === currentTier.name && "text-[#4ade80] font-bold",
                 )}
               >
                 <span className="uppercase tracking-wider">{t.name}</span>
@@ -256,9 +256,10 @@ export function LoyaltyProgress({
 
         {/* Tier ladder with icons */}
         <div className="flex items-center justify-between gap-1 pt-2">
-          {TIERS.map((tier, i) => {
+          {visibleTiers.map((tier) => {
             const Icon = tier.icon;
-            const reached = i <= currentTierIndex;
+            const reached = combined >= tier.min;
+
             return (
               <div
                 key={tier.name}
