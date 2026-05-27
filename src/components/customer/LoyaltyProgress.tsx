@@ -187,16 +187,16 @@ export function LoyaltyProgress({
             <p className={cn("text-2xl font-bold", currentTier.color)}>
               {currentTier.name}
             </p>
-            {nextTierVisible ? (
+            {nextTier && !nextTierLocked ? (
               <p className="text-xs text-muted-foreground">
-                {formatCurrency(remainingToNext)} more (spend or earn) to reach{" "}
+                {remainingToNext.toLocaleString()} pts more to reach{" "}
                 <span className="font-semibold text-foreground">
-                  {nextTierVisible.name}
+                  {nextTier.name}
                 </span>
               </p>
-            ) : nextTier ? (
+            ) : nextTier && nextTierLocked ? (
               <p className="text-xs text-muted-foreground">
-                You've reached the highest known tier… but whispers speak of something beyond. 🜲
+                Reach Diamond to unveil what lies beyond… 🜲
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
