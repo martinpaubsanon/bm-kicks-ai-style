@@ -173,3 +173,9 @@ All colors MUST be HSL.
     animation: sparkle 1.5s ease-in-out infinite;
   }
 }
+
+@keyframes scan {
+  0% { top: -10%; }
+  50% { top: 110%; }
+  100% { top: -10%; }
+}
