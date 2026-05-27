@@ -118,6 +118,12 @@ export const AllProducts = () => {
       console.log('After category filter:', filtered.length);
     }
 
+    if (selectedGender === "queens") {
+      filtered = filtered.filter(isWomens);
+    } else if (selectedGender === "kings") {
+      filtered = filtered.filter(isMens);
+    }
+
     // Search filter - checks name, description, and brand
     if (debouncedSearchQuery.trim()) {
       const query = debouncedSearchQuery.toLowerCase();
