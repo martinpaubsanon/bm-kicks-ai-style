@@ -597,15 +597,104 @@ export default function Rewards() {
             </TabsList>
 
             {[
-              { key: "store", kind: "store_discount" },
-              { key: "gift", kind: "physical_gift" },
-              { key: "partner", kind: "partner_voucher" },
-            ].map(({ key, kind }) => (
+              {
+                key: "store",
+                kind: "store_discount",
+                teasers: [
+                  { icon: Store, title: "BM Store Credit", desc: "QAR 100 / 250 / 500 off your next drop" },
+                  { icon: Flame, title: "Early Drop Access", desc: "Cop limited releases 24h before everyone else" },
+                  { icon: Sparkles, title: "Member-Only Pricing", desc: "Exclusive discounts on premium silhouettes" },
+                ],
+              },
+              {
+                key: "gift",
+                kind: "physical_gift",
+                teasers: [
+                  { icon: Gift, title: "Mystery Boxes", desc: "Curated surprise drops — sneakers, accessories & more" },
+                  { icon: Trophy, title: "BM Merch Capsule", desc: "Tees, caps and crewnecks reserved for members" },
+                  { icon: Crown, title: "Grail Sneakers", desc: "Hand-picked rare pairs available only to top tiers" },
+                ],
+              },
+              {
+                key: "partner",
+                kind: "partner_voucher",
+                teasers: [
+                  { icon: Ticket, title: "Lifestyle Partners", desc: "Cafés, barbers, fitness studios across Doha" },
+                  { icon: Star, title: "Travel & Hospitality", desc: "Hotel upgrades, lounge passes & weekend escapes" },
+                  { icon: Gem, title: "Luxury Experiences", desc: "Watches, fragrances & VIP events from our brand network" },
+                ],
+              },
+            ].map(({ key, kind, teasers }) => (
               <TabsContent key={key} value={key} className="mt-6">
                 {filtered(kind).length === 0 ? (
-                  <p className="text-center text-muted-foreground py-12 text-sm">
-                    No rewards in this category yet. Check back soon.
-                  </p>
+                  <div className="space-y-6">
+                    {/* Hero teaser banner */}
+                    <div className="relative overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/10 via-background to-primary/10 p-6 md:p-8">
+                      <div className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-gold/20 blur-3xl" />
+                      <div className="pointer-events-none absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-primary/15 blur-3xl" />
+                      <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center text-gold-foreground shadow-glow">
+                            <Sparkles className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.3em] text-gold font-bold mb-1">
+                              Dropping Soon
+                            </p>
+                            <h3 className="font-display text-xl md:text-2xl uppercase tracking-tight">
+                              The vault is being stocked
+                            </h3>
+                            <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                              Keep stacking points — when redemption opens, members with the highest balances cop first.
+                            </p>
+                          </div>
+                        </div>
+                        <a
+                          href={`https://wa.me/97433467115?text=${encodeURIComponent(
+                            `Notify me when ${key === "store" ? "BM Store" : key === "gift" ? "Gift" : "Partner"} rewards go live`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gold text-gold-foreground text-xs font-bold uppercase tracking-wider hover:opacity-90 transition shadow-glow whitespace-nowrap"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                          Notify me on WhatsApp
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Coming-soon teaser cards */}
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {teasers.map((t, i) => {
+                        const Icon = t.icon;
+                        return (
+                          <div
+                            key={i}
+                            className="group relative overflow-hidden rounded-2xl p-5 border border-border/60 bg-card hover:border-gold/40 transition-all"
+                          >
+                            <div className="pointer-events-none absolute -top-10 -right-10 h-32 w-32 rounded-full bg-gold/5 blur-2xl group-hover:bg-gold/15 transition" />
+                            <div className="relative flex items-start gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-primary/20 flex items-center justify-center text-gold shrink-0">
+                                <Icon className="w-5 h-5" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-semibold text-sm">{t.title}</h4>
+                                  <Lock className="w-3 h-3 text-muted-foreground/60" />
+                                </div>
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                  {t.desc}
+                                </p>
+                                <p className="text-[10px] uppercase tracking-widest text-gold/80 font-bold mt-2">
+                                  Coming soon
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 ) : (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filtered(kind).map((r) => {
