@@ -275,7 +275,7 @@ export function LoyaltyProgress({
             <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
           </CollapsibleTrigger>
           <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pt-3">
               {achievements.map((a) => {
                 return (
                   <div
