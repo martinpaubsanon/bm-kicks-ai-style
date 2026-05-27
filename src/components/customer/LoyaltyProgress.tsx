@@ -51,6 +51,7 @@ interface Achievement {
   name: string;
   description: string;
   icon: typeof ShoppingBag;
+  emoji: string;
   unlocked: boolean;
   color: string;
 }
@@ -103,25 +104,26 @@ export function LoyaltyProgress({
       segWidth;
 
   const achievements: Achievement[] = [
-    { id: "first",        name: "First Step",           description: "Place your first order",         icon: ShoppingBag, unlocked: totalOrders >= 1,        color: "text-green-400" },
-    { id: "repeat",       name: "Coming Back",          description: "Complete 3 orders",              icon: Repeat,      unlocked: totalOrders >= 3,        color: "text-blue-400" },
-    { id: "loyal",        name: "Loyal Fan",            description: "Complete 10 orders",             icon: Heart,       unlocked: totalOrders >= 10,       color: "text-rose-400" },
-    { id: "bigspender",   name: "Big Spender",          description: `Spend ${formatCurrency(5000)}`,  icon: Flame,       unlocked: totalSpent >= 5000,      color: "text-orange-400" },
-    { id: "delivered5",   name: "Verified Sneakerhead", description: "5 delivered orders",             icon: Zap,         unlocked: deliveredOrders >= 5,    color: "text-yellow-400" },
-    { id: "elite",        name: "Elite Collector",      description: `Spend ${formatCurrency(10000)}`, icon: Sparkles,    unlocked: totalSpent >= 10000,     color: "text-fuchsia-400" },
-    { id: "browser",      name: "Window Shopper",       description: "View 10 products",               icon: Eye,         unlocked: productViews >= 10,      color: "text-sky-400" },
-    { id: "explorer",     name: "Explorer",             description: "View 50 products",               icon: Target,      unlocked: productViews >= 50,      color: "text-indigo-400" },
-    { id: "streaker",     name: "On a Streak",          description: "Visit 3 days in a row",          icon: Calendar,    unlocked: streak >= 3,             color: "text-emerald-400" },
-    { id: "marathon",     name: "Marathon",             description: "Visit 7 days in a row",          icon: Flame,       unlocked: streak >= 7,             color: "text-orange-500" },
-    { id: "hypebeast",    name: "Hypebeast",            description: "Earn 5,000 points",              icon: Rocket,      unlocked: pointsBalance >= 5000,   color: "text-pink-400" },
-    { id: "ambassador",   name: "Ambassador",           description: "Refer your first friend",       icon: Users,       unlocked: referralsCompleted >= 1, color: "text-violet-400" },
-    { id: "influencer",   name: "Influencer",           description: "Refer 5 friends",               icon: PartyPopper, unlocked: referralsCompleted >= 5, color: "text-amber-400" },
-    { id: "collector",    name: "Badge Collector",      description: "Earn 5 badges",                  icon: Trophy,      unlocked: badgesEarned >= 5,       color: "text-yellow-300" },
-    { id: "vip",          name: "VIP Status",           description: "Reach Gold tier",                icon: Crown,       unlocked: currentTierIndex >= 3,   color: "text-yellow-400" },
-    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier",             icon: Gem,         unlocked: currentTierIndex >= 5,   color: "text-fuchsia-300" },
-    { id: "saver",        name: "Point Saver",          description: "Hold 1,000 points",              icon: Coins,       unlocked: pointsBalance >= 1000,   color: "text-amber-300" },
-    { id: "gifter",       name: "Gift Giver",           description: "Redeem a reward",                icon: Gift,        unlocked: false,                   color: "text-rose-300" },
+    { id: "first",        name: "First Step",           description: "Place your first order",         icon: ShoppingBag, emoji: "👟", unlocked: totalOrders >= 1,        color: "text-green-400" },
+    { id: "repeat",       name: "Coming Back",          description: "Complete 3 orders",              icon: Repeat,      emoji: "🔁", unlocked: totalOrders >= 3,        color: "text-blue-400" },
+    { id: "loyal",        name: "Loyal Fan",            description: "Complete 10 orders",             icon: Heart,       emoji: "❤️", unlocked: totalOrders >= 10,       color: "text-rose-400" },
+    { id: "bigspender",   name: "Big Spender",          description: `Spend ${formatCurrency(5000)}`,  icon: Flame,       emoji: "🔥", unlocked: totalSpent >= 5000,      color: "text-orange-400" },
+    { id: "delivered5",   name: "Verified Sneakerhead", description: "5 delivered orders",             icon: Zap,         emoji: "👟", unlocked: deliveredOrders >= 5,    color: "text-yellow-400" },
+    { id: "elite",        name: "Elite Collector",      description: `Spend ${formatCurrency(10000)}`, icon: Sparkles,    emoji: "✨", unlocked: totalSpent >= 10000,     color: "text-fuchsia-400" },
+    { id: "browser",      name: "Window Shopper",       description: "View 10 products",               icon: Eye,         emoji: "👀", unlocked: productViews >= 10,      color: "text-sky-400" },
+    { id: "explorer",     name: "Explorer",             description: "View 50 products",               icon: Target,      emoji: "🧭", unlocked: productViews >= 50,      color: "text-indigo-400" },
+    { id: "streaker",     name: "On a Streak",          description: "Visit 3 days in a row",          icon: Calendar,    emoji: "⚡", unlocked: streak >= 3,             color: "text-emerald-400" },
+    { id: "marathon",     name: "Marathon",             description: "Visit 7 days in a row",          icon: Flame,       emoji: "🏃", unlocked: streak >= 7,             color: "text-orange-500" },
+    { id: "hypebeast",    name: "Hypebeast",            description: "Earn 5,000 points",              icon: Rocket,      emoji: "🚀", unlocked: pointsBalance >= 5000,   color: "text-pink-400" },
+    { id: "ambassador",   name: "Ambassador",           description: "Refer your first friend",       icon: Users,       emoji: "🤝", unlocked: referralsCompleted >= 1, color: "text-violet-400" },
+    { id: "influencer",   name: "Influencer",           description: "Refer 5 friends",               icon: PartyPopper, emoji: "📣", unlocked: referralsCompleted >= 5, color: "text-amber-400" },
+    { id: "collector",    name: "Badge Collector",      description: "Earn 5 badges",                  icon: Trophy,      emoji: "🏆", unlocked: badgesEarned >= 5,       color: "text-yellow-300" },
+    { id: "vip",          name: "VIP Status",           description: "Reach Gold tier",                icon: Crown,       emoji: "👑", unlocked: currentTierIndex >= 3,   color: "text-yellow-400" },
+    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier",             icon: Gem,         emoji: "💎", unlocked: currentTierIndex >= 5,   color: "text-fuchsia-300" },
+    { id: "saver",        name: "Point Saver",          description: "Hold 1,000 points",              icon: Coins,       emoji: "🪙", unlocked: pointsBalance >= 1000,   color: "text-amber-300" },
+    { id: "gifter",       name: "Gift Giver",           description: "Redeem a reward",                icon: Gift,        emoji: "🎁", unlocked: false,                   color: "text-rose-300" },
   ];
+
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
 
@@ -275,7 +277,6 @@ export function LoyaltyProgress({
           <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pt-3">
               {achievements.map((a) => {
-                const Icon = a.unlocked ? a.icon : Lock;
                 return (
                   <div
                     key={a.id}
@@ -288,16 +289,22 @@ export function LoyaltyProgress({
                   >
                     <div
                       className={cn(
-                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
-                        a.unlocked ? "bg-primary/10" : "bg-muted/40",
+                        "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-xl",
+                        a.unlocked
+                          ? "bg-gradient-to-br from-primary/15 to-primary/5 shadow-inner"
+                          : "bg-muted/40",
                       )}
                     >
-                      <Icon
-                        className={cn(
-                          "h-4 w-4",
-                          a.unlocked ? a.color : "text-muted-foreground",
-                        )}
-                      />
+                      {a.unlocked ? (
+                        <span
+                          className="drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]"
+                          aria-hidden
+                        >
+                          {a.emoji}
+                        </span>
+                      ) : (
+                        <Lock className="h-4 w-4 text-muted-foreground" />
+                      )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p
