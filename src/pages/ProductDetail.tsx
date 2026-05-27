@@ -321,7 +321,7 @@ const ProductDetail = () => {
             )}
 
             {/* Pre-Order Info Box */}
-            {effectiveIsPreorder && (
+            {effectiveIsPreorder && !isInquiryOnly && (
               <div className="bg-orange-50 dark:bg-orange-950 border-2 border-orange-200 dark:border-orange-800 rounded-lg p-4 space-y-2">
                 <div className="flex items-center gap-2 text-orange-700 dark:text-orange-300 font-semibold">
                   <span className="text-xl">🔔</span>
@@ -335,6 +335,25 @@ const ProductDetail = () => {
                 <p className="text-xs text-orange-700 dark:text-orange-300 ml-7 pt-1">
                   ✓ Full payment collected upon delivery
                 </p>
+              </div>
+            )}
+
+            {/* Inquiry-only colorway box */}
+            {isInquiryOnly && (
+              <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-4 space-y-3">
+                <div className="flex items-center gap-2 font-semibold">
+                  <span className="text-xl">💬</span>
+                  <span>Available on request</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  The <strong className="text-foreground">{activeColorway?.name}</strong> colorway is sourced on demand.
+                  Message us on WhatsApp for current pricing, availability and delivery time.
+                </p>
+                <WhatsAppButton
+                  message={`Hi! I'm interested in the ${product.brand} ${product.name} — ${activeColorway?.name} colorway. Could you share the price and availability?`}
+                  size="default"
+                  className="w-full"
+                />
               </div>
             )}
 
