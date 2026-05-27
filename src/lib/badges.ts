@@ -145,7 +145,11 @@ export interface BadgeDef {
   category: "journey" | "spend" | "engagement" | "social" | "elite";
   /** Auto-evaluator. Returns true if this should be earned given current data. */
   check?: (ctx: BadgeContext) => boolean;
+  /** Hidden until the user reaches Diamond tier (tierIndex >= 5). */
+  secret?: boolean;
 }
+
+export const SECRET_BADGE_IDS = new Set(["mythic_ascended", "arcana_awakened"]);
 
 export interface BadgeContext {
   totalSpent: number;
