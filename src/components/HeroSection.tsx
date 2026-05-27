@@ -12,7 +12,8 @@ interface HeroSectionProps {
 
 export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
   const { user } = useAuth();
-  const { account, currentTier, settings, displayPoints } = useLoyalty();
+  const { account, currentTier, settings, bonusPoints } = useLoyalty();
+  const lifetimePoints = (account?.lifetime_points ?? 0) + (bonusPoints ?? 0);
 
   return (
     <section className="relative min-h-[80vh] lg:min-h-screen flex items-center bg-gradient-hero overflow-hidden pt-20 pb-16">
