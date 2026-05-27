@@ -214,8 +214,7 @@ export function LoyaltyProgress({
               Crew Journey
             </span>
             <span className="font-mono">
-              {formatCurrency(combined)} /{" "}
-              {formatCurrency(visibleTiers[visibleTiers.length - 1].min)}
+              {combined.toLocaleString()} / {tierMinLabel(visibleTiers[visibleTiers.length - 1])}
             </span>
           </div>
           <div className="relative h-3 rounded-full bg-secondary overflow-hidden">
