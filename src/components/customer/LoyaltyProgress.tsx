@@ -43,9 +43,15 @@ const TIERS: Tier[] = [
   { name: "Silver",   min: 2000,  icon: Award,   color: "text-zinc-300",    bg: "bg-zinc-400/10",    glow: "shadow-zinc-400/30" },
   { name: "Gold",     min: 5000,  icon: Trophy,  color: "text-yellow-400",  bg: "bg-yellow-500/10",  glow: "shadow-yellow-500/40" },
   { name: "Platinum", min: 10000, icon: Crown,   color: "text-cyan-300",    bg: "bg-cyan-400/10",    glow: "shadow-cyan-400/40" },
-  { name: "Mythic",   min: 15000, icon: Sparkles,color: "text-purple-300",  bg: "bg-purple-500/10",  glow: "shadow-purple-500/50" },
-  { name: "Diamond",  min: 25000, icon: Gem,     color: "text-fuchsia-400", bg: "bg-fuchsia-500/10", glow: "shadow-fuchsia-500/50" },
+  { name: "Diamond",  min: 20000, icon: Gem,     color: "text-fuchsia-400", bg: "bg-fuchsia-500/10", glow: "shadow-fuchsia-500/50" },
+  // Secret tiers — only revealed once Diamond is reached
+  { name: "Mythic",   min: 30000, icon: Sparkles,color: "text-purple-300",  bg: "bg-purple-500/10",  glow: "shadow-purple-500/50" },
+  { name: "Arcana",   min: 50000, icon: Sparkles,color: "text-pink-300",    bg: "bg-pink-500/10",    glow: "shadow-pink-500/60" },
 ];
+
+const DIAMOND_INDEX = 5;
+const SECRET_TIER_NAMES = new Set(["Mythic", "Arcana"]);
+
 
 interface Achievement {
   id: string;
