@@ -34,6 +34,10 @@ export const AllProducts = () => {
   const { toast } = useToast();
 
   const selectedCategory = searchParams.get("category") || "all";
+  const selectedGender = searchParams.get("gender") || "all"; // all | kings | queens
+
+  const isWomens = (p: Product) => /\b(women|woman|womens|wmns|w'?s)\b/i.test(p.name);
+  const isMens = (p: Product) => !isWomens(p);
 
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
@@ -114,6 +118,12 @@ export const AllProducts = () => {
       console.log('After category filter:', filtered.length);
     }
 
+    if (selectedGender === "queens") {
+      filtered = filtered.filter(isWomens);
+    } else if (selectedGender === "kings") {
+      filtered = filtered.filter(isMens);
+    }
+
     // Search filter - checks name, description, and brand
     if (debouncedSearchQuery.trim()) {
       const query = debouncedSearchQuery.toLowerCase();
@@ -177,7 +187,16 @@ export const AllProducts = () => {
     }
     
     setFilteredProducts(filtered);
-  }, [selectedCategory, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly, debouncedSearchQuery]);
+  }, [selectedCategory, selectedGender, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly, debouncedSearchQuery]);
+
+  const handleGenderChange = (gender: string) => {
+    if (gender === "all") {
+      searchParams.delete("gender");
+    } else {
+      searchParams.set("gender", gender);
+    }
+    setSearchParams(searchParams);
+  };
 
   const handleCategoryChange = (category: string) => {
     if (category === "all") {
@@ -238,6 +257,27 @@ export const AllProducts = () => {
             {debouncedSearchQuery && ` for "${debouncedSearchQuery}"`}
           </p>
         </div>
+
+        {/* Gender subcategory — cool labels */}
+        <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3 mb-6 md:mb-8">
+          {[
+            { key: "all", label: "Everyone", count: products.length },
+            { key: "kings", label: "KINGS", sub: "for him", count: products.filter(isMens).length },
+            { key: "queens", label: "QUEENS", sub: "for her", count: products.filter(isWomens).length },
+          ].map(g => (
+            <Badge
+              key={g.key}
+              variant={selectedGender === g.key ? "default" : "outline"}
+              className="cursor-pointer px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm tracking-widest uppercase font-bold hover:bg-primary/20 transition-colors"
+              onClick={() => handleGenderChange(g.key)}
+            >
+              {g.label}
+              {g.sub && <span className="ml-1.5 text-[10px] font-normal opacity-70 normal-case tracking-normal">· {g.sub}</span>}
+              <span className="ml-2 opacity-60">({g.count})</span>
+            </Badge>
+          ))}
+        </div>
+
 
         <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-6 md:mb-8">
           <Badge
