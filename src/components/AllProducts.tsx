@@ -187,7 +187,16 @@ export const AllProducts = () => {
     }
     
     setFilteredProducts(filtered);
-  }, [selectedCategory, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly, debouncedSearchQuery]);
+  }, [selectedCategory, selectedGender, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly, debouncedSearchQuery]);
+
+  const handleGenderChange = (gender: string) => {
+    if (gender === "all") {
+      searchParams.delete("gender");
+    } else {
+      searchParams.set("gender", gender);
+    }
+    setSearchParams(searchParams);
+  };
 
   const handleCategoryChange = (category: string) => {
     if (category === "all") {
