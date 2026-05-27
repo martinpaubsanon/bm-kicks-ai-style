@@ -305,19 +305,23 @@ export default function Rewards() {
               );
             })()}
             <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
-              {SPEND_TIERS.map((t, i) => (
-                <div
-                  key={t.name}
-                  className={cn(
-                    "flex flex-col items-center gap-0.5",
-                    combinedScore >= t.min ? "text-foreground" : "",
-                    i === currentLevelIndex && "text-[#4ade80] font-bold",
-                  )}
-                >
-                  <span className="uppercase tracking-wider">{t.name}</span>
-                  <span className="font-mono">{formatCurrency(t.min)}</span>
-                </div>
-              ))}
+              {SPEND_TIERS.map((t, i) => {
+                const masked = t.secret && !hasDiamond;
+                return (
+                  <div
+                    key={t.name}
+                    className={cn(
+                      "flex flex-col items-center gap-0.5",
+                      combinedScore >= t.min ? "text-foreground" : "",
+                      i === currentLevelIndex && "text-[#4ade80] font-bold",
+                      masked && "italic text-muted-foreground/70",
+                    )}
+                  >
+                    <span className="uppercase tracking-wider">{tierName(t)}</span>
+                    <span className="font-mono">{tierMinLabel(t)}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
