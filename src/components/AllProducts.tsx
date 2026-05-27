@@ -16,6 +16,7 @@ interface Product {
   price: number;
   images?: string[];
   category: string;
+  gender?: string;
   is_featured?: boolean;
   is_limited_edition?: boolean;
   stock_total?: number;
@@ -36,8 +37,10 @@ export const AllProducts = () => {
   const selectedCategory = searchParams.get("category") || "all";
   const selectedGender = searchParams.get("gender") || "all"; // all | kings | queens
 
-  const isWomens = (p: Product) => /\b(women|woman|womens|wmns|w'?s)\b/i.test(p.name);
-  const isMens = (p: Product) => !isWomens(p);
+  const isWomens = (p: Product) =>
+    p.gender === "women" || (!p.gender && /\b(women|woman|womens|wmns|w'?s)\b/i.test(p.name));
+  const isMens = (p: Product) =>
+    p.gender === "men" || p.gender === "unisex" || (!p.gender && !/\b(women|woman|womens|wmns|w'?s)\b/i.test(p.name));
 
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);

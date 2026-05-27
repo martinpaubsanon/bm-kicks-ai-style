@@ -32,6 +32,7 @@ export default function ProductForm() {
     name: "",
     brand: "",
     category: "Running",
+    gender: "unisex",
     description: "",
     price: "",
     images: [] as string[],
@@ -71,6 +72,7 @@ export default function ProductForm() {
         name: data.name || "",
         brand: data.brand || "",
         category: data.category || "Running",
+        gender: (data as any).gender || "unisex",
         description: data.description || "",
         price: data.price?.toString() || "",
         images: data.images || [],
@@ -194,6 +196,7 @@ export default function ProductForm() {
         name: formData.name,
         brand: formData.brand,
         category: formData.category,
+        gender: formData.gender,
         description: formData.description,
         price: validation.data.price,
         images: formData.images,
@@ -345,6 +348,28 @@ export default function ProductForm() {
                 </Select>
               </div>
             </div>
+
+            <div>
+              <Label htmlFor="gender">Gender / Audience *</Label>
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => setFormData({ ...formData, gender: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="men">Men (Kings)</SelectItem>
+                  <SelectItem value="women">Women (Queens)</SelectItem>
+                  <SelectItem value="unisex">Unisex (Everyone)</SelectItem>
+                  <SelectItem value="kids">Kids</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground mt-1">
+                Drives the homepage Kings / Queens filter
+              </p>
+            </div>
+
 
             <div>
               <Label htmlFor="description">Description</Label>

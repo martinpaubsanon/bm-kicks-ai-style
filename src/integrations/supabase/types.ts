@@ -577,6 +577,7 @@ export type Database = {
           colors: string[] | null
           created_at: string | null
           description: string | null
+          gender: string
           id: string
           images: string[] | null
           is_featured: boolean | null
@@ -595,6 +596,7 @@ export type Database = {
           colors?: string[] | null
           created_at?: string | null
           description?: string | null
+          gender?: string
           id?: string
           images?: string[] | null
           is_featured?: boolean | null
@@ -613,6 +615,7 @@ export type Database = {
           colors?: string[] | null
           created_at?: string | null
           description?: string | null
+          gender?: string
           id?: string
           images?: string[] | null
           is_featured?: boolean | null
