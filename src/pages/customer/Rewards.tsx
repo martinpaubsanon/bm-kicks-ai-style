@@ -29,12 +29,15 @@ import { formatCurrency } from "@/lib/currency";
 
 // Spend-based tiers — MUST match src/components/customer/LoyaltyProgress.tsx
 const SPEND_TIERS = [
-  { name: "Rookie",   min: 0,     icon: Star,   color: "#cbd5e1" },
-  { name: "Bronze",   min: 500,   icon: Medal,  color: "#d97706" },
-  { name: "Silver",   min: 2000,  icon: Award,  color: "#d4d4d8" },
-  { name: "Gold",     min: 5000,  icon: Trophy, color: "#facc15" },
-  { name: "Platinum", min: 10000, icon: Crown,  color: "#67e8f9" },
-  { name: "Diamond",  min: 25000, icon: Gem,    color: "#e879f9" },
+  { name: "Rookie",   min: 0,     icon: Star,   color: "#cbd5e1", secret: false },
+  { name: "Bronze",   min: 500,   icon: Medal,  color: "#d97706", secret: false },
+  { name: "Silver",   min: 2000,  icon: Award,  color: "#d4d4d8", secret: false },
+  { name: "Gold",     min: 5000,  icon: Trophy, color: "#facc15", secret: false },
+  { name: "Platinum", min: 10000, icon: Crown,  color: "#67e8f9", secret: false },
+  { name: "Diamond",  min: 20000, icon: Gem,    color: "#e879f9", secret: false },
+  // Secret tiers — revealed only after Diamond
+  { name: "Mythic",   min: 30000, icon: Sparkles, color: "#c084fc", secret: true },
+  { name: "Arcana",   min: 50000, icon: Sparkles, color: "#f0abfc", secret: true },
 ];
 
 // ---------- Gamified config ----------
@@ -174,6 +177,13 @@ export default function Rewards() {
       )
     : 100;
   const remainingToNext = nextSpendTier ? Math.max(0, nextSpendTier.min - combinedScore) : 0;
+  // Diamond is index 5. Secret tiers (Mythic, Arcana) are masked until Diamond is reached.
+  const hasDiamond = currentLevelIndex >= 5;
+  const nextTierMasked = !!nextSpendTier?.secret && !hasDiamond;
+  const tierName = (t: (typeof SPEND_TIERS)[number]) =>
+    t.secret && !hasDiamond ? "???" : t.name;
+  const tierMinLabel = (t: (typeof SPEND_TIERS)[number]) =>
+    t.secret && !hasDiamond ? "??? pts" : `${t.min.toLocaleString()} pts`;
 
   return (
     <div className="space-y-6">
@@ -199,10 +209,12 @@ export default function Rewards() {
                   Next rank
                 </p>
                 <p className="text-2xl md:text-3xl font-black text-[#4ade80]">
-                  {nextSpendTier.name}
+                  {nextTierMasked ? "???" : nextSpendTier.name}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {formatCurrency(remainingToNext)} away
+                  {nextTierMasked
+                    ? "Reach Diamond to unveil…"
+                    : `${remainingToNext.toLocaleString()} pts away`}
                 </p>
               </div>
             ) : (
@@ -248,8 +260,7 @@ export default function Rewards() {
                 Crew Journey
               </span>
               <span className="font-mono">
-                {formatCurrency(combinedScore)} /{" "}
-                {formatCurrency(SPEND_TIERS[SPEND_TIERS.length - 1].min)}
+                {combinedScore.toLocaleString()} pts / {tierMinLabel(SPEND_TIERS[SPEND_TIERS.length - 1])}
               </span>
             </div>
             {(() => {
@@ -294,19 +305,23 @@ export default function Rewards() {
               );
             })()}
             <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
-              {SPEND_TIERS.map((t, i) => (
-                <div
-                  key={t.name}
-                  className={cn(
-                    "flex flex-col items-center gap-0.5",
-                    combinedScore >= t.min ? "text-foreground" : "",
-                    i === currentLevelIndex && "text-[#4ade80] font-bold",
-                  )}
-                >
-                  <span className="uppercase tracking-wider">{t.name}</span>
-                  <span className="font-mono">{formatCurrency(t.min)}</span>
-                </div>
-              ))}
+              {SPEND_TIERS.map((t, i) => {
+                const masked = t.secret && !hasDiamond;
+                return (
+                  <div
+                    key={t.name}
+                    className={cn(
+                      "flex flex-col items-center gap-0.5",
+                      combinedScore >= t.min ? "text-foreground" : "",
+                      i === currentLevelIndex && "text-[#4ade80] font-bold",
+                      masked && "italic text-muted-foreground/70",
+                    )}
+                  >
+                    <span className="uppercase tracking-wider">{tierName(t)}</span>
+                    <span className="font-mono">{tierMinLabel(t)}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -381,6 +396,7 @@ export default function Rewards() {
               {SPEND_TIERS.map((tier, i) => {
                 const unlocked = i <= currentLevelIndex;
                 const isYou = i === currentLevelIndex;
+                const masked = tier.secret && !hasDiamond;
                 const TierIcon = tier.icon;
                 return (
                   <div
@@ -392,23 +408,24 @@ export default function Rewards() {
                         : unlocked
                           ? "border-border bg-secondary/40"
                           : "border-border opacity-50",
+                      masked && "border-dashed",
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      {unlocked ? (
-                        <TierIcon className="w-5 h-5" style={{ color: tier.color }} />
-                      ) : (
+                      {masked || !unlocked ? (
                         <Lock className="w-5 h-5 text-muted-foreground" />
+                      ) : (
+                        <TierIcon className="w-5 h-5" style={{ color: tier.color }} />
                       )}
                       <div>
                         <p
-                          className="font-bold"
-                          style={{ color: unlocked ? tier.color : undefined }}
+                          className={cn("font-bold", masked && "italic")}
+                          style={{ color: unlocked && !masked ? tier.color : undefined }}
                         >
-                          {tier.name}
+                          {tierName(tier)}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {formatCurrency(tier.min)}+ spent
+                          {masked ? "Reach Diamond to unveil" : `${tier.min.toLocaleString()}+ pts`}
                         </p>
                       </div>
                     </div>

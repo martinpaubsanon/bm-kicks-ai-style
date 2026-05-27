@@ -145,13 +145,19 @@ export interface BadgeDef {
   category: "journey" | "spend" | "engagement" | "social" | "elite";
   /** Auto-evaluator. Returns true if this should be earned given current data. */
   check?: (ctx: BadgeContext) => boolean;
+  /** Hidden until the user reaches Diamond tier (tierIndex >= 5). */
+  secret?: boolean;
 }
+
+export const SECRET_BADGE_IDS = new Set(["mythic_ascended", "arcana_awakened"]);
 
 export interface BadgeContext {
   totalSpent: number;
   orderCount: number;
   pointsBalance: number;
   lifetimePoints: number;
+  /** Combined score = QAR spent + lifetime/bonus points. Drives tier and spend badges. */
+  combinedScore: number;
   tierIndex: number;
   game: LocalGameState;
   referralsCompleted: number;
@@ -225,51 +231,51 @@ export const BADGES: BadgeDef[] = [
     check: (c) => c.orderCount >= 10,
   },
 
-  // Spend tiers
+  // Spend tiers (based on combined score in points)
   {
     id: "bronze_spender",
     label: "Bronze Spender",
-    description: "Spend QAR 500",
+    description: "Earn 500 points",
     emoji: "🥉",
     rarity: "common",
     category: "spend",
-    check: (c) => c.totalSpent >= 500,
+    check: (c) => c.combinedScore >= 500,
   },
   {
     id: "silver_spender",
     label: "Silver Spender",
-    description: "Spend QAR 2,000",
+    description: "Earn 2,000 points",
     emoji: "🥈",
     rarity: "rare",
     category: "spend",
-    check: (c) => c.totalSpent >= 2000,
+    check: (c) => c.combinedScore >= 2000,
   },
   {
     id: "gold_spender",
     label: "Gold Spender",
-    description: "Spend QAR 5,000",
+    description: "Earn 5,000 points",
     emoji: "🥇",
     rarity: "epic",
     category: "spend",
-    check: (c) => c.totalSpent >= 5000,
+    check: (c) => c.combinedScore >= 5000,
   },
   {
     id: "platinum_elite",
     label: "Platinum Elite",
-    description: "Spend QAR 10,000",
+    description: "Earn 10,000 points",
     emoji: "👑",
     rarity: "legendary",
     category: "elite",
-    check: (c) => c.totalSpent >= 10000,
+    check: (c) => c.combinedScore >= 10000,
   },
   {
     id: "diamond_legend",
     label: "Diamond Legend",
-    description: "Spend QAR 25,000",
+    description: "Earn 20,000 points",
     emoji: "💠",
     rarity: "legendary",
     category: "elite",
-    check: (c) => c.totalSpent >= 25000,
+    check: (c) => c.combinedScore >= 20000,
   },
 
   // Engagement
@@ -454,24 +460,27 @@ export const BADGES: BadgeDef[] = [
     check: (c) => (c.maxItemPrice ?? 0) >= 5000,
   },
 
-  // Secret tiers — only shown once Diamond (tierIndex >= 5) is reached
+  // Secret tiers — only revealed once Diamond (tierIndex >= 5) is reached.
+  // The UI masks label/description until then.
   {
     id: "mythic_ascended",
     label: "Mythic Ascended",
-    description: "Reach Mythic tier (QAR 30,000+ combined)",
+    description: "Earn 30,000 points",
     emoji: "🔮",
     rarity: "legendary",
     category: "elite",
-    check: (c) => c.tierIndex >= 6,
+    secret: true,
+    check: (c) => c.combinedScore >= 30000,
   },
   {
     id: "arcana_awakened",
     label: "Arcana Awakened",
-    description: "Reach Arcana tier (QAR 50,000+ combined)",
+    description: "Earn 50,000 points",
     emoji: "🜲",
     rarity: "legendary",
     category: "elite",
-    check: (c) => c.tierIndex >= 7,
+    secret: true,
+    check: (c) => c.combinedScore >= 50000,
   },
 
 ];

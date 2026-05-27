@@ -91,24 +91,20 @@ export function LoyaltyProgress({
     0,
   );
   const currentTier = TIERS[currentTierIndex];
-  // Secret tiers (Mythic, Arcana) stay hidden until the user reaches Diamond
+  // Secret tiers (Mythic, Arcana) stay as mystery teasers until the user reaches Diamond
   const hasDiamond = currentTierIndex >= DIAMOND_INDEX;
-  const visibleTiers = hasDiamond
-    ? TIERS
-    : TIERS.filter((t) => !SECRET_TIER_NAMES.has(t.name));
+  // Always render all tiers on the progress so secret ones appear as locked teasers
+  const visibleTiers = TIERS;
   const nextTier = TIERS[currentTierIndex + 1];
-  // Hide the next tier's name/threshold if it's still a secret
-  const nextTierVisible =
-    nextTier && (hasDiamond || !SECRET_TIER_NAMES.has(nextTier.name))
-      ? nextTier
-      : null;
+  const nextTierIsSecret = nextTier ? SECRET_TIER_NAMES.has(nextTier.name) : false;
+  const nextTierLocked = nextTierIsSecret && !hasDiamond;
   const remainingToNext = nextTier ? Math.max(0, nextTier.min - combined) : 0;
   const TierIcon = currentTier.icon;
 
   // Multi-segment progress that mirrors the Rewards page
   const segCount = visibleTiers.length - 1;
   const segWidth = 100 / segCount;
-  const visibleIndex = visibleTiers.findIndex((t) => t.name === currentTier.name);
+  const visibleIndex = currentTierIndex;
   const visibleNext = visibleTiers[visibleIndex + 1];
   const fillPct = !visibleNext
     ? 100
@@ -122,14 +118,21 @@ export function LoyaltyProgress({
         )) *
       segWidth;
 
+  const tierLabel = (t: Tier) =>
+    SECRET_TIER_NAMES.has(t.name) && !hasDiamond ? "???" : t.name;
+  const tierMinLabel = (t: Tier) =>
+    SECRET_TIER_NAMES.has(t.name) && !hasDiamond
+      ? "??? pts"
+      : `${t.min.toLocaleString()} pts`;
+
 
   const allAchievements: (Achievement & { secret?: boolean })[] = [
     { id: "first",        name: "First Step",           description: "Place your first order",         icon: ShoppingBag, emoji: "👟", unlocked: totalOrders >= 1,        color: "text-green-400" },
     { id: "repeat",       name: "Coming Back",          description: "Complete 3 orders",              icon: Repeat,      emoji: "🔁", unlocked: totalOrders >= 3,        color: "text-blue-400" },
     { id: "loyal",        name: "Loyal Fan",            description: "Complete 10 orders",             icon: Heart,       emoji: "❤️", unlocked: totalOrders >= 10,       color: "text-rose-400" },
-    { id: "bigspender",   name: "Big Spender",          description: `Spend ${formatCurrency(5000)}`,  icon: Flame,       emoji: "🔥", unlocked: totalSpent >= 5000,      color: "text-orange-400" },
+    { id: "bigspender",   name: "Big Spender",          description: "Earn 5,000 points",              icon: Flame,       emoji: "🔥", unlocked: combined >= 5000,        color: "text-orange-400" },
     { id: "delivered5",   name: "Verified Sneakerhead", description: "5 delivered orders",             icon: Zap,         emoji: "👟", unlocked: deliveredOrders >= 5,    color: "text-yellow-400" },
-    { id: "elite",        name: "Elite Collector",      description: `Spend ${formatCurrency(10000)}`, icon: Sparkles,    emoji: "✨", unlocked: totalSpent >= 10000,     color: "text-fuchsia-400" },
+    { id: "elite",        name: "Elite Collector",      description: "Earn 10,000 points",             icon: Sparkles,    emoji: "✨", unlocked: combined >= 10000,       color: "text-fuchsia-400" },
     { id: "browser",      name: "Window Shopper",       description: "View 10 products",               icon: Eye,         emoji: "👀", unlocked: productViews >= 10,      color: "text-sky-400" },
     { id: "explorer",     name: "Explorer",             description: "View 50 products",               icon: Target,      emoji: "🧭", unlocked: productViews >= 50,      color: "text-indigo-400" },
     { id: "streaker",     name: "On a Streak",          description: "Visit 3 days in a row",          icon: Calendar,    emoji: "⚡", unlocked: streak >= 3,             color: "text-emerald-400" },
@@ -139,15 +142,16 @@ export function LoyaltyProgress({
     { id: "influencer",   name: "Influencer",           description: "Refer 5 friends",               icon: PartyPopper, emoji: "📣", unlocked: referralsCompleted >= 5, color: "text-amber-400" },
     { id: "collector",    name: "Badge Collector",      description: "Earn 5 badges",                  icon: Trophy,      emoji: "🏆", unlocked: badgesEarned >= 5,       color: "text-yellow-300" },
     { id: "vip",          name: "VIP Status",           description: "Reach Gold tier",                icon: Crown,       emoji: "👑", unlocked: currentTierIndex >= 3,   color: "text-yellow-400" },
-    { id: "legend",       name: "Living Legend",        description: `Reach Diamond tier (${formatCurrency(20000)})`, icon: Gem, emoji: "💎", unlocked: currentTierIndex >= DIAMOND_INDEX, color: "text-fuchsia-300" },
+    { id: "legend",       name: "Living Legend",        description: "Reach Diamond tier (20,000 pts)", icon: Gem,        emoji: "💎", unlocked: currentTierIndex >= DIAMOND_INDEX, color: "text-fuchsia-300" },
     { id: "saver",        name: "Point Saver",          description: "Hold 1,000 points",              icon: Coins,       emoji: "🪙", unlocked: pointsBalance >= 1000,   color: "text-amber-300" },
     { id: "gifter",       name: "Gift Giver",           description: "Redeem a reward",                icon: Gift,        emoji: "🎁", unlocked: false,                   color: "text-rose-300" },
-    // Secret achievements — hidden until Diamond is reached
-    { id: "mythic",       name: "Mythic Ascended",      description: `Reach Mythic tier (${formatCurrency(30000)})`,  icon: Sparkles, emoji: "🔮", unlocked: currentTierIndex >= 6, color: "text-purple-300", secret: true },
-    { id: "arcana",       name: "Arcana Awakened",      description: `Reach Arcana tier (${formatCurrency(50000)})`,  icon: Sparkles, emoji: "🜲", unlocked: currentTierIndex >= 7, color: "text-pink-300",   secret: true },
+    // Secret achievements — masked until Diamond is reached
+    { id: "mythic",       name: "Mythic Ascended",      description: "Earn 30,000 points",             icon: Sparkles, emoji: "🔮", unlocked: currentTierIndex >= 6, color: "text-purple-300", secret: true },
+    { id: "arcana",       name: "Arcana Awakened",      description: "Earn 50,000 points",             icon: Sparkles, emoji: "🜲", unlocked: currentTierIndex >= 7, color: "text-pink-300",   secret: true },
   ];
 
-  const achievements = allAchievements.filter((a) => hasDiamond || !a.secret);
+  // Always include secret achievements so they show as locked mystery cards
+  const achievements = allAchievements;
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
 
 
@@ -183,16 +187,16 @@ export function LoyaltyProgress({
             <p className={cn("text-2xl font-bold", currentTier.color)}>
               {currentTier.name}
             </p>
-            {nextTierVisible ? (
+            {nextTier && !nextTierLocked ? (
               <p className="text-xs text-muted-foreground">
-                {formatCurrency(remainingToNext)} more (spend or earn) to reach{" "}
+                {remainingToNext.toLocaleString()} pts more to reach{" "}
                 <span className="font-semibold text-foreground">
-                  {nextTierVisible.name}
+                  {nextTier.name}
                 </span>
               </p>
-            ) : nextTier ? (
+            ) : nextTier && nextTierLocked ? (
               <p className="text-xs text-muted-foreground">
-                You've reached the highest known tier… but whispers speak of something beyond. 🜲
+                Reach Diamond to unveil what lies beyond… 🜲
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
@@ -210,8 +214,7 @@ export function LoyaltyProgress({
               Crew Journey
             </span>
             <span className="font-mono">
-              {formatCurrency(combined)} /{" "}
-              {formatCurrency(visibleTiers[visibleTiers.length - 1].min)}
+              {combined.toLocaleString()} / {tierMinLabel(visibleTiers[visibleTiers.length - 1])}
             </span>
           </div>
           <div className="relative h-3 rounded-full bg-secondary overflow-hidden">
@@ -238,19 +241,23 @@ export function LoyaltyProgress({
             })}
           </div>
           <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
-            {visibleTiers.map((t) => (
-              <div
-                key={t.name}
-                className={cn(
-                  "flex flex-col items-center gap-0.5",
-                  combined >= t.min ? "text-foreground" : "",
-                  t.name === currentTier.name && "text-[#4ade80] font-bold",
-                )}
-              >
-                <span className="uppercase tracking-wider">{t.name}</span>
-                <span className="font-mono">{formatCurrency(t.min)}</span>
-              </div>
-            ))}
+            {visibleTiers.map((t) => {
+              const masked = SECRET_TIER_NAMES.has(t.name) && !hasDiamond;
+              return (
+                <div
+                  key={t.name}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5",
+                    combined >= t.min ? "text-foreground" : "",
+                    t.name === currentTier.name && "text-[#4ade80] font-bold",
+                    masked && "italic text-muted-foreground/70",
+                  )}
+                >
+                  <span className="uppercase tracking-wider">{tierLabel(t)}</span>
+                  <span className="font-mono">{tierMinLabel(t)}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -259,6 +266,7 @@ export function LoyaltyProgress({
           {visibleTiers.map((tier) => {
             const Icon = tier.icon;
             const reached = combined >= tier.min;
+            const masked = SECRET_TIER_NAMES.has(tier.name) && !hasDiamond;
 
             return (
               <div
@@ -271,22 +279,28 @@ export function LoyaltyProgress({
                     reached
                       ? cn(tier.bg, "ring-1 ring-border")
                       : "bg-muted/30 opacity-40",
+                    masked && "border border-dashed border-muted-foreground/40",
                   )}
                 >
-                  <Icon
-                    className={cn(
-                      "h-4 w-4",
-                      reached ? tier.color : "text-muted-foreground",
-                    )}
-                  />
+                  {masked ? (
+                    <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                  ) : (
+                    <Icon
+                      className={cn(
+                        "h-4 w-4",
+                        reached ? tier.color : "text-muted-foreground",
+                      )}
+                    />
+                  )}
                 </div>
                 <span
                   className={cn(
                     "text-[9px] md:text-[10px] truncate w-full text-center",
                     reached ? "text-foreground font-medium" : "text-muted-foreground",
+                    masked && "italic",
                   )}
                 >
-                  {tier.name}
+                  {tierLabel(tier)}
                 </span>
               </div>
             );
@@ -307,6 +321,7 @@ export function LoyaltyProgress({
           <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pt-3">
               {achievements.map((a) => {
+                const masked = !!a.secret && !hasDiamond && !a.unlocked;
                 return (
                   <div
                     key={a.id}
@@ -332,6 +347,8 @@ export function LoyaltyProgress({
                         >
                           {a.emoji}
                         </span>
+                      ) : masked ? (
+                        <span className="text-base text-muted-foreground" aria-hidden>❓</span>
                       ) : (
                         <Lock className="h-4 w-4 text-muted-foreground" />
                       )}
@@ -343,10 +360,14 @@ export function LoyaltyProgress({
                           a.unlocked ? "text-foreground" : "text-muted-foreground",
                         )}
                       >
-                        {a.name}
+                        {masked ? "??? (Secret)" : a.name}
                       </p>
                       <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground break-words">
-                        {a.unlocked ? `Earned: ${a.description}` : `How to earn: ${a.description}`}
+                        {a.unlocked
+                          ? `Earned: ${a.description}`
+                          : masked
+                            ? "Reach Diamond tier to reveal"
+                            : `How to earn: ${a.description}`}
                       </p>
                     </div>
                   </div>

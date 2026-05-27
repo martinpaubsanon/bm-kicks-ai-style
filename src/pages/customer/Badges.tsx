@@ -112,6 +112,7 @@ export default function Badges() {
     orderCount,
     pointsBalance: account?.points_balance ?? 0,
     lifetimePoints: account?.lifetime_points ?? 0,
+    combinedScore,
     tierIndex,
     game,
     referralsCompleted,
@@ -120,6 +121,9 @@ export default function Badges() {
     maxItemPrice,
     maxOrderTotal,
   };
+
+  // Diamond is tier index 5. Secret badges stay masked until then.
+  const hasDiamond = tierIndex >= 5;
 
   const earned = useMemo(() => computeEarnedBadges(ctx), [ctx]);
 
@@ -179,7 +183,7 @@ export default function Badges() {
             className="h-3 bg-secondary [&>div]:bg-[linear-gradient(90deg,#f59e0b,#ec4899,#8b5cf6)]"
           />
           <p className="text-xs text-muted-foreground mt-2">
-            {Math.round(progressPct)}% complete · {formatCurrency(totalSpent)} spent ·{" "}
+            {Math.round(progressPct)}% complete · {combinedScore.toLocaleString()} pts ·{" "}
             {orderCount} orders · {game.streak}d streak
           </p>
 
@@ -214,6 +218,7 @@ export default function Badges() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {visible.map((b) => {
           const isEarned = earned.has(b.id);
+          const isMasked = !!b.secret && !hasDiamond && !isEarned;
           const r = RARITY_STYLE[b.rarity];
           return (
             <Card
@@ -222,16 +227,17 @@ export default function Badges() {
                 "relative overflow-hidden border-2 transition-all hover:-translate-y-1",
                 isEarned ? r.ring : "border-border opacity-60",
                 isEarned && r.glow,
+                isMasked && "border-dashed",
               )}
             >
               <CardContent className="p-5 flex flex-col items-center text-center">
                 <span
                   className={cn(
                     "absolute top-2 right-2 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full",
-                    r.chip,
+                    isMasked ? "bg-muted/40 text-muted-foreground" : r.chip,
                   )}
                 >
-                  {b.rarity}
+                  {isMasked ? "SECRET" : b.rarity}
                 </span>
                 <div
                   className={cn(
@@ -241,7 +247,13 @@ export default function Badges() {
                       : "bg-secondary/40 grayscale scale-90",
                   )}
                 >
-                  {isEarned ? b.emoji : <Lock className="w-8 h-8 text-muted-foreground" />}
+                  {isEarned ? (
+                    b.emoji
+                  ) : isMasked ? (
+                    <span className="text-3xl text-muted-foreground">❓</span>
+                  ) : (
+                    <Lock className="w-8 h-8 text-muted-foreground" />
+                  )}
                 </div>
                 <p
                   className={cn(
@@ -249,10 +261,10 @@ export default function Badges() {
                     isEarned ? r.label : "text-muted-foreground",
                   )}
                 >
-                  {b.label}
+                  {isMasked ? "???" : b.label}
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
-                  {b.description}
+                  {isMasked ? "Reach Diamond tier to reveal" : b.description}
                 </p>
               </CardContent>
             </Card>
