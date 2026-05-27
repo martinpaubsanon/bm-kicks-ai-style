@@ -91,24 +91,37 @@ export function LoyaltyProgress({
     0,
   );
   const currentTier = TIERS[currentTierIndex];
+  // Secret tiers (Mythic, Arcana) stay hidden until the user reaches Diamond
+  const hasDiamond = currentTierIndex >= DIAMOND_INDEX;
+  const visibleTiers = hasDiamond
+    ? TIERS
+    : TIERS.filter((t) => !SECRET_TIER_NAMES.has(t.name));
   const nextTier = TIERS[currentTierIndex + 1];
+  // Hide the next tier's name/threshold if it's still a secret
+  const nextTierVisible =
+    nextTier && (hasDiamond || !SECRET_TIER_NAMES.has(nextTier.name))
+      ? nextTier
+      : null;
   const remainingToNext = nextTier ? Math.max(0, nextTier.min - combined) : 0;
   const TierIcon = currentTier.icon;
 
   // Multi-segment progress that mirrors the Rewards page
-  const segCount = TIERS.length - 1;
+  const segCount = visibleTiers.length - 1;
   const segWidth = 100 / segCount;
-  const fillPct = !nextTier
+  const visibleIndex = visibleTiers.findIndex((t) => t.name === currentTier.name);
+  const visibleNext = visibleTiers[visibleIndex + 1];
+  const fillPct = !visibleNext
     ? 100
-    : (currentTierIndex +
+    : (visibleIndex +
         Math.min(
           1,
           Math.max(
             0,
-            (combined - currentTier.min) / (nextTier.min - currentTier.min),
+            (combined - currentTier.min) / (visibleNext.min - currentTier.min),
           ),
         )) *
       segWidth;
+
 
   const achievements: Achievement[] = [
     { id: "first",        name: "First Step",           description: "Place your first order",         icon: ShoppingBag, emoji: "👟", unlocked: totalOrders >= 1,        color: "text-green-400" },
