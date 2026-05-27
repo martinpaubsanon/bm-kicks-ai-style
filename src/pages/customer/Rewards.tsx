@@ -29,12 +29,15 @@ import { formatCurrency } from "@/lib/currency";
 
 // Spend-based tiers — MUST match src/components/customer/LoyaltyProgress.tsx
 const SPEND_TIERS = [
-  { name: "Rookie",   min: 0,     icon: Star,   color: "#cbd5e1" },
-  { name: "Bronze",   min: 500,   icon: Medal,  color: "#d97706" },
-  { name: "Silver",   min: 2000,  icon: Award,  color: "#d4d4d8" },
-  { name: "Gold",     min: 5000,  icon: Trophy, color: "#facc15" },
-  { name: "Platinum", min: 10000, icon: Crown,  color: "#67e8f9" },
-  { name: "Diamond",  min: 25000, icon: Gem,    color: "#e879f9" },
+  { name: "Rookie",   min: 0,     icon: Star,   color: "#cbd5e1", secret: false },
+  { name: "Bronze",   min: 500,   icon: Medal,  color: "#d97706", secret: false },
+  { name: "Silver",   min: 2000,  icon: Award,  color: "#d4d4d8", secret: false },
+  { name: "Gold",     min: 5000,  icon: Trophy, color: "#facc15", secret: false },
+  { name: "Platinum", min: 10000, icon: Crown,  color: "#67e8f9", secret: false },
+  { name: "Diamond",  min: 20000, icon: Gem,    color: "#e879f9", secret: false },
+  // Secret tiers — revealed only after Diamond
+  { name: "Mythic",   min: 30000, icon: Sparkles, color: "#c084fc", secret: true },
+  { name: "Arcana",   min: 50000, icon: Sparkles, color: "#f0abfc", secret: true },
 ];
 
 // ---------- Gamified config ----------
