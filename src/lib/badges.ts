@@ -456,24 +456,25 @@ export const BADGES: BadgeDef[] = [
     check: (c) => (c.maxItemPrice ?? 0) >= 5000,
   },
 
-  // Secret tiers — only shown once Diamond (tierIndex >= 5) is reached
+  // Secret tiers — only revealed once Diamond (tierIndex >= 5) is reached.
+  // The UI masks label/description until then.
   {
     id: "mythic_ascended",
     label: "Mythic Ascended",
-    description: "Reach Mythic tier (QAR 30,000+ combined)",
+    description: "Earn 30,000 points",
     emoji: "🔮",
     rarity: "legendary",
     category: "elite",
-    check: (c) => c.tierIndex >= 6,
+    check: (c) => c.combinedScore >= 30000,
   },
   {
     id: "arcana_awakened",
     label: "Arcana Awakened",
-    description: "Reach Arcana tier (QAR 50,000+ combined)",
+    description: "Earn 50,000 points",
     emoji: "🜲",
     rarity: "legendary",
     category: "elite",
-    check: (c) => c.tierIndex >= 7,
+    check: (c) => c.combinedScore >= 50000,
   },
 
 ];
