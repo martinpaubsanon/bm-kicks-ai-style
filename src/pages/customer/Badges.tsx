@@ -18,7 +18,7 @@ import {
   type BadgeRarity,
 } from "@/lib/badges";
 
-const SPEND_TIERS_MIN = [0, 500, 2000, 5000, 10000, 25000];
+const SPEND_TIERS_MIN = [0, 500, 2000, 5000, 10000, 15000, 25000];
 
 const CATEGORIES: { key: BadgeContext extends never ? never : string; label: string }[] = [
   { key: "all", label: "All" },
