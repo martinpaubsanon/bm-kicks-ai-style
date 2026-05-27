@@ -16,6 +16,7 @@ interface Product {
   price: number;
   images?: string[];
   category: string;
+  gender?: string;
   is_featured?: boolean;
   is_limited_edition?: boolean;
   stock_total?: number;
