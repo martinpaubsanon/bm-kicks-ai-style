@@ -396,6 +396,7 @@ export default function Rewards() {
               {SPEND_TIERS.map((tier, i) => {
                 const unlocked = i <= currentLevelIndex;
                 const isYou = i === currentLevelIndex;
+                const masked = tier.secret && !hasDiamond;
                 const TierIcon = tier.icon;
                 return (
                   <div
@@ -407,23 +408,24 @@ export default function Rewards() {
                         : unlocked
                           ? "border-border bg-secondary/40"
                           : "border-border opacity-50",
+                      masked && "border-dashed",
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      {unlocked ? (
-                        <TierIcon className="w-5 h-5" style={{ color: tier.color }} />
-                      ) : (
+                      {masked || !unlocked ? (
                         <Lock className="w-5 h-5 text-muted-foreground" />
+                      ) : (
+                        <TierIcon className="w-5 h-5" style={{ color: tier.color }} />
                       )}
                       <div>
                         <p
-                          className="font-bold"
-                          style={{ color: unlocked ? tier.color : undefined }}
+                          className={cn("font-bold", masked && "italic")}
+                          style={{ color: unlocked && !masked ? tier.color : undefined }}
                         >
-                          {tier.name}
+                          {tierName(tier)}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {formatCurrency(tier.min)}+ spent
+                          {masked ? "Reach Diamond to unveil" : `${tier.min.toLocaleString()}+ pts`}
                         </p>
                       </div>
                     </div>
