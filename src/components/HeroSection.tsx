@@ -176,14 +176,19 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
               </div>
 
               {/* Loyalty earn badge */}
-              {settings && (
-                <div className="absolute -bottom-4 -right-2 md:bottom-4 md:-right-4 z-20 glass-strong p-4 rounded-2xl flex flex-col items-center gap-1 transform rotate-3 shadow-card max-w-[180px]">
-                  <div className="w-12 h-12 bg-gradient-gold rounded-full flex items-center justify-center text-gold-foreground font-display text-lg shadow-glow">
-                    +{settings.points_per_order}
+              {settings && (settings.points_per_qar > 0 || settings.points_per_order > 0) && (
+                <div className="absolute -bottom-4 -right-2 md:bottom-4 md:-right-4 z-20 glass-strong p-4 rounded-2xl flex flex-col items-center gap-1 transform rotate-3 shadow-card max-w-[200px]">
+                  <div className="w-14 h-14 bg-gradient-gold rounded-full flex flex-col items-center justify-center text-gold-foreground font-display shadow-glow leading-none">
+                    <span className="text-lg">+{settings.points_per_qar}</span>
+                    <span className="text-[8px] uppercase tracking-wider mt-0.5">pt/QAR</span>
                   </div>
                   <div className="text-[10px] font-bold text-center">
-                    <p className="text-muted-foreground uppercase tracking-widest">Base Pts</p>
-                    <p className="text-gold mt-0.5">Per Order</p>
+                    <p className="text-muted-foreground uppercase tracking-widest">Earn Points</p>
+                    <p className="text-gold mt-0.5">
+                      {settings.points_per_order > 0
+                        ? `+${settings.points_per_order} bonus / order`
+                        : "On every order"}
+                    </p>
                   </div>
                 </div>
               )}
