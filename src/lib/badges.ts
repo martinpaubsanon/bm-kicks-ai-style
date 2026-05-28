@@ -3,9 +3,10 @@ export const STORAGE_KEY = "bmkicks-gamified-v1";
 let activeGameUserId: string | null = null;
 
 export function setActiveGameUserId(userId: string | null) {
+  const previousUserId = activeGameUserId;
   activeGameUserId = userId;
   if (typeof window !== "undefined") {
-    if (userId) {
+    if (userId && !previousUserId) {
       const userKey = gameStorageKey(userId);
       const legacy = localStorage.getItem(STORAGE_KEY);
       if (userKey && legacy && !localStorage.getItem(userKey)) {
