@@ -23,7 +23,14 @@ interface Product {
   created_at?: string;
 }
 
-const categories = ["Running", "Basketball", "Lifestyle", "Training", "Skateboarding"];
+const categories = ["Running", "Basketball", "Lifestyle", "Training", "Skateboarding", "Watches"];
+
+// Subcategory pills shown when a parent category is selected (e.g. brands within Watches)
+const subcategoriesByCategory: Record<string, { key: string; label: string; sub?: string; brands: string[] }[]> = {
+  Watches: [
+    { key: "seiko", label: "SEIKO", sub: "auto · GMT · icons", brands: ["Seiko"] },
+  ],
+};
 
 export const AllProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);

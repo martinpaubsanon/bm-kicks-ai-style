@@ -35,11 +35,12 @@ const categories = [
   },
   {
     title: "Watches",
-    description: "Timepieces that define your wrist game",
+    description: "Time you can wear loud — automatic GMTs & icons",
     image: watchesTeaserImage,
     category: "Watches",
-    comingSoon: true,
+    comingSoon: false,
   },
+
   {
     title: "Cosmetics",
     description: "Glow up, head to toe",
