@@ -252,23 +252,23 @@ Use the recommend_shoes tool to return your recommendations with a friendly expl
         .limit(4);
       
       return new Response(
-        JSON.stringify({ 
-          error: error instanceof Error ? error.message : "Unknown error",
+        JSON.stringify({
           text: "I'm having trouble right now, but here are some of our top picks! 😊",
           products: fallbackProducts || []
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     } catch (fallbackError) {
-      console.error("Fallback error occurred");
+      console.error("Fallback error occurred", fallbackError);
       return new Response(
-        JSON.stringify({ 
-          error: error instanceof Error ? error.message : "Unknown error",
+        JSON.stringify({
+          error: "An unexpected error occurred. Please try again.",
           text: "Sorry, I encountered an error. Please try again.",
           products: []
         }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+
     }
   }
 });
