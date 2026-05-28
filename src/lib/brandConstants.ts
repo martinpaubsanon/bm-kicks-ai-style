@@ -20,6 +20,8 @@ export const BRAND_OPTIONS = [
   "Saucony",
   "Fila",
   "Sketchers",
+  "Seiko",
 ] as const;
+
 
 export type BrandOption = typeof BRAND_OPTIONS[number];

@@ -23,7 +23,14 @@ interface Product {
   created_at?: string;
 }
 
-const categories = ["Running", "Basketball", "Lifestyle", "Training", "Skateboarding"];
+const categories = ["Running", "Basketball", "Lifestyle", "Training", "Skateboarding", "Watches"];
+
+// Subcategory pills shown when a parent category is selected (e.g. brands within Watches)
+const subcategoriesByCategory: Record<string, { key: string; label: string; sub?: string; brands: string[] }[]> = {
+  Watches: [
+    { key: "seiko", label: "SEIKO", sub: "auto · GMT · icons", brands: ["Seiko"] },
+  ],
+};
 
 export const AllProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -36,6 +43,8 @@ export const AllProducts = () => {
 
   const selectedCategory = searchParams.get("category") || "all";
   const selectedGender = searchParams.get("gender") || "all"; // all | kings | queens
+  const selectedSubcategory = searchParams.get("sub") || "all";
+  const activeSubcategories = subcategoriesByCategory[selectedCategory] || [];
 
   const isWomens = (p: Product) =>
     p.gender === "women" || (!p.gender && /\b(women|woman|womens|wmns|w'?s)\b/i.test(p.name));
@@ -121,6 +130,13 @@ export const AllProducts = () => {
       console.log('After category filter:', filtered.length);
     }
 
+    if (selectedSubcategory !== "all" && activeSubcategories.length > 0) {
+      const sub = activeSubcategories.find(s => s.key === selectedSubcategory);
+      if (sub) {
+        filtered = filtered.filter(p => sub.brands.includes(p.brand));
+      }
+    }
+
     if (selectedGender === "queens") {
       filtered = filtered.filter(isWomens);
     } else if (selectedGender === "kings") {
@@ -190,7 +206,13 @@ export const AllProducts = () => {
     }
     
     setFilteredProducts(filtered);
-  }, [selectedCategory, selectedGender, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly, debouncedSearchQuery]);
+  }, [selectedCategory, selectedSubcategory, selectedGender, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly, debouncedSearchQuery]);
+
+  const handleSubcategoryChange = (sub: string) => {
+    if (sub === "all") searchParams.delete("sub");
+    else searchParams.set("sub", sub);
+    setSearchParams(searchParams);
+  };
 
   const handleGenderChange = (gender: string) => {
     if (gender === "all") {
@@ -207,6 +229,8 @@ export const AllProducts = () => {
     } else {
       searchParams.set("category", category);
     }
+    // Reset subcategory when changing parent category
+    searchParams.delete("sub");
     setSearchParams(searchParams);
   };
 
@@ -304,6 +328,34 @@ export const AllProducts = () => {
             );
           })}
         </div>
+
+        {/* Subcategory pills (e.g. SEIKO under Watches) */}
+        {activeSubcategories.length > 0 && (
+          <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3 mb-6 md:mb-8">
+            <Badge
+              variant={selectedSubcategory === "all" ? "default" : "outline"}
+              className="cursor-pointer px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm tracking-widest uppercase font-bold hover:bg-primary/20 transition-colors"
+              onClick={() => handleSubcategoryChange("all")}
+            >
+              All {selectedCategory}
+            </Badge>
+            {activeSubcategories.map(s => {
+              const count = products.filter(p => p.category === selectedCategory && s.brands.includes(p.brand)).length;
+              return (
+                <Badge
+                  key={s.key}
+                  variant={selectedSubcategory === s.key ? "default" : "outline"}
+                  className="cursor-pointer px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm tracking-widest uppercase font-bold hover:bg-primary/20 transition-colors"
+                  onClick={() => handleSubcategoryChange(s.key)}
+                >
+                  {s.label}
+                  {s.sub && <span className="ml-1.5 text-[10px] font-normal opacity-70 normal-case tracking-normal">· {s.sub}</span>}
+                  <span className="ml-2 opacity-60">({count})</span>
+                </Badge>
+              );
+            })}
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-[280px_1fr] gap-4 md:gap-8">
           <aside className="lg:sticky lg:top-4 lg:self-start">
