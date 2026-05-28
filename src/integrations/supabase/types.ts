@@ -792,6 +792,17 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      place_order: {
+        Args: {
+          p_customer_email: string
+          p_customer_name: string
+          p_customer_phone: string
+          p_items: Json
+          p_payment_method: string
+          p_shipping: Json
+        }
+        Returns: string
+      }
       recalculate_tier: { Args: { p_user_id: string }; Returns: undefined }
       redeem_reward: {
         Args: { p_reward_id: string }
