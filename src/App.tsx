@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -46,11 +47,15 @@ import OrderSuccess from "./pages/customer/OrderSuccess";
 const queryClient = new QueryClient();
 
 function DailyVisitTracker() {
+  const { user, isLoading } = useAuth();
+
   useEffect(() => {
+    if (isLoading || !user) return;
     // small delay so the toast feels like a welcome, not part of initial load
-    const t = setTimeout(() => tryDailyVisit(15), 1200);
+    const t = setTimeout(() => tryDailyVisit(15, user.id), 1200);
     return () => clearTimeout(t);
-  }, []);
+  }, [isLoading, user]);
+
   return null;
 }
 
