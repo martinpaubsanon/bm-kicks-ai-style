@@ -130,6 +130,13 @@ export const AllProducts = () => {
       console.log('After category filter:', filtered.length);
     }
 
+    if (selectedSubcategory !== "all" && activeSubcategories.length > 0) {
+      const sub = activeSubcategories.find(s => s.key === selectedSubcategory);
+      if (sub) {
+        filtered = filtered.filter(p => sub.brands.includes(p.brand));
+      }
+    }
+
     if (selectedGender === "queens") {
       filtered = filtered.filter(isWomens);
     } else if (selectedGender === "kings") {
@@ -199,7 +206,13 @@ export const AllProducts = () => {
     }
     
     setFilteredProducts(filtered);
-  }, [selectedCategory, selectedGender, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly, debouncedSearchQuery]);
+  }, [selectedCategory, selectedSubcategory, selectedGender, products, priceRange, selectedBrands, sortBy, inStockOnly, showFeaturedOnly, showLimitedOnly, debouncedSearchQuery]);
+
+  const handleSubcategoryChange = (sub: string) => {
+    if (sub === "all") searchParams.delete("sub");
+    else searchParams.set("sub", sub);
+    setSearchParams(searchParams);
+  };
 
   const handleGenderChange = (gender: string) => {
     if (gender === "all") {
@@ -216,6 +229,8 @@ export const AllProducts = () => {
     } else {
       searchParams.set("category", category);
     }
+    // Reset subcategory when changing parent category
+    searchParams.delete("sub");
     setSearchParams(searchParams);
   };
 
