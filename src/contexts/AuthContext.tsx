@@ -96,40 +96,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (session?.user) {
         setTimeout(async () => {
-          const { data, error } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", session.user.id)
-            .single();
-          
-          // Fetch customer profile
+          const { data: roleData } = await supabase.rpc("get_current_user_role");
+
           const { data: profileData } = await supabase
             .from("customer_profiles")
             .select("*")
             .eq("id", session.user.id)
             .single();
-          
+
           if (profileData) {
             setCustomerProfile({
               ...profileData,
               default_shipping_address: profileData.default_shipping_address as CustomerProfile['default_shipping_address']
             });
           }
-          
-          // Handle case where user role not assigned yet
-          if (error && error.code === 'PGRST116') {
+
+          if (!roleData) {
             setTimeout(async () => {
-              const { data: retryData } = await supabase
-                .from("user_roles")
-                .select("role")
-                .eq("user_id", session.user.id)
-                .single();
-              
-              setRole(retryData?.role as AppRole || "user");
+              const { data: retryRole } = await supabase.rpc("get_current_user_role");
+              setRole((retryRole as AppRole) || "user");
               setIsLoading(false);
             }, 1000);
           } else {
-            setRole(data?.role as AppRole || "user");
+            setRole((roleData as AppRole) || "user");
             setIsLoading(false);
           }
         }, 0);
@@ -137,6 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setActiveGameUserId(null);
         setIsLoading(false);
       }
+
     });
 
     return () => subscription.unsubscribe();
