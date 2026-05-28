@@ -1,5 +1,20 @@
 export const STORAGE_KEY = "bmkicks-gamified-v1";
 
+let activeGameUserId: string | null = null;
+
+export function setActiveGameUserId(userId: string | null) {
+  activeGameUserId = userId;
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent("bmkicks:game-user-changed", { detail: { userId } })
+    );
+  }
+}
+
+function gameStorageKey(userId: string | null | undefined = activeGameUserId) {
+  return userId ? `${STORAGE_KEY}:${userId}` : null;
+}
+
 export interface LocalGameState {
   productViews: number;
   lastVisit: string | null;
@@ -24,10 +39,12 @@ export const defaultGameState: LocalGameState = {
   cartProductIds: [],
 };
 
-export function loadGameState(): LocalGameState {
+export function loadGameState(userId?: string | null): LocalGameState {
   if (typeof window === "undefined") return defaultGameState;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const key = gameStorageKey(userId);
+    if (!key) return defaultGameState;
+    const raw = localStorage.getItem(key);
     if (!raw) return defaultGameState;
     return { ...defaultGameState, ...JSON.parse(raw) };
   } catch {
@@ -35,9 +52,11 @@ export function loadGameState(): LocalGameState {
   }
 }
 
-export function saveGameState(s: LocalGameState) {
+export function saveGameState(s: LocalGameState, userId?: string | null) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    const key = gameStorageKey(userId);
+    if (!key) return;
+    localStorage.setItem(key, JSON.stringify(s));
     window.dispatchEvent(new CustomEvent("bmkicks:game-updated", { detail: s }));
   } catch {}
 }
@@ -52,11 +71,12 @@ export interface BonusEvent {
   emoji?: string;
 }
 
-export function awardBonus(amount: number, label: string, emoji = "✨") {
+export function awardBonus(amount: number, label: string, emoji = "✨", userId?: string | null) {
   if (typeof window === "undefined" || amount <= 0) return;
-  const s = loadGameState();
+  if (!gameStorageKey(userId)) return;
+  const s = loadGameState(userId);
   s.bonusPoints = (s.bonusPoints ?? 0) + amount;
-  saveGameState(s);
+  saveGameState(s, userId);
   window.dispatchEvent(
     new CustomEvent<BonusEvent>("bmkicks:bonus-awarded", {
       detail: { amount, label, emoji },
@@ -67,9 +87,10 @@ export function awardBonus(amount: number, label: string, emoji = "✨") {
 /* ---------------- Anti-exploit task helpers ---------------- */
 
 /** Daily visit: +15 every 24h. Also updates streak. */
-export function tryDailyVisit(points = 15) {
+export function tryDailyVisit(points = 15, userId?: string | null) {
   if (typeof window === "undefined") return false;
-  const s = loadGameState();
+  if (!gameStorageKey(userId)) return false;
+  const s = loadGameState(userId);
   const now = Date.now();
   const last = s.lastVisitTs ?? 0;
   if (now - last < 24 * 60 * 60 * 1000) return false;
@@ -85,52 +106,55 @@ export function tryDailyVisit(points = 15) {
   const badges = [...s.badges];
   if (!badges.includes("first_steps")) badges.push("first_steps");
 
-  saveGameState({ ...s, lastVisit: today, lastVisitTs: now, streak, badges });
-  awardBonus(points, "Daily visit", "🗓️");
+  saveGameState({ ...s, lastVisit: today, lastVisitTs: now, streak, badges }, userId);
+  awardBonus(points, "Daily visit", "🗓️", userId);
   return true;
 }
 
 /** View a unique product: +2, once per product id ever. */
-export function tryViewProduct(productId: string, points = 2) {
+export function tryViewProduct(productId: string, points = 2, userId?: string | null) {
   if (typeof window === "undefined" || !productId) return false;
-  const s = loadGameState();
+  if (!gameStorageKey(userId)) return false;
+  const s = loadGameState(userId);
   if (s.viewedProductIds.includes(productId)) return false;
   const viewedProductIds = [...s.viewedProductIds, productId];
   saveGameState({
     ...s,
     viewedProductIds,
     productViews: viewedProductIds.length,
-  });
-  awardBonus(points, "Viewed a product", "👀");
+  }, userId);
+  awardBonus(points, "Viewed a product", "👀", userId);
   return true;
 }
 
 /** Add unique product to cart: +10, once per product id ever (can't exploit by re-adding). */
-export function tryAddToCart(productId: string, points = 10) {
+export function tryAddToCart(productId: string, points = 10, userId?: string | null) {
   if (typeof window === "undefined" || !productId) return false;
-  const s = loadGameState();
+  if (!gameStorageKey(userId)) return false;
+  const s = loadGameState(userId);
   if (s.cartProductIds.includes(productId)) return false;
   const cartProductIds = [...s.cartProductIds, productId];
   const badges = [...s.badges];
   if (!badges.includes("cart_starter")) badges.push("cart_starter");
-  saveGameState({ ...s, cartProductIds, badges });
-  awardBonus(points, "Added to bag", "🛒");
+  saveGameState({ ...s, cartProductIds, badges }, userId);
+  awardBonus(points, "Added to bag", "🛒", userId);
   return true;
 }
 
 /** Compare earned-badge IDs vs persisted ones; award +50 for each newly earned. */
-export function syncBadgeUnlocks(earnedIds: Iterable<string>, perBadge = 50) {
+export function syncBadgeUnlocks(earnedIds: Iterable<string>, perBadge = 50, userId?: string | null) {
   if (typeof window === "undefined") return;
-  const s = loadGameState();
+  if (!gameStorageKey(userId)) return;
+  const s = loadGameState(userId);
   const known = new Set(s.badges);
   const newly: string[] = [];
   for (const id of earnedIds) if (!known.has(id)) newly.push(id);
   if (newly.length === 0) return;
   const badges = [...s.badges, ...newly];
-  saveGameState({ ...s, badges });
+  saveGameState({ ...s, badges }, userId);
   newly.forEach((id) => {
     const def = BADGES.find((b) => b.id === id);
-    awardBonus(perBadge, `Badge unlocked: ${def?.label ?? id}`, def?.emoji ?? "🏆");
+    awardBonus(perBadge, `Badge unlocked: ${def?.label ?? id}`, def?.emoji ?? "🏆", userId);
   });
 }
 
