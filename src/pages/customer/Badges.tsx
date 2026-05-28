@@ -13,6 +13,7 @@ import {
   RARITY_STYLE,
   computeEarnedBadges,
   loadGameState,
+  type LocalGameState,
   syncBadgeUnlocks,
   type BadgeContext,
   type BadgeRarity,
@@ -40,7 +41,20 @@ export default function Badges() {
   const [maxItemPrice, setMaxItemPrice] = useState(0);
   const [maxOrderTotal, setMaxOrderTotal] = useState(0);
   const [filter, setFilter] = useState<string>("all");
-  const game = loadGameState();
+  const [game, setGame] = useState<LocalGameState>(() => loadGameState(user?.id));
+
+  useEffect(() => {
+    const refresh = () => setGame(loadGameState(user?.id));
+    refresh();
+    window.addEventListener("bmkicks:game-updated", refresh);
+    window.addEventListener("bmkicks:game-user-changed", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("bmkicks:game-updated", refresh);
+      window.removeEventListener("bmkicks:game-user-changed", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -129,8 +143,8 @@ export default function Badges() {
 
   // Award +50 bonus once for any newly-unlocked badge
   useEffect(() => {
-    if (earned.size > 0) syncBadgeUnlocks(earned, 50);
-  }, [earned]);
+    if (user && earned.size > 0) syncBadgeUnlocks(earned, 50, user.id);
+  }, [earned, user]);
 
   const visible =
     filter === "all" ? BADGES : BADGES.filter((b) => b.category === filter);
