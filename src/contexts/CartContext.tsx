@@ -158,7 +158,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Award bonus once per unique product (anti-exploit: re-adding won't earn again)
-      tryAddToCart(productId, 10);
+      tryAddToCart(productId, 10, user.id);
     } catch (error: any) {
       console.error("Error adding to cart:", error);
       throw error;
