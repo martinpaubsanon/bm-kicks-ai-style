@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { setActiveGameUserId } from "@/lib/badges";
 
 type AppRole = "admin" | "moderator" | "user";
 
@@ -46,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setActiveGameUserId(session?.user?.id ?? null);
         
         if (session?.user) {
           // Fetch user role with retry logic for race conditions
@@ -89,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
           }, 0);
         } else {
+          setActiveGameUserId(null);
           setRole(null);
           setCustomerProfile(null);
           setIsLoading(false);
@@ -100,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setActiveGameUserId(session?.user?.id ?? null);
       
       if (session?.user) {
         setTimeout(async () => {
@@ -141,6 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }, 0);
       } else {
+        setActiveGameUserId(null);
         setIsLoading(false);
       }
     });
@@ -152,6 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
+    setActiveGameUserId(null);
     setRole(null);
     setCustomerProfile(null);
   };

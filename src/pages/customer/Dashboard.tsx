@@ -11,12 +11,12 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { LoyaltyProgress } from "@/components/customer/LoyaltyProgress";
 import { useLoyalty } from "@/hooks/useLoyalty";
-import { loadGameState } from "@/lib/badges";
+import { loadGameState, type LocalGameState } from "@/lib/badges";
 
 export default function Dashboard() {
   const { user, customerProfile } = useAuth();
   const { account, combinedScore, bonusPoints } = useLoyalty();
-  const game = loadGameState();
+  const [game, setGame] = useState<LocalGameState>(() => loadGameState(user?.id));
   const [orders, setOrders] = useState<any[]>([]);
   const [stats, setStats] = useState({
     total: 0,
@@ -30,6 +30,19 @@ export default function Dashboard() {
     if (user) {
       loadDashboardData();
     }
+  }, [user]);
+
+  useEffect(() => {
+    const refresh = () => setGame(loadGameState(user?.id));
+    refresh();
+    window.addEventListener("bmkicks:game-updated", refresh);
+    window.addEventListener("bmkicks:game-user-changed", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("bmkicks:game-updated", refresh);
+      window.removeEventListener("bmkicks:game-user-changed", refresh);
+      window.removeEventListener("storage", refresh);
+    };
   }, [user]);
 
   const loadDashboardData = async () => {

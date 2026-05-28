@@ -67,20 +67,23 @@ export default function Rewards() {
   const [redeeming, setRedeeming] = useState<string | null>(null);
   const [totalSpent, setTotalSpent] = useState(0);
 
-  const [game, setGame] = useState<LocalGameState>(loadState);
+  const [game, setGame] = useState<LocalGameState>(() => loadState(user?.id));
   const [spinning, setSpinning] = useState(false);
   const [spinAngle, setSpinAngle] = useState(0);
 
   // Stay in sync with localStorage updates triggered elsewhere (toast events, etc.)
   useEffect(() => {
-    const refresh = () => setGame(loadState());
+    const refresh = () => setGame(loadState(user?.id));
+    refresh();
     window.addEventListener("bmkicks:game-updated", refresh);
+    window.addEventListener("bmkicks:game-user-changed", refresh);
     window.addEventListener("storage", refresh);
     return () => {
       window.removeEventListener("bmkicks:game-updated", refresh);
+      window.removeEventListener("bmkicks:game-user-changed", refresh);
       window.removeEventListener("storage", refresh);
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -130,10 +133,10 @@ export default function Rewards() {
     reload();
   };
 
-  const canSpin = game.lastSpin !== todayStr();
+  const canSpin = !!user && game.lastSpin !== todayStr();
 
   const handleSpin = useCallback(() => {
-    if (!canSpin || spinning) return;
+    if (!user || !canSpin || spinning) return;
     setSpinning(true);
     const rewards = [1, 5, 10, 15, 20, 25, 35, 50];
     const reward = rewards[Math.floor(Math.random() * rewards.length)];
@@ -142,13 +145,13 @@ export default function Rewards() {
     setTimeout(() => {
       setSpinning(false);
       // Mark the spin so it's once-a-day, then award via global bonus toast.
-      const prev = loadState();
+      const prev = loadState(user.id);
       const badges = [...prev.badges];
       if (!badges.includes("spinner")) badges.push("spinner");
-      saveState({ ...prev, lastSpin: todayStr(), badges });
-      awardBonus(reward, "Daily spin reward", "🎰");
+      saveState({ ...prev, lastSpin: todayStr(), badges }, user.id);
+      awardBonus(reward, "Daily spin reward", "🎰", user.id);
     }, 3000);
-  }, [canSpin, spinning]);
+  }, [canSpin, spinning, user]);
 
   if (loading || !account) {
     return (

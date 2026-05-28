@@ -57,8 +57,8 @@ const ProductDetail = () => {
   } | null>(null);
 
   useEffect(() => {
-    if (id) tryViewProduct(id, 2);
-  }, [id]);
+    if (id && user) tryViewProduct(id, 2, user.id);
+  }, [id, user]);
 
   useEffect(() => {
     const load = async () => {
