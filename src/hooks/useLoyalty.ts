@@ -69,7 +69,7 @@ export function useLoyalty() {
       setAccount(null);
       setPaidSpent(0);
     }
-    setBonusPoints(loadGameState().bonusPoints ?? 0);
+    setBonusPoints(user ? (loadGameState(user.id).bonusPoints ?? 0) : 0);
     setLoading(false);
   }, [user]);
 
@@ -79,14 +79,16 @@ export function useLoyalty() {
 
   // Re-read local bonus points whenever the game state updates
   useEffect(() => {
-    const onUpdate = () => setBonusPoints(loadGameState().bonusPoints ?? 0);
+    const onUpdate = () => setBonusPoints(user ? (loadGameState(user.id).bonusPoints ?? 0) : 0);
     window.addEventListener("bmkicks:game-updated", onUpdate);
     window.addEventListener("bmkicks:bonus-awarded", onUpdate);
+    window.addEventListener("bmkicks:game-user-changed", onUpdate);
     return () => {
       window.removeEventListener("bmkicks:game-updated", onUpdate);
       window.removeEventListener("bmkicks:bonus-awarded", onUpdate);
+      window.removeEventListener("bmkicks:game-user-changed", onUpdate);
     };
-  }, []);
+  }, [user]);
 
   // Combined score drives tier: paid spend + lifetime points + local bonus points
   const combinedScore =
