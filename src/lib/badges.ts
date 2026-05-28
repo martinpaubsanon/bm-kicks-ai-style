@@ -5,6 +5,14 @@ let activeGameUserId: string | null = null;
 export function setActiveGameUserId(userId: string | null) {
   activeGameUserId = userId;
   if (typeof window !== "undefined") {
+    if (userId) {
+      const userKey = gameStorageKey(userId);
+      const legacy = localStorage.getItem(STORAGE_KEY);
+      if (userKey && legacy && !localStorage.getItem(userKey)) {
+        localStorage.setItem(userKey, legacy);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
     window.dispatchEvent(
       new CustomEvent("bmkicks:game-user-changed", { detail: { userId } })
     );
