@@ -50,43 +50,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setActiveGameUserId(session?.user?.id ?? null);
         
         if (session?.user) {
-          // Fetch user role with retry logic for race conditions
           setTimeout(async () => {
-            const { data, error } = await supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", session.user.id)
-              .single();
-            
-            // Fetch customer profile if not admin
+            const { data: roleData } = await supabase.rpc("get_current_user_role");
+
             const { data: profileData } = await supabase
               .from("customer_profiles")
               .select("*")
               .eq("id", session.user.id)
               .single();
-            
+
             if (profileData) {
               setCustomerProfile({
                 ...profileData,
                 default_shipping_address: profileData.default_shipping_address as CustomerProfile['default_shipping_address']
               });
             }
-            
-            // Handle case where user role not assigned yet (race condition with trigger)
-            if (error && error.code === 'PGRST116') {
-              // No rows returned - wait and retry
+
+            if (!roleData) {
+              // Race with handle_new_user trigger — retry once
               setTimeout(async () => {
-                const { data: retryData } = await supabase
-                  .from("user_roles")
-                  .select("role")
-                  .eq("user_id", session.user.id)
-                  .single();
-                
-                setRole(retryData?.role as AppRole || "user");
+                const { data: retryRole } = await supabase.rpc("get_current_user_role");
+                setRole((retryRole as AppRole) || "user");
                 setIsLoading(false);
               }, 1000);
             } else {
-              setRole(data?.role as AppRole || "user");
+              setRole((roleData as AppRole) || "user");
               setIsLoading(false);
             }
           }, 0);
@@ -96,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setCustomerProfile(null);
           setIsLoading(false);
         }
+
       }
     );
 
