@@ -329,6 +329,34 @@ export const AllProducts = () => {
           })}
         </div>
 
+        {/* Subcategory pills (e.g. SEIKO under Watches) */}
+        {activeSubcategories.length > 0 && (
+          <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3 mb-6 md:mb-8">
+            <Badge
+              variant={selectedSubcategory === "all" ? "default" : "outline"}
+              className="cursor-pointer px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm tracking-widest uppercase font-bold hover:bg-primary/20 transition-colors"
+              onClick={() => handleSubcategoryChange("all")}
+            >
+              All {selectedCategory}
+            </Badge>
+            {activeSubcategories.map(s => {
+              const count = products.filter(p => p.category === selectedCategory && s.brands.includes(p.brand)).length;
+              return (
+                <Badge
+                  key={s.key}
+                  variant={selectedSubcategory === s.key ? "default" : "outline"}
+                  className="cursor-pointer px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm tracking-widest uppercase font-bold hover:bg-primary/20 transition-colors"
+                  onClick={() => handleSubcategoryChange(s.key)}
+                >
+                  {s.label}
+                  {s.sub && <span className="ml-1.5 text-[10px] font-normal opacity-70 normal-case tracking-normal">· {s.sub}</span>}
+                  <span className="ml-2 opacity-60">({count})</span>
+                </Badge>
+              );
+            })}
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-[280px_1fr] gap-4 md:gap-8">
           <aside className="lg:sticky lg:top-4 lg:self-start">
             <ProductFilters
