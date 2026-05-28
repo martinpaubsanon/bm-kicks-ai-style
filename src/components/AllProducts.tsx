@@ -43,6 +43,8 @@ export const AllProducts = () => {
 
   const selectedCategory = searchParams.get("category") || "all";
   const selectedGender = searchParams.get("gender") || "all"; // all | kings | queens
+  const selectedSubcategory = searchParams.get("sub") || "all";
+  const activeSubcategories = subcategoriesByCategory[selectedCategory] || [];
 
   const isWomens = (p: Product) =>
     p.gender === "women" || (!p.gender && /\b(women|woman|womens|wmns|w'?s)\b/i.test(p.name));
