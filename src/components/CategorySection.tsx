@@ -80,7 +80,8 @@ export const CategorySection = () => {
             if (category.comingSoon) {
               return (
                 <div key={index} className="group text-left cursor-default">
-                  <Card className="overflow-hidden h-[400px] relative border-border">
+                  <Card className="overflow-hidden h-[220px] sm:h-[300px] md:h-[400px] relative border-border">
+
                     {/* Background image */}
                     <div className="absolute inset-0">
                       <img
