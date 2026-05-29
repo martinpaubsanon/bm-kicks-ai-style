@@ -24,6 +24,13 @@ function gameStorageKey(userId: string | null | undefined = activeGameUserId) {
   return userId ? `${STORAGE_KEY}:${userId}` : null;
 }
 
+export interface BonusHistoryEntry {
+  amount: number;
+  label: string;
+  emoji?: string;
+  ts: number;
+}
+
 export interface LocalGameState {
   productViews: number;
   lastVisit: string | null;
@@ -34,6 +41,7 @@ export interface LocalGameState {
   bonusPoints: number;
   viewedProductIds: string[];
   cartProductIds: string[];
+  bonusHistory: BonusHistoryEntry[];
 }
 
 export const defaultGameState: LocalGameState = {
@@ -46,6 +54,7 @@ export const defaultGameState: LocalGameState = {
   bonusPoints: 0,
   viewedProductIds: [],
   cartProductIds: [],
+  bonusHistory: [],
 };
 
 export function loadGameState(userId?: string | null): LocalGameState {
@@ -84,7 +93,10 @@ export function awardBonus(amount: number, label: string, emoji = "✨", userId?
   if (typeof window === "undefined" || amount <= 0) return;
   if (!gameStorageKey(userId)) return;
   const s = loadGameState(userId);
+  const entry: BonusHistoryEntry = { amount, label, emoji, ts: Date.now() };
+  const history = [entry, ...(s.bonusHistory ?? [])].slice(0, 100);
   s.bonusPoints = (s.bonusPoints ?? 0) + amount;
+  s.bonusHistory = history;
   saveGameState(s, userId);
   window.dispatchEvent(
     new CustomEvent<BonusEvent>("bmkicks:bonus-awarded", {

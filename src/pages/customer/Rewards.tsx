@@ -785,34 +785,67 @@ export default function Rewards() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {transactions.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-6 text-center">No activity yet.</p>
-          ) : (
-            <div className="divide-y divide-border/40">
-              {transactions.map((t) => (
-                <div key={t.id} className="flex items-center justify-between py-3">
-                  <div>
-                    <p className="text-sm font-medium">{t.description || t.type}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(t.created_at).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </p>
+          {(() => {
+            const bonusEntries = (game.bonusHistory ?? []).map((b, i) => ({
+              id: `bonus-${b.ts}-${i}`,
+              description: b.label,
+              type: "earn_bonus",
+              delta: b.amount,
+              created_at: new Date(b.ts).toISOString(),
+              emoji: b.emoji,
+              _bonus: true as const,
+            }));
+            const merged = [
+              ...transactions.map((t) => ({ ...t, _bonus: false as const })),
+              ...bonusEntries,
+            ].sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            );
+            if (merged.length === 0) {
+              return (
+                <p className="text-sm text-muted-foreground py-6 text-center">
+                  No activity yet.
+                </p>
+              );
+            }
+            return (
+              <div className="divide-y divide-border/40">
+                {merged.map((t: any) => (
+                  <div key={t.id} className="flex items-center justify-between py-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {t.emoji && <span className="text-base">{t.emoji}</span>}
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {t.description || t.type}
+                          {t._bonus && (
+                            <span className="ml-2 text-[10px] uppercase tracking-wider text-muted-foreground border border-border/60 rounded px-1.5 py-0.5">
+                              Bonus
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(t.created_at).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`font-display text-base ${
+                        t.delta > 0 ? "text-[#4ade80]" : "text-muted-foreground"
+                      }`}
+                    >
+                      {t.delta > 0 ? "+" : ""}
+                      {t.delta.toLocaleString()}
+                    </span>
                   </div>
-                  <span
-                    className={`font-display text-base ${
-                      t.delta > 0 ? "text-[#4ade80]" : "text-muted-foreground"
-                    }`}
-                  >
-                    {t.delta > 0 ? "+" : ""}
-                    {t.delta.toLocaleString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
         </CardContent>
       </Card>
     </div>
