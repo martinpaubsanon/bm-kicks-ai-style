@@ -1,4 +1,4 @@
-import { ShoppingCart, Menu, Search, User, LogOut, Package, UserCircle, LayoutDashboard, Gift } from "lucide-react";
+import { ShoppingCart, Menu, Search, User, LogOut, Package, UserCircle, LayoutDashboard, Gift, Home, ShoppingBag, Shield, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -9,6 +9,7 @@ import { useLoyalty } from "@/hooks/useLoyalty";
 import CartDrawer from "@/components/CartDrawer";
 import { InlineSearch } from "@/components/InlineSearch";
 import { CurrencySelector } from "@/components/CurrencySelector";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,10 +23,18 @@ export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const { user, customerProfile, signOut } = useAuth();
+  const { user, customerProfile, isAdmin, signOut } = useAuth();
   const { cartCount } = useCart();
   const { account, currentTier, combinedScore } = useLoyalty();
   const navigate = useNavigate();
+
+  const displayName = customerProfile?.full_name || user?.email?.split("@")[0] || "Account";
+  const initial = (customerProfile?.full_name || user?.email || "U").charAt(0).toUpperCase();
+
+  const go = (path: string) => {
+    setMobileMenuOpen(false);
+    navigate(path);
+  };
 
   return (
     <header className="fixed top-3 left-0 right-0 z-50 px-3 md:px-6 transition-all duration-300">
@@ -59,9 +68,9 @@ export const Header = () => {
                 className={`rounded-full ${user ? "ring-1 ring-gold/40" : ""}`}
                 aria-label="User menu"
               >
-                {user && customerProfile ? (
+                {user ? (
                   <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-gradient-accent text-primary-foreground flex items-center justify-center font-semibold text-xs md:text-sm shadow-glow">
-                    {customerProfile.full_name?.charAt(0) || "U"}
+                    {initial}
                   </div>
                 ) : (
                   <User className="h-4 w-4 md:h-5 md:w-5" />
@@ -69,11 +78,11 @@ export const Header = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 glass-strong border-border/60">
-              {user && customerProfile ? (
+              {user ? (
                 <>
                   <DropdownMenuLabel>
                     <div className="flex flex-col gap-1">
-                      <span className="font-semibold">{customerProfile.full_name}</span>
+                      <span className="font-semibold">{displayName}</span>
                       <span className="text-xs text-muted-foreground">{user.email}</span>
                       {account && (
                         <div className="mt-2 flex items-center justify-between px-2 py-1.5 rounded-lg bg-primary/10 border border-primary/20">
@@ -91,6 +100,12 @@ export const Header = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate('/admin')}>
+                      <Shield className="mr-2 h-4 w-4 text-gold" />
+                      Admin Dashboard
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={() => navigate('/customer')}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
@@ -143,7 +158,7 @@ export const Header = () => {
             variant="ghost"
             size="icon"
             className="md:hidden rounded-full"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => setMobileMenuOpen(true)}
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
@@ -151,6 +166,84 @@ export const Header = () => {
         </div>
       </div>
 
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="right" className="w-[85vw] sm:w-96 glass-strong border-border/60 p-0">
+          <SheetHeader className="px-5 pt-6 pb-4 border-b border-border/40">
+            <SheetTitle className="font-display text-lg uppercase tracking-wider">
+              {user ? displayName : "Menu"}
+            </SheetTitle>
+            {user && (
+              <span className="text-xs text-muted-foreground">{user.email}</span>
+            )}
+          </SheetHeader>
+
+          <div className="flex flex-col p-2">
+            <Button variant="ghost" className="justify-start h-12" onClick={() => go("/")}>
+              <Home className="mr-3 h-4 w-4" /> Home
+            </Button>
+            <Button variant="ghost" className="justify-start h-12" onClick={() => go("/#products")}>
+              <ShoppingBag className="mr-3 h-4 w-4" /> Shop
+            </Button>
+            <Button
+              variant="ghost"
+              className="justify-start h-12"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setSearchOpen(true);
+              }}
+            >
+              <Search className="mr-3 h-4 w-4" /> Search
+            </Button>
+
+            <div className="my-2 border-t border-border/40" />
+
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Button variant="ghost" className="justify-start h-12" onClick={() => go("/admin")}>
+                    <Shield className="mr-3 h-4 w-4 text-gold" /> Admin Dashboard
+                  </Button>
+                )}
+                <Button variant="ghost" className="justify-start h-12" onClick={() => go("/customer")}>
+                  <LayoutDashboard className="mr-3 h-4 w-4" /> Dashboard
+                </Button>
+                <Button variant="ghost" className="justify-start h-12" onClick={() => go("/customer/rewards")}>
+                  <Gift className="mr-3 h-4 w-4 text-gold" /> Rewards
+                </Button>
+                <Button variant="ghost" className="justify-start h-12" onClick={() => go("/customer/badges")}>
+                  <Trophy className="mr-3 h-4 w-4 text-gold" /> Badges
+                </Button>
+                <Button variant="ghost" className="justify-start h-12" onClick={() => go("/customer/orders")}>
+                  <Package className="mr-3 h-4 w-4" /> My Orders
+                </Button>
+                <Button variant="ghost" className="justify-start h-12" onClick={() => go("/customer/profile")}>
+                  <UserCircle className="mr-3 h-4 w-4" /> Profile
+                </Button>
+                <div className="my-2 border-t border-border/40" />
+                <Button
+                  variant="ghost"
+                  className="justify-start h-12 text-destructive"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    signOut();
+                  }}
+                >
+                  <LogOut className="mr-3 h-4 w-4" /> Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" className="justify-start h-12" onClick={() => go("/auth")}>
+                  <User className="mr-3 h-4 w-4" /> Login
+                </Button>
+                <Button variant="default" className="justify-start h-12 mt-1" onClick={() => go("/auth?tab=signup")}>
+                  Sign Up
+                </Button>
+              </>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
     </header>
