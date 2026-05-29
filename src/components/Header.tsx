@@ -22,13 +22,22 @@ import {
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, customerProfile, isAdmin, signOut } = useAuth();
-
+  const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const { user, customerProfile, signOut } = useAuth();
+  const { user, customerProfile, isAdmin, signOut } = useAuth();
   const { cartCount } = useCart();
   const { account, currentTier, combinedScore } = useLoyalty();
   const navigate = useNavigate();
+
+  const displayName = customerProfile?.full_name || user?.email?.split("@")[0] || "Account";
+  const initial = (customerProfile?.full_name || user?.email || "U").charAt(0).toUpperCase();
+
+  const go = (path: string) => {
+    setMobileMenuOpen(false);
+    navigate(path);
+  };
+
+
 
   return (
     <header className="fixed top-3 left-0 right-0 z-50 px-3 md:px-6 transition-all duration-300">
