@@ -147,7 +147,8 @@ export const CategorySection = () => {
                 key={index}
                 onClick={() => scrollToCategory(category.category)}
                 className="group text-left"
-              >
+                <Card className="overflow-hidden h-[220px] sm:h-[300px] md:h-[400px] relative cursor-pointer border-border hover:shadow-2xl transition-all duration-300">
+
                 <Card className="overflow-hidden h-[400px] relative cursor-pointer border-border hover:shadow-2xl transition-all duration-300">
                   <div className="absolute inset-0">
                     <img
