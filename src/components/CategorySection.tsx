@@ -160,14 +160,15 @@ export const CategorySection = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                   </div>
 
-                  <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
-                    <h3 className="text-3xl font-bold mb-2">{category.title}</h3>
-                    <p className="text-white/90 mb-4">{category.description}</p>
-                    <div className="flex items-center gap-2 text-accent font-semibold group-hover:gap-4 transition-all">
+                  <div className="absolute inset-0 p-4 md:p-8 flex flex-col justify-end text-white">
+                    <h3 className="text-xl md:text-3xl font-bold mb-1 md:mb-2">{category.title}</h3>
+                    <p className="text-xs md:text-base text-white/90 mb-2 md:mb-4 line-clamp-2">{category.description}</p>
+                    <div className="flex items-center gap-2 text-accent font-semibold text-sm md:text-base group-hover:gap-4 transition-all">
                       Shop Now
-                      <ArrowRight className="h-5 w-5" />
+                      <ArrowRight className="h-4 w-4 md:h-5 md:w-5" />
                     </div>
                   </div>
+
                 </Card>
               </button>
             );
