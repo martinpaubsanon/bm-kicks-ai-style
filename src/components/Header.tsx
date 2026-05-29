@@ -68,12 +68,9 @@ export const Header = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`rounded-full ${user ? "ring-1 ring-gold/40" : ""}`}
-                aria-label="User menu"
-              >
-                {user && customerProfile ? (
+                {user ? (
                   <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-gradient-accent text-primary-foreground flex items-center justify-center font-semibold text-xs md:text-sm shadow-glow">
-                    {customerProfile.full_name?.charAt(0) || "U"}
+                    {initial}
                   </div>
                 ) : (
                   <User className="h-4 w-4 md:h-5 md:w-5" />
@@ -81,11 +78,11 @@ export const Header = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 glass-strong border-border/60">
-              {user && customerProfile ? (
+              {user ? (
                 <>
                   <DropdownMenuLabel>
                     <div className="flex flex-col gap-1">
-                      <span className="font-semibold">{customerProfile.full_name}</span>
+                      <span className="font-semibold">{displayName}</span>
                       <span className="text-xs text-muted-foreground">{user.email}</span>
                       {account && (
                         <div className="mt-2 flex items-center justify-between px-2 py-1.5 rounded-lg bg-primary/10 border border-primary/20">
@@ -103,6 +100,12 @@ export const Header = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate('/admin')}>
+                      <Shield className="mr-2 h-4 w-4 text-gold" />
+                      Admin Dashboard
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={() => navigate('/customer')}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
@@ -135,6 +138,16 @@ export const Header = () => {
                   </DropdownMenuItem>
                 </>
               )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative rounded-full"
+            onClick={() => setCartOpen(true)}
+            aria-label="Shopping cart"
+          >
+
             </DropdownMenuContent>
           </DropdownMenu>
           <Button
