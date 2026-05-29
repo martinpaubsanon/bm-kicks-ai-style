@@ -8,6 +8,9 @@ import { ProductFilters } from "./ProductFilters";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
 import { useDebounce } from "@/hooks/use-debounce";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { SlidersHorizontal } from "lucide-react";
+
 
 interface Product {
   id: string;
@@ -357,8 +360,49 @@ export const AllProducts = () => {
           </div>
         )}
 
+        {/* Mobile filter trigger */}
+        <div className="lg:hidden mb-4 flex justify-end">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                Filters
+                {(selectedBrands.length > 0 || inStockOnly || showFeaturedOnly || showLimitedOnly) && (
+                  <span className="ml-1 h-2 w-2 rounded-full bg-primary" />
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[85vw] sm:w-96 p-0 overflow-y-auto">
+              <SheetHeader className="px-4 pt-4">
+                <SheetTitle>Filter & Sort</SheetTitle>
+              </SheetHeader>
+              <div className="p-2">
+                <ProductFilters
+                  searchQuery={searchQuery}
+                  onSearchQueryChange={setSearchQuery}
+                  priceRange={priceRange}
+                  onPriceRangeChange={setPriceRange}
+                  selectedBrands={selectedBrands}
+                  onBrandToggle={handleBrandToggle}
+                  sortBy={sortBy}
+                  onSortChange={setSortBy}
+                  onClearFilters={handleClearFilters}
+                  inStockOnly={inStockOnly}
+                  onInStockToggle={() => setInStockOnly(!inStockOnly)}
+                  showFeaturedOnly={showFeaturedOnly}
+                  onFeaturedToggle={() => setShowFeaturedOnly(!showFeaturedOnly)}
+                  showLimitedOnly={showLimitedOnly}
+                  onLimitedToggle={() => setShowLimitedOnly(!showLimitedOnly)}
+                  availableBrands={availableBrands}
+                  maxPrice={maxPrice}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         <div className="grid lg:grid-cols-[280px_1fr] gap-4 md:gap-8">
-          <aside className="lg:sticky lg:top-4 lg:self-start">
+          <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start">
             <ProductFilters
               searchQuery={searchQuery}
               onSearchQueryChange={setSearchQuery}
@@ -380,11 +424,11 @@ export const AllProducts = () => {
             />
           </aside>
 
-          <div>
+          <div id="all-products-grid" className="scroll-mt-24">
             {filteredProducts.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-muted-foreground text-lg mb-2">
-                  {debouncedSearchQuery 
+                  {debouncedSearchQuery
                     ? `No products found for "${debouncedSearchQuery}"`
                     : "No products match your filters."}
                 </p>
@@ -396,7 +440,7 @@ export const AllProducts = () => {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {filteredProducts.map(product => (
                   <ProductCard
                     key={product.id}

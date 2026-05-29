@@ -1,15 +1,23 @@
 import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 import type { BonusEvent } from "@/lib/badges";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ActiveBonus extends BonusEvent {
   id: number;
 }
 
 export function BonusToast() {
+  const { user } = useAuth();
   const [stack, setStack] = useState<ActiveBonus[]>([]);
 
   useEffect(() => {
+    // Only listen for bonus events while the user is signed in — guests
+    // should never see "+pts earned" notifications.
+    if (!user) {
+      setStack([]);
+      return;
+    }
     let nextId = 1;
     const handler = (e: Event) => {
       const detail = (e as CustomEvent<BonusEvent>).detail;
@@ -22,7 +30,8 @@ export function BonusToast() {
     };
     window.addEventListener("bmkicks:bonus-awarded", handler);
     return () => window.removeEventListener("bmkicks:bonus-awarded", handler);
-  }, []);
+  }, [user]);
+
 
   if (stack.length === 0) return null;
 

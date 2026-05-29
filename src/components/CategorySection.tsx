@@ -52,15 +52,18 @@ const categories = [
 
 export const CategorySection = () => {
   const scrollToCategory = (category: string) => {
-    const element = document.getElementById("all-products");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setTimeout(() => {
-        window.history.pushState({}, "", `?category=${category}`);
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      }, 500);
-    }
+    // Update URL first so AllProducts filters before we scroll
+    window.history.pushState({}, "", `?category=${category}`);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    // Wait a tick for the filter to apply, then scroll directly to the product grid
+    setTimeout(() => {
+      const target =
+        document.getElementById("all-products-grid") ||
+        document.getElementById("all-products");
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
   };
+
 
   return (
     <section className="py-20 bg-background">
@@ -77,7 +80,8 @@ export const CategorySection = () => {
             if (category.comingSoon) {
               return (
                 <div key={index} className="group text-left cursor-default">
-                  <Card className="overflow-hidden h-[400px] relative border-border">
+                  <Card className="overflow-hidden h-[220px] sm:h-[300px] md:h-[400px] relative border-border">
+
                     {/* Background image */}
                     <div className="absolute inset-0">
                       <img
@@ -144,7 +148,8 @@ export const CategorySection = () => {
                 onClick={() => scrollToCategory(category.category)}
                 className="group text-left"
               >
-                <Card className="overflow-hidden h-[400px] relative cursor-pointer border-border hover:shadow-2xl transition-all duration-300">
+                <Card className="overflow-hidden h-[220px] sm:h-[300px] md:h-[400px] relative cursor-pointer border-border hover:shadow-2xl transition-all duration-300">
+
                   <div className="absolute inset-0">
                     <img
                       src={category.image}
@@ -155,14 +160,15 @@ export const CategorySection = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                   </div>
 
-                  <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
-                    <h3 className="text-3xl font-bold mb-2">{category.title}</h3>
-                    <p className="text-white/90 mb-4">{category.description}</p>
-                    <div className="flex items-center gap-2 text-accent font-semibold group-hover:gap-4 transition-all">
+                  <div className="absolute inset-0 p-4 md:p-8 flex flex-col justify-end text-white">
+                    <h3 className="text-xl md:text-3xl font-bold mb-1 md:mb-2">{category.title}</h3>
+                    <p className="text-xs md:text-base text-white/90 mb-2 md:mb-4 line-clamp-2">{category.description}</p>
+                    <div className="flex items-center gap-2 text-accent font-semibold text-sm md:text-base group-hover:gap-4 transition-all">
                       Shop Now
-                      <ArrowRight className="h-5 w-5" />
+                      <ArrowRight className="h-4 w-4 md:h-5 md:w-5" />
                     </div>
                   </div>
+
                 </Card>
               </button>
             );
