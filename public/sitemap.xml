@@ -6,6 +6,21 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://bmkicks.shop/auth</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://bmkicks.shop/checkout</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://bmkicks.shop/customer/order-success</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://bmkicks.shop/privacy-policy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>

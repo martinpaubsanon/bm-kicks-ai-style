@@ -166,7 +166,7 @@ export const AIShoeConsultant = ({ isOpen, onOpenChange }: AIShoeConsultantProps
               <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary-foreground" />
             </div>
             <div>
-              <h2 className="text-base md:text-lg font-bold tracking-tight">AI Shoe Consultant</h2>
+              <h2 className="text-base md:text-lg font-bold tracking-tight">BMKicks</h2>
               <p className="text-[10px] md:text-xs text-muted-foreground">Powered by AI • Instant Recommendations</p>
             </div>
           </div>
