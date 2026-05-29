@@ -22,7 +22,8 @@ import {
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
+  const { user, customerProfile, isAdmin, signOut } = useAuth();
+
   const [searchOpen, setSearchOpen] = useState(false);
   const { user, customerProfile, signOut } = useAuth();
   const { cartCount } = useCart();
