@@ -8,6 +8,9 @@ import { ProductFilters } from "./ProductFilters";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
 import { useDebounce } from "@/hooks/use-debounce";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { SlidersHorizontal } from "lucide-react";
+
 
 interface Product {
   id: string;
