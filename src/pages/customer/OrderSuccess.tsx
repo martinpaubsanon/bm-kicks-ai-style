@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Package, ShoppingBag, Clock } from "lucide-react";
 import { Header } from "@/components/Header";
+import { PageSEO } from "@/components/seo/PageSEO";
 
 interface OrderItem {
   product_name: string;
@@ -72,6 +73,7 @@ export default function OrderSuccess() {
 
   return (
     <>
+      <PageSEO title="Order Confirmed | BM Kicks" description="Your BM Kicks order has been confirmed." noIndex />
       <Header />
       <div className="min-h-screen bg-background pt-24 pb-12">
         <div className="container max-w-2xl">

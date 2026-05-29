@@ -94,7 +94,7 @@ export default function Checkout() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-      <PageSEO title="Checkout | BM Kicks" description="Securely complete your sneaker order with flexible payment and pre-order options." path="/checkout" />
+      <PageSEO title="Checkout | BM Kicks" description="Securely complete your sneaker order with flexible payment and pre-order options." path="/checkout" noIndex />
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground mb-4">Your cart is empty</p>

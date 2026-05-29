@@ -116,7 +116,7 @@ export default function CustomerAuth() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
-      <PageSEO title="Sign In or Create Account | BM Kicks" description="Sign in or create your BM Kicks account to shop sneakers, track orders, and earn rewards." path="/auth" />
+      <PageSEO title="Sign In or Create Account | BM Kicks" description="Sign in or create your BM Kicks account to shop sneakers, track orders, and earn rewards." path="/auth" noIndex />
       <div className="w-full max-w-md space-y-4">
         <h1 className="text-center text-2xl font-bold text-foreground">Customer Login or Create Account</h1>
         <Card>
