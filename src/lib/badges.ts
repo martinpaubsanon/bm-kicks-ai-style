@@ -93,7 +93,10 @@ export function awardBonus(amount: number, label: string, emoji = "✨", userId?
   if (typeof window === "undefined" || amount <= 0) return;
   if (!gameStorageKey(userId)) return;
   const s = loadGameState(userId);
+  const entry: BonusHistoryEntry = { amount, label, emoji, ts: Date.now() };
+  const history = [entry, ...(s.bonusHistory ?? [])].slice(0, 100);
   s.bonusPoints = (s.bonusPoints ?? 0) + amount;
+  s.bonusHistory = history;
   saveGameState(s, userId);
   window.dispatchEvent(
     new CustomEvent<BonusEvent>("bmkicks:bonus-awarded", {
