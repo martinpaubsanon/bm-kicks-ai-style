@@ -1,4 +1,4 @@
-import { ShoppingCart, Menu, Search, User, LogOut, Package, UserCircle, LayoutDashboard, Gift } from "lucide-react";
+import { ShoppingCart, Menu, Search, User, LogOut, Package, UserCircle, LayoutDashboard, Gift, Home, ShoppingBag, Shield, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -9,6 +9,7 @@ import { useLoyalty } from "@/hooks/useLoyalty";
 import CartDrawer from "@/components/CartDrawer";
 import { InlineSearch } from "@/components/InlineSearch";
 import { CurrencySelector } from "@/components/CurrencySelector";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
