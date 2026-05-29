@@ -52,15 +52,18 @@ const categories = [
 
 export const CategorySection = () => {
   const scrollToCategory = (category: string) => {
-    const element = document.getElementById("all-products");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setTimeout(() => {
-        window.history.pushState({}, "", `?category=${category}`);
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      }, 500);
-    }
+    // Update URL first so AllProducts filters before we scroll
+    window.history.pushState({}, "", `?category=${category}`);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    // Wait a tick for the filter to apply, then scroll directly to the product grid
+    setTimeout(() => {
+      const target =
+        document.getElementById("all-products-grid") ||
+        document.getElementById("all-products");
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
   };
+
 
   return (
     <section className="py-20 bg-background">
