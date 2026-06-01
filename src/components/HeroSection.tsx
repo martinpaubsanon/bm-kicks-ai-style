@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare, Sparkles, ArrowRight, Gift } from "lucide-react";
 import { Link } from "react-router-dom";
 import bmKicksLogo from "@/assets/bm-kicks-logo.png";
-import { Sneaker3DCarousel } from "@/components/Sneaker3DCarousel";
+import { HeroSneaker360 } from "@/components/HeroSneaker360";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoyalty } from "@/hooks/useLoyalty";
 
