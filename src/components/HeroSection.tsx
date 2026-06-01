@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare, Sparkles, ArrowRight, Gift } from "lucide-react";
 import { Link } from "react-router-dom";
 import bmKicksLogo from "@/assets/bm-kicks-logo.png";
-import { Sneaker3DCarousel } from "@/components/Sneaker3DCarousel";
+import { HeroSneaker360 } from "@/components/HeroSneaker360";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoyalty } from "@/hooks/useLoyalty";
 
@@ -154,7 +154,7 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
             <div className="relative flex justify-center items-center min-h-[340px] lg:min-h-[480px]">
               <div className="absolute w-full h-full bg-primary/10 rounded-full blur-[80px]" />
               <div className="relative z-10 w-full">
-                <Sneaker3DCarousel />
+                <HeroSneaker360 />
                 {/* Logo overlay */}
                 <img
                   src={bmKicksLogo}
