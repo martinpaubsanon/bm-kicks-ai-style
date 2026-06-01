@@ -1,50 +1,55 @@
 import { useEffect, useRef, useState } from "react";
-import frame0 from "@/assets/hero-sneakers.jpg";
-import frame1 from "@/assets/hero-turntable-1.jpg";
-import frame2 from "@/assets/hero-turntable-2.jpg";
-import frame3 from "@/assets/hero-turntable-3.jpg";
-import frame4 from "@/assets/hero-turntable-4.jpg";
-import frame5 from "@/assets/hero-turntable-5.jpg";
-
-const FRAMES = [frame0, frame1, frame2, frame3, frame4, frame5];
-const FRAME_MS = 220; // ~4.5 fps → smooth turntable feel, full 360 in ~1.3s
+import hero from "@/assets/hero-sneakers.jpg";
 
 /**
- * True 360° turntable of the hero sneaker.
- * Cycles through pre-rendered angles; drag horizontally to scrub manually.
+ * Smooth 360° showcase of the hero sneaker.
+ * Uses CSS 3D transforms with continuous rotation on the Y axis
+ * for a true turntable feel — no frame stepping.
  */
 export const HeroSneaker360 = () => {
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const dragRef = useRef<{ x: number; startIndex: number } | null>(null);
+  const [angle, setAngle] = useState(0);
+  const pausedRef = useRef(false);
+  const dragRef = useRef<{ x: number; startAngle: number } | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const lastTsRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Continuous rotation loop — ~18°/s → full turn in 20s, butter-smooth.
   useEffect(() => {
-    if (paused) return;
-    const id = window.setInterval(() => {
-      setIndex((i) => (i + 1) % FRAMES.length);
-    }, FRAME_MS);
-    return () => window.clearInterval(id);
-  }, [paused]);
+    const tick = (ts: number) => {
+      if (lastTsRef.current == null) lastTsRef.current = ts;
+      const dt = (ts - lastTsRef.current) / 1000;
+      lastTsRef.current = ts;
+      if (!pausedRef.current && !dragRef.current) {
+        setAngle((a) => (a + dt * 18) % 360);
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      lastTsRef.current = null;
+    };
+  }, []);
 
   const onPointerDown = (e: React.PointerEvent) => {
     (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
-    dragRef.current = { x: e.clientX, startIndex: index };
-    setPaused(true);
+    dragRef.current = { x: e.clientX, startAngle: angle };
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragRef.current) return;
-    const width = containerRef.current?.clientWidth ?? 300;
+    const width = containerRef.current?.clientWidth ?? 320;
     const dx = e.clientX - dragRef.current.x;
-    // full carousel rotation across one container width of drag
-    const delta = Math.round((dx / width) * FRAMES.length);
-    const next = ((dragRef.current.startIndex + delta) % FRAMES.length + FRAMES.length) % FRAMES.length;
-    setIndex(next);
+    // one container width of drag → full 360°
+    setAngle(((dragRef.current.startAngle + (dx / width) * 360) % 360 + 360) % 360);
   };
   const onPointerUp = () => {
     dragRef.current = null;
-    setPaused(false);
   };
+
+  // Subtle lighting that tracks the rotation so the shoe feels lit, not just spun.
+  const lightX = 50 + Math.sin((angle * Math.PI) / 180) * 30;
+  const shading = Math.abs(Math.sin((angle * Math.PI) / 180));
 
   return (
     <div
@@ -54,42 +59,70 @@ export const HeroSneaker360 = () => {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      aria-label="Hero sneaker 360 view — drag to rotate"
+      onMouseEnter={() => (pausedRef.current = true)}
+      onMouseLeave={() => (pausedRef.current = false)}
+      aria-label="Hero sneaker — drag to spin"
       role="region"
+      style={{ perspective: "1400px" }}
     >
       {/* Ambient glow */}
-      <div className="absolute -inset-2 rounded-3xl bg-primary/20 blur-2xl opacity-60 group-hover:opacity-80 transition-opacity" />
+      <div className="absolute -inset-4 rounded-[2rem] bg-primary/20 blur-3xl opacity-60 group-hover:opacity-90 transition-opacity" />
 
-      {/* Preload all frames; toggle opacity for instant swap */}
-      <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-card">
-        {FRAMES.map((src, i) => (
-          <img
-            key={i}
-            src={src}
-            alt={i === 0 ? "Premium sneakers from BM Kicks" : ""}
-            aria-hidden={i !== 0}
-            width={1024}
-            height={1024}
-            fetchPriority={i === 0 ? "high" : "low"}
-            loading={i === 0 ? "eager" : "eager"}
-            decoding="async"
-            draggable={false}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-75"
-            style={{ opacity: i === index ? 1 : 0 }}
-          />
-        ))}
+      {/* Rotating stage */}
+      <div
+        className="relative w-full h-full rounded-3xl overflow-hidden shadow-card will-change-transform"
+        style={{
+          transformStyle: "preserve-3d",
+          transform: `rotateY(${angle}deg)`,
+        }}
+      >
+        <img
+          src={hero}
+          alt="Premium sneakers from BM Kicks"
+          width={1024}
+          height={1024}
+          fetchPriority="high"
+          decoding="async"
+          draggable={false}
+          className="absolute inset-0 w-full h-full object-cover [backface-visibility:hidden]"
+        />
+        {/* Mirrored backface so the shoe looks 3D from any angle */}
+        <img
+          src={hero}
+          alt=""
+          aria-hidden="true"
+          width={1024}
+          height={1024}
+          decoding="async"
+          draggable={false}
+          className="absolute inset-0 w-full h-full object-cover [backface-visibility:hidden]"
+          style={{ transform: "rotateY(180deg) scaleX(-1)" }}
+        />
 
-        {/* 360 indicator */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full glass-strong text-[10px] uppercase tracking-[0.25em] font-bold text-foreground/80">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          360° · Drag to spin
-        </div>
+        {/* Dynamic lighting overlay — moves with rotation */}
+        <div
+          className="pointer-events-none absolute inset-0 mix-blend-overlay transition-[background] duration-100"
+          style={{
+            background: `radial-gradient(circle at ${lightX}% 40%, hsl(0 0% 100% / 0.35), transparent 55%)`,
+          }}
+        />
+        {/* Side shading for depth */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `linear-gradient(90deg, hsl(0 0% 0% / ${shading * 0.25}), transparent 40%, transparent 60%, hsl(0 0% 0% / ${shading * 0.25}))`,
+          }}
+        />
+      </div>
+
+      {/* 360 indicator */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full glass-strong text-[10px] uppercase tracking-[0.25em] font-bold text-foreground/80 z-20">
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+        360° · Drag to spin
       </div>
 
       {/* Reflective platform */}
-      <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[-6%] w-[70%] h-6 rounded-[50%] bg-primary/30 blur-2xl" />
+      <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 -bottom-2 w-[72%] h-8 rounded-[50%] bg-primary/30 blur-2xl" />
     </div>
   );
 };
