@@ -109,6 +109,10 @@ export default {
           "0%, 100%": { opacity: "0", transform: "scale(0)" },
           "50%": { opacity: "1", transform: "scale(1)" },
         },
+        "spin-y": {
+          "0%": { transform: "rotateY(0deg)" },
+          "100%": { transform: "rotateY(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.3s ease-out",
@@ -122,6 +126,7 @@ export default {
         "sparkle": "sparkle 1.5s ease-in-out infinite",
         "pulse-subtle": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "bounce-subtle": "bounce 2s infinite",
+        "spin-y": "spin-y 12s linear infinite",
       },
     },
   },
