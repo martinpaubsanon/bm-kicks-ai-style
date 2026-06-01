@@ -93,7 +93,7 @@ export const HeroSneaker360 = () => {
               aria-hidden={i !== 0}
               width={1024}
               height={1024}
-              fetchpriority={i === 0 ? "high" : "low"}
+              fetchPriority={i === 0 ? "high" : "low"}
               loading="eager"
               decoding="async"
               draggable={false}
