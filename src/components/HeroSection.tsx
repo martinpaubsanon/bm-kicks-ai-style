@@ -151,9 +151,9 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
             </div>
 
             {/* Right column visual */}
-            <div className="relative flex justify-center items-center min-h-[320px] lg:min-h-[480px]">
+            <div className="relative flex justify-center items-center min-h-[320px] lg:min-h-[480px]" style={{ perspective: "1200px" }}>
               <div className="absolute w-full h-full bg-primary/10 rounded-full blur-[80px]" />
-              <div className="relative z-10 group">
+              <div className="relative z-10 group" style={{ transformStyle: "preserve-3d" }}>
                 <div className="absolute -inset-2 rounded-3xl bg-primary/20 blur-2xl opacity-60 group-hover:opacity-80 transition-opacity" />
                 <img
                   src={heroImage}
@@ -163,7 +163,8 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
                   fetchPriority="high"
                   loading="eager"
                   decoding="async"
-                  className="relative rounded-3xl shadow-card w-full max-w-2xl aspect-square object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                  style={{ backfaceVisibility: "hidden" }}
+                  className="relative rounded-3xl shadow-card w-full max-w-2xl aspect-square object-cover animate-spin-y group-hover:[animation-play-state:paused]"
                 />
                 {/* Logo overlay */}
                 <img
@@ -172,9 +173,10 @@ export const HeroSection = ({ onAIClick }: HeroSectionProps) => {
                   aria-hidden="true"
                   width={96}
                   height={96}
-                  className="absolute -top-6 -left-6 w-20 h-20 md:w-24 md:h-24 rounded-2xl glass-strong p-2 shadow-glow"
+                  className="absolute -top-6 -left-6 w-20 h-20 md:w-24 md:h-24 rounded-2xl glass-strong p-2 shadow-glow z-20"
                 />
               </div>
+
 
               {/* Loyalty earn badge */}
               {settings && (() => {
